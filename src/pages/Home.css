@@ -1,0 +1,18 @@
+
+.home_main{
+    height: 100%;
+}
+.home_hub{
+    height: calc(100%);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Divide en 4 columnas iguales */
+}
+.big_card{
+    padding: 20px;
+    width: 100vh;
+}
+
+.small_card{
+    padding: 20px;
+    width: 60vh;
+}

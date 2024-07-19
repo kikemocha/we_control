@@ -1,0 +1,47 @@
+.card_main{
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+}
+.card_main h3{
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+.card_content{
+    background-color: white;
+    height: 95%;
+    width: 95%;
+    margin: auto;
+    border-radius: 40px;
+    border: 1px solid black;
+}
+.card_content p{
+    margin-top: 10px;
+    padding-left: 40px;
+    font-size: 0.8em;
+}
+.card_table{
+
+    padding: 0px 20px;
+    width: 100%;
+    height: 70%;
+    text-align: center;
+}
+.div_button_Card {
+    display: flex; /* Hacer que el contenedor use flexbox */
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    height: 20%; /* Asegúrate de que la altura sea adecuada */
+    padding: 10px; /* Añadir padding para evitar desbordamiento */
+}
+
+.button_Card {
+    background-color: yellow;
+    color: black;
+    border-radius: 40px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 15px 20px; /* Ajustar el padding para que el contenido encaje bien */
+    white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
+    box-sizing: border-box; /* Incluir padding y borde en el tamaño total del elemento */
+}

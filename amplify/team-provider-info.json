@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-wecontrol-dev-f8717-authRole",
+      "UnauthRoleArn": "arn:aws:iam::749018078828:role/amplify-wecontrol-dev-f8717-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::749018078828:role/amplify-wecontrol-dev-f8717-authRole",
+      "Region": "eu-west-1",
+      "DeploymentBucketName": "amplify-wecontrol-dev-f8717-deployment",
+      "UnauthRoleName": "amplify-wecontrol-dev-f8717-unauthRole",
+      "StackName": "amplify-wecontrol-dev-f8717",
+      "StackId": "arn:aws:cloudformation:eu-west-1:749018078828:stack/amplify-wecontrol-dev-f8717/31777080-45d0-11ef-bffa-06115388f1cf",
+      "AmplifyAppId": "d2almkar4lsvwg"
+    }
+  }
+}

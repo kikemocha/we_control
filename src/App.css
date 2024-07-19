@@ -1,38 +1,61 @@
-.App {
-  text-align: center;
+.main_action{
+    height: 100%;
+    padding: 20px;
+}
+.main_action h3{
+    font-size: 2em;
+}
+.main_action .upper_box{
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 40%;
+    height: 120px;
+    padding: 20px 30px;
+    font-weight: bold;
+}
+.main_action .upper_box div{
+    display: flex;
+    font-size: 2.5em;
+}
+.main_action .upper_box div span{
+    margin-left: auto;
+    margin-right: 40px;
+}
+.main_action .bottom_box{
+    height: 80%;
+    width: 95%;
+    margin-top: 40px;
+    margin-bottom: 0px;
+    border: 1px black solid;
+    border-radius: 30px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.bottom_box_top{
+    display: flex;
+    height: 70px;
+    align-items: center;
+    padding: 10px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.bottom_box_top p{
+    font-weight: bold;
+    font-size: 1.5em;
+    margin-left: 20px;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.bottom_box_top div{
+    margin-left: auto;
 }
-
-.App-link {
-  color: #61dafb;
+.bottom_box_top div select{
+    padding: 10px;
+    border-radius: 20px;
+    border: 0px;
+    margin-right: 20px;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.bottom_box_top div a{
+    margin-right: 20px;
+    background-color: yellow;
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    padding: 15px 40px;
+    border-radius: 20px;
 }
