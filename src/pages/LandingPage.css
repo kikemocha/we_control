@@ -1,0 +1,171 @@
+.landing_page header{
+    background-color: black;
+    color: white;
+    text-align: center;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bolder;
+    font-size: 30px;
+    letter-spacing: 4px;
+}
+.landing_page header span{
+    color: yellow;
+}
+.landing_page header .login_button{
+    background-color: yellow;
+    border: none;
+    border-radius: 30px;
+    
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+
+    padding: 10px 25px;
+    
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    
+    
+}
+.landing_page .second_div{
+    background-color: black;
+    display: flex;
+    padding: 50px;
+    height: 700px;
+    justify-content: center;
+
+}
+.landing_page .second_div img{
+    height: 300px;
+}
+.landing_page .intro_page{
+    background-color: white;
+    height: 800px;
+    width: 100%;
+    color: black;
+}
+.landing_page .contact_page{
+    background-color: black;
+    height: 10  00px;
+    width: 100%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+.contact_page h3{
+    text-align: center;
+    margin-top: 100px;
+    font-size: 2em;
+    margin-bottom: 0px;
+}
+.contact_page h3 span{
+    color: yellow;
+}
+.contact_page .contact_div{
+    margin: 0px auto;
+    background-color: black;
+    height: 60%;
+    width: 50%;
+}
+.contact_div form{
+    display: flex;
+    flex-direction: column;
+}
+.contact_div form p{
+    color: white;
+    width: 70%;
+    margin: auto;
+    height: auto;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+.contact_div form input{
+    padding: 10px 20px;
+    width: 70%;
+    margin: 20px auto;
+    height: 50px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2em;
+
+}
+.contact_div form input:focus{
+    background-color: rgb(255, 255, 218);
+    border: none;
+    outline: none;
+}
+.contact_div .description {
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: whitesmoke;
+    width: 80%; 
+    height: 300px;
+    border: none;
+    border-radius: 30px;
+    box-sizing: border-box; /* Para incluir el padding dentro del tamaño total */
+    text-align: left; /* Alineación del texto a la izquierda */
+    resize: none; /* Evita que se pueda redimensionar */
+    overflow-y: auto; /* Asegura que si hay demasiado texto, aparezca un scroll vertical */
+}
+.contact_div .description:focus{
+    background-color: rgb(255, 255, 218);
+    border: none;
+    outline: none;
+}
+.submit_contact{
+    width: 200px;
+    padding: 20px 10px;
+    color: black;
+    background-color: yellow;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: auto;
+}
+.submit_contact:hover{
+    background-color: rgb(255, 217, 0);
+}
+
+.landing_page footer{
+    background-color: black;
+    color: white;
+    height: 300px;
+}
+.palapadel{
+    height: 300px;
+    padding: auto;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    margin: 20px;
+    border-radius: 30px;
+    color: black;
+}
+.palapadel img{
+    margin: auto;
+    height: 200px;
+    width: 130px;
+}
+
+ul {
+    list-style-position: inside;
+    padding-left: 0;
+}
+  
+ul li {
+    display: flex;
+    margin-left: 20px; /* Ajusta este valor según sea necesario */
+}
+

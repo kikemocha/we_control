@@ -2,17 +2,217 @@
 .home_main{
     height: 100%;
 }
+.home_main .admin_home{
+    height: 100%;
+}
+.home_main .gestor_home{
+    height: 60%;
+}
+.responsable_home{
+    height: 89%;
+    width: 100%;
+}
+.responsable_main{
+    height: 70vh;
+    width: 90%;
+}
+.length-responsable{
+    height: 10%;
+}
+
+
+.table-container {
+    height: 260px; /* Ajusta la altura según tus necesidades */
+    overflow-y: auto;
+    border-radius: 30px;
+    position: relative;
+}
+
+.card_table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.card_table thead {
+    position: sticky;
+    top: 0;
+    background-color: white; /* O el color que prefieras */
+    z-index: 1;
+}
+.table-row th {
+    text-align: center;
+    height: 60px; /* Altura fija para los th y td */
+    border-top: none;
+    font-weight: bold;
+    font-size: 0.9em;
+    text-align: left;
+    padding: 8px; /* Añade padding si es necesario */
+}
+
+.table-row td {
+    text-align: center;
+    height: 60px; /* Altura fija para los th y td */
+    border-top: 1px solid black;
+    font-weight: lighter;
+    font-size: 0.9em;
+    text-align: left;
+    padding: 8px; /* Añade padding si es necesario */
+}
+
+.table-row th {
+    height: 40px; /* Altura fija para el encabezado */
+    font-size: 0.8em;
+    padding-left: 20px;
+}
+
+.table-row td {
+    height: 60px;
+    padding-left: 20px;
+}
+
+.table-row svg{
+    background-color: rgba(128, 128, 128, 0.555);
+    border-radius: 100px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.archive_responsable{
+    padding: 0px 20px;
+    cursor: pointer;
+}
+.archive_responsable .archive{
+    background-color: yellow;
+    border-radius: 40px;
+    overflow: hidden;
+    height: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .home_hub{
+    height: 100%;
+
+    position: relative;
     height: calc(100%);
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Divide en 4 columnas iguales */
 }
+.close-icon {
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    cursor: pointer;
+}
+
 .big_card{
     padding: 20px;
     width: 100vh;
+    height: 40vh;
 }
 
 .small_card{
     padding: 20px;
     width: 60vh;
+    height: 40vh;
+}
+
+/* ADMIN */
+.admin_boxes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    justify-content: start;
+    height: 100%;
+    width: 100%;
+    padding: 0px 80px;
+}
+  
+.bussiness_boxes {
+    cursor: pointer;
+    width: 80%;
+    padding: 10px;
+    margin: 20px;
+    background-color: rgba(255, 230, 0, 0.39);
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 2px solid black;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.bussiness_boxes h3{
+    margin-top: 10px;
+}
+.bussiness_boxes:hover{
+    background-color: rgba(255, 230, 0, 0.623);
+}
+
+
+.upper_box{
+    border: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    width: 400px;
+    height: 100px;
+    padding: 0px;
+    border-radius: 30px;
+    margin: 20px 0px;
+}
+
+.upper_box .text{
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+.upper_box .number{
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+.main_action{
+    height: 100%;
+}
+
+.riesgos_controles{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.riesgos_controles div{
+    background-color: yellow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 30px;
+    height: 40px;
+    width: 50px;
+    padding: 10px;
+    margin: 10px;
+    
+}
+.total_add{
+    display: flex;
+    align-items: center;    
+    justify-content: space-between;
+}
+.total_add svg{
+    margin-right: 200px;
+    background-color: yellow;
+    border-radius: 100px;
+    padding: 10px;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+}
+
+.card_option .table-container{
+    height: 100%;
+    padding: 20px 0px;
+    border: 1px solid black;
+    border-radius: 30px;
 }

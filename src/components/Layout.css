@@ -34,6 +34,7 @@ body {
     margin-bottom: 60px;
 }
 .sidebar {
+    position: relative;
     border-right: 1px solid grey;
     margin: 0px;
     margin-right: 40px;
@@ -64,6 +65,25 @@ body {
     color: black;
     text-decoration: none;
 }
+.signout_button {
+    background-color: yellow;
+    width: 80%;
+    padding: 10px 30px;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: background-color 0.3s ease; /* Añadir una transición para un efecto suave */
+  }
+  
+  .signout_button:hover {
+    background-color: orange;
+  }
+
 
 /* Estilos para el navbar */
 .navbar {

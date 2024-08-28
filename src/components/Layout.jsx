@@ -3,7 +3,7 @@ import React from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import { Outlet } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet';
 
 import './Layout.css';
 
@@ -11,7 +11,7 @@ const Layout = () => {
     return (
         <div>
             <Helmet>
-                <title>We Control</title>
+                <title>We Controol</title>
             </Helmet>
             <div className="layout-container">
             <Sidebar />

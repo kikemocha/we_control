@@ -1,3 +1,45 @@
 {
-  "hosting": {}
+  "auth": {
+    "amplifylogin267e17f9": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_amplifylogin267e17f9_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "amplifylogin267e17f9"
+        }
+      ]
+    },
+    "AMPLIFY_auth_amplifylogin267e17f9_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "amplifylogin267e17f9"
+        }
+      ]
+    },
+    "AMPLIFY_auth_amplifylogin267e17f9_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "amplifylogin267e17f9"
+        }
+      ]
+    },
+    "AMPLIFY_auth_amplifylogin267e17f9_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "amplifylogin267e17f9"
+        }
+      ]
+    }
+  }
 }

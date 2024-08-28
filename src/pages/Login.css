@@ -1,0 +1,64 @@
+.login-container{
+    background-color: black;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+}
+.form_login{
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    width: 600px;
+    height: 800px;
+    margin: auto;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    color: white;
+}
+.form_login img{
+    height: 300px;
+    width: 300px;
+    margin-bottom: 50px;
+}
+
+.form_login form{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.form_login form input{
+    margin: 20px 0px;
+    width: 400px;
+    height: 60px;
+    font-size: 1.1em;
+    padding: 15px 20px;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+}
+.form_login form button{
+    padding-top: 3px;
+    width: 150px;
+    margin: auto;
+    height: 40px;
+    border-radius: 30px;
+    border: none;
+    background-color: yellow;
+    font-weight: bold;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+.form_login form button:hover{
+    background-color: orange;
+}
+.form_login .change_passw_button{
+    width: 200px;
+    height: 90px;
+    text-align: center;
+}
+.form_login .change_passw_button:hover{
+    background-color: orange;
+}
