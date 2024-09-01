@@ -8,8 +8,8 @@
     font-size: 0.9em;
 }
 .card_content{
-    background-color: white;
-    height: 100%;
+    background-color: whitesmoke;
+    height: 110%;
     width: 95%;
     margin: auto;
     border-radius: 40px;
@@ -21,7 +21,6 @@
     font-size: 0.8em;
 }
 .card_table{
-
     padding: 0px 20px;
     width: 100%;
     height: 70%;
@@ -32,7 +31,6 @@
     justify-content: center; /* Centrar horizontalmente */
     align-items: center; /* Centrar verticalmente */
     height: 20%; /* Asegúrate de que la altura sea adecuada */
-    padding: 10px; /* Añadir padding para evitar desbordamiento */
 }
 
 .button_Card {

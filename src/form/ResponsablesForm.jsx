@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './Popup.css'; // Asegúrate de tener los estilos
 import { useAuth } from '../context/AuthContext';
 
-const GestoresForm = ({ show, onClose, fetchData }) => {
+const ResponsablesForm = ({ show, onClose, fetchData }) => {
   const {selectedEmpresa} = useAuth();
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
@@ -24,8 +24,8 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
       email: email,
       role: titulo,
       belongs_to: selectedEmpresa,
-      is_responsable: false,
-      is_gestor: true
+      is_responsable: true,
+      is_gestor: false
     };
 
     try {
@@ -70,7 +70,7 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
         </button>
 
         <form onSubmit={handleSubmit}>
-          <h4>NUEVO GESTOR</h4>
+          <h4>NUEVO RESPONSABLE</h4>
           <label>
             <p>Nombre</p>
             <input 
@@ -132,11 +132,11 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
           <div></div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
-          <button type="submit">Nuevo Gestor</button>
+          <button type="submit">Nuevo Responsables</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default GestoresForm;
+export default ResponsablesForm;

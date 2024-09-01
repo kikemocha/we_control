@@ -3,13 +3,9 @@ import React, { useState } from 'react';
 import './Popup.css'; // Asegúrate de tener los estilos
 import { useAuth } from '../context/AuthContext';
 
-const GestoresForm = ({ show, onClose, fetchData }) => {
+const AuditoriaForm = ({ show, onClose, fetchData }) => {
   const {selectedEmpresa} = useAuth();
   const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [titulo, setTitulo] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -19,17 +15,11 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
 
     const requestBody = {
       name: name,
-      surname: surname,
-      phone: phone,
-      email: email,
-      role: titulo,
       belongs_to: selectedEmpresa,
-      is_responsable: false,
-      is_gestor: true
     };
 
     try {
-      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertUser', {
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertAuditoria', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +60,7 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
         </button>
 
         <form onSubmit={handleSubmit}>
-          <h4>NUEVO GESTOR</h4>
+          <h4>NUEVA AUDITORÍA</h4>
           <label>
             <p>Nombre</p>
             <input 
@@ -80,63 +70,15 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required/>
-          </label>
-          <br />
-          <label>
-            <p>Apellido</p>
-            <input 
-              className='number_form_name' 
-              type="text" 
-              name="surname" 
-              value={surname}
-              onChange={(e) => setSurname(e.target.value)}
-              required/>
-          </label>
-          <br />
-          <label>
-            <p>Teléfono</p>
-            <input 
-              className='number_form_name' 
-              type="text" 
-              name="phone" 
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)} 
-              required/>
-          </label>
-          <br />
-
-          <label>
-            <p>email</p>
-            <input 
-              className='email' 
-              type="text" 
-              name="email"  
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required/>
-          </label>
-          <br />
-
-          <label>
-            <p>titulo</p>
-            <input 
-              className='calor_inherente' 
-              type="text" 
-              name="titulo"  
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              required/>
-          </label>
-          <br />
-          
+          </label>  
           <div></div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
-          <button type="submit">Nuevo Gestor</button>
+          <button type="submit">Nueva auditoría</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default GestoresForm;
+export default AuditoriaForm;

@@ -2,6 +2,8 @@
 import {React, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import ResponsablesForm from '../form/ResponsablesForm';
+
 
 const Responsables = () => {
     const {selectedEmpresa} = useAuth();
@@ -9,19 +11,24 @@ const Responsables = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [showPopup, setShowPopup] = useState(false);
+    const handleOpenPopup = () => setShowPopup(true);
+    const handleClosePopup = () => setShowPopup(false);
+
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa="+selectedEmpresa);
+            let data_clean = [];
+            data_clean = response.data
+            setData(data_clean);
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa="+selectedEmpresa);
-                let data_clean = [];
-                data_clean = response.data
-                setData(data_clean);
-            } catch (error) {
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, [selectedEmpresa]);
     
@@ -31,10 +38,27 @@ const Responsables = () => {
     }
 
     return <div className='card_option'>
-            <h3>Gestores</h3>
-            <div className='upper_box'>
-                <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
-                <div className='number'>{data.length}</div>
+            <ResponsablesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
+            <h3>Responsables</h3>
+            <div className='total_add'>
+                <div className='upper_box'>
+                    <div className='text'>Total de&nbsp;<strong>responsables</strong>:</div>
+                    <div className='number'>{data.length}</div>
+                </div>
+                <div onClick={handleOpenPopup}>
+                    <svg
+                        viewBox="0 0 1024 1024"
+                        fill="currentColor"
+                        height="2em"
+                        width="2em"
+                        >
+                        <defs>
+                            <style />
+                        </defs>
+                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                    </svg>
+                </div>
             </div>
             {data ? (
                 <div className='responsable_home'>
@@ -56,7 +80,7 @@ const Responsables = () => {
                                         <td>{responsable[3]}</td>
                                         <td>{responsable[5]}</td>
                                         <td>{responsable[4]}</td>
-                                        <td>{responsable[9]}</td>
+                                        <td>{responsable[10]}</td>
                                         <td>
                                             <svg
                                                 viewBox="0 0 24 24"

@@ -92,9 +92,7 @@
 }
 .home_hub{
     height: 100%;
-
     position: relative;
-    height: calc(100%);
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Divide en 4 columnas iguales */
 }

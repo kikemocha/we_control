@@ -157,3 +157,29 @@
     text-align: center;
     font-weight: bold;
 }
+.react-datepicker__navigation.react-datepicker__navigation--next,
+.react-datepicker__navigation.react-datepicker__navigation--previous {
+  width: 50px;  /* Cambiar el ancho a un tamaño más pequeño */
+  height: 30px; /* Cambiar la altura a un tamaño más pequeño */
+  background-color: yellow; /* Mantener el fondo amarillo */
+  border-radius: 20px; /* Darle una forma circular si es necesario */
+  box-shadow: none; /* Eliminar cualquier sombra si existe */
+  outline: none; /* Eliminar el contorno de enfoque si existe */
+  display: flex; /* Asegurar que el contenido esté centrado */
+  align-items: center; /* Centrar el contenido verticalmente */
+  justify-content: center; /* Centrar el contenido horizontalmente */
+}
+
+/* Estilo para los iconos de navegación dentro de los botones */
+react-datepicker__navigation-icon,
+react-datepicker__navigation-icon--next{
+  width: 10px; /* Ajustar el tamaño del icono */
+  height: 10px; /* Ajustar el tamaño del icono */
+  border-color: black; /* Cambiar el color del icono de navegación (la flecha) */
+}
+
+/* Asegurarse de que el color de fondo al pasar el ratón sea adecuado */
+.react-datepicker__navigation--next:hover,
+.react-datepicker__navigation--previous:hover {
+  background-color: #e0a800; /* Un tono más oscuro de amarillo al pasar el ratón */
+}

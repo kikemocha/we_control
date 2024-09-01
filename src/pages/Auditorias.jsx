@@ -2,7 +2,8 @@
 import {React, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-
+import AuditoriaForm from '../form/AuditoriaForm';
+import AuditoriaControlesForm from '../form/AuditoriaControlForm';
 
 const Auditorias = () => {
     const { selectedEmpresa } = useAuth();
@@ -12,6 +13,20 @@ const Auditorias = () => {
     const [selectedAuditoria, setSelectedAuditoria] = useState(null);
     const [ selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
     const [AuditoriaData, setAuditoriaData] = useState(null);
+
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupFormType, setPopupFormType] = useState(''); // Nuevo estado para controlar qué formulario mostrar
+
+
+    const handleOpenPopup = (formType) => {
+        setShowPopup(true);
+        setPopupFormType(formType); // Establecer el tipo de formulario a mostrar
+    };
+    const handleClosePopup = () => {
+        setShowPopup(false);
+        setPopupFormType(''); // Restablecer el tipo de formulario cuando se cierra el popup
+    };
+
 
     const handleAuditoria = (id_auditoria, name) => {
         setSelectedAuditoria(id_auditoria);
@@ -23,36 +38,37 @@ const Auditorias = () => {
         setAuditoriaData([]);
       }
 
-    useEffect(() => {
-        const fetchAuditoriaData = async () => {
-            if (selectedAuditoria) {
-                try {
-                    const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditoriaData?id_auditoria=${selectedAuditoria}`);
-                    setAuditoriaData(response.data);
-                } catch (error) {
-                    setError(error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-        };
     
-        fetchAuditoriaData();
-    }, [selectedAuditoria]);
-
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchAuditoriaData = async () => {
+        if (selectedAuditoria) {
             try {
-                const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa="+selectedEmpresa);
-                let data_clean = [];
-                data_clean = response.data
-                setData(data_clean);
+                const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditoriaData?id_auditoria=${selectedAuditoria}`);
+                console.log(response.data);
+                setAuditoriaData(response.data);
             } catch (error) {
                 setError(error);
             } finally {
                 setLoading(false);
             }
-        };
+        }
+    };
+    useEffect(() => {
+        fetchAuditoriaData();
+    }, [selectedAuditoria]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa="+selectedEmpresa);
+            let data_clean = [];
+            data_clean = response.data
+            setData(data_clean);
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {  
         fetchData();
     }, [AuditoriaData]);
     
@@ -63,7 +79,7 @@ const Auditorias = () => {
     
     return <div className='card_option'>
         {selectedAuditoria? (
-            <div>
+            <div>  
                 <div>
                     <svg 
                     className='close-icon'
@@ -84,52 +100,121 @@ const Auditorias = () => {
                     </svg>
                 </div>
                 <h3>{selectedAuditoriaName}</h3>
-            <div className='upper_box'>
-                <div className='text'>Total de auditorías:</div>
-                <div className='number'>{data.length}</div>
-            </div>
-            {AuditoriaData ? (
-                <div className='responsable_home'>
-                    <div className='responsable_main'>
-                        <div className="table-container">
-                            <div>
-                                <table className="card_table">
-                                <tr className="table-row">
-                                    <th>Número de Control</th>
-                                    <th>Nombre</th>
-                                    <th>Responsable</th>
-                                    <th>Fecha límite</th>
-                                    <th>Fecha de creación</th>
-                                    <th>Archivos subidos</th>
-                                    <th>Estado</th>
-                                </tr>
-                                {AuditoriaData.map((control, index) => (
-                                    <tr key={index} className="table-row">
-                                        <td>{control[0]}</td>
-                                        <td>{control[1]}</td>
-                                        <td>{control[2]}</td>
-                                        <td>{control[3]}</td>
-                                        <td>{control[4]}</td>
-                                        <td className='archive_responsable'><div className={control[5] ==='None' ? '' : 'archive'}>{control[5]}</div></td>
-                                        <td>{control[6]}</td>
-                                    </tr>
-                                ))}
-                            </table>
+                    {AuditoriaData ? (
+                        <div>
+                            {popupFormType === 'control' && (
+                                <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} selectedAuditoria={selectedAuditoria}/>
+                            )}
+                            {popupFormType === 'auditoria' && (
+                                <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                            )}
+                            <div className='total_add'>
+                                <div className='upper_box'>
+                                    <div className='text'>Total de auditorías:</div>
+                                    <div className='number'>{AuditoriaData.length}</div>
+                                </div>
+                                <div onClick={() => handleOpenPopup('control')}>
+                                    <svg
+                                        viewBox="0 0 1024 1024"
+                                        fill="currentColor"
+                                        height="2em"
+                                        width="2em"
+                                        >
+                                        <defs>
+                                            <style />
+                                        </defs>
+                                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div className='responsable_home'>
+                                <div className='responsable_main'>
+                                    <div className="table-container">
+                                        <div>
+                                            <table className="card_table">
+                                            <tr className="table-row">
+                                                <th>Número de Control</th>
+                                                <th>Nombre</th>
+                                                <th>Responsable</th>
+                                                <th>Fecha límite</th>
+                                                <th>Fecha de creación</th>
+                                                <th>Archivos subidos</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                            {AuditoriaData.map((control, index) => (
+                                                <tr key={index} className="table-row">
+                                                    <td>{control[0]}</td>
+                                                    <td>{control[1]}</td>
+                                                    <td>{control[2]}</td>
+                                                    <td>{control[3]}</td>
+                                                    <td>{control[4]}</td>
+                                                    <td className='archive_responsable'><div className={control[5] ==='None' ? '' : 'archive'}>{control[5]}</div></td>
+                                                    <td>{control[6]}</td>
+                                                </tr>
+                                            ))}
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            ):(
-                <div>Loading...</div>
-            )}
+                    ):(
+                        <div>
+                            <div>NO DATA</div>
+                                {popupFormType === 'control' && (
+                                    <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                                )}
+                                {popupFormType === 'control' && (
+                                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                                )}
+                            <div className='total_add'>
+                                <div onClick={() => handleOpenPopup('control')}>
+                                    <svg
+                                        viewBox="0 0 1024 1024"
+                                        fill="currentColor"
+                                        height="2em"
+                                        width="2em"
+                                        >
+                                        <defs>
+                                            <style />
+                                        </defs>
+                                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    )}
         </div>
         ):(
         <div>
             <h3>Auditorías</h3>
-            
-            <div className='upper_box'>
-                <div className='text'>Total de &nbsp;<strong>auditorías</strong>:</div>
-                <div className='number'>{data.length}</div>
+                {popupFormType === 'auditoria' && (
+                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                )}
+                {popupFormType === 'control' && (
+                    <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                )}
+            <div className='total_add'>
+                <div className='upper_box'>
+                    <div className='text'>Total de&nbsp;<strong>auditorías</strong>:</div>
+                    <div className='number'>{data.length}</div>
+                </div>
+                <div onClick={() => handleOpenPopup('auditoria')}>
+                    <svg
+                        viewBox="0 0 1024 1024"
+                        fill="currentColor"
+                        height="2em"
+                        width="2em"
+                        >
+                        <defs>
+                            <style />
+                        </defs>
+                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                    </svg>
+                </div>
             </div>
             
             <div className='responsable_home'>
