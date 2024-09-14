@@ -3,16 +3,20 @@ import Card from '../components/Card';
 import './Home.css';
 import EmpresasForm from '../form/EmpresasForm';
 
+
+import FileUploadPopup from '../form/UploadFile'; // Importa el nuevo componente
+
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
-import {jwtDecode} from "jwt-decode";
-import S3Image from '../components/S3Image';
+import ShowFile from '../form/ShowFile';
 
 const Home = () => {
+  
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
+  const [showIMGPopup, setshowIMGPopup] = useState(false);
 
   const { name, role, cognitoId, token, setSelectedEmpresa, selectedEmpresa, configureAwsCredentials} = useAuth();
-  const [prueba, setPrueba] = useState('');
   const [UserInfo, setUserInfo] = useState(null); // State para guardar los datos
   const [loading, setLoading] = useState(true); // Estado de carga
 
@@ -21,8 +25,14 @@ const Home = () => {
   const handleClosePopup = () => setShowPopup(false);
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedControl, setSelectedControl] = useState(null);
+
+  const [UserAuditoriaData, setUserAuditoriaData] = useState(null);
 
 
+  const handleUpload = async (file) => {
+    // Aquí va tu lógica de carga de archivos usando S3
+  };
   const [isCredentialsFetched, setIsCredentialsFetched] = useState(false);
 
   useEffect(() => {
@@ -51,6 +61,7 @@ const Home = () => {
   const fetchData = async () => {
     try {
         setData(data.empresas);
+        getUserData();
     } catch (error) {
         setError(error);
     } finally {
@@ -59,23 +70,31 @@ const Home = () => {
   };
 
   useEffect(() => {
-      fetchData();    
+      fetchData();
   }, [selectedEmpresa]);
 
 
+  const fetchUserAuditoriaData = async () => {
+    try {
+        const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserAuditoriaData?id_cognito="+cognitoId);
+        let data_clean = [];
+        data_clean = response.data
+        setUserAuditoriaData(data_clean);
+    } catch (error) {
+        setError(error);
+    } finally {
+        setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (role === 'admin') {
-      setPrueba('Eres admin');
       getUserData();
     } else if (role === 'gestor') {
-      setPrueba('Eres gestor');
       getUserData();
     } else if (role === 'responsable') {
-      setPrueba('Eres responsable');
       getUserData();
-    } else {
-      setPrueba('No se que eres');
+      fetchUserAuditoriaData();
     }
   }, [role]);
 
@@ -256,6 +275,7 @@ const Home = () => {
                 <div className='length-responsable'>
                   Controles Resultantes: {UserInfo.data.riesgos.length}
                 </div>
+                <div className='card_option'>
                 <div className="table-container">
                   {UserInfo && UserInfo.data && UserInfo.data.riesgos ? (
                       <div>
@@ -278,7 +298,37 @@ const Home = () => {
                               <td>{riesgo[4]}</td>
                               <td>{riesgo[5]}</td>
                               <td>{riesgo[6]}</td>
-                              <td className='archive_responsable'><div className={riesgo[7] ==='None' ? '' : 'archive'}>{riesgo[7]}</div></td>
+                              <td className='archive_responsable'>
+                                <div className={riesgo[7] === 'None' ? '' : 'archive'}>
+                                    {riesgo[7] === 'None' ? (
+                                      <>
+                                        <button className='archive_button' onClick={() => {
+                                              setShowUploadPopup(true);
+                                              setSelectedControl(riesgo);
+                                            }
+                                        }>Subir Archivo</button>
+                                        <FileUploadPopup
+                                          show={showUploadPopup}
+                                          onClose={() => setShowUploadPopup(false)}
+                                          onUpload={handleUpload}
+                                          selectedControl={selectedControl}
+                                          selectedAuditoria={riesgo[9]}
+                                          userData = {UserAuditoriaData}
+                                        />
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p onClick={() => setshowIMGPopup(true)}>{riesgo[7]}</p>
+                                        <ShowFile
+                                          show={showIMGPopup}
+                                          onClose={() => setshowIMGPopup(false)}
+                                          imgkey={riesgo[7]} // Pasamos el Key del archivo
+                                          bucketName={`empresa-${riesgo[10]}`}
+                                        />
+                                      </>
+                                    )}
+                                  </div>
+                                </td>
                               <td>{riesgo[8]}</td>
                             </tr>
                           ))}
@@ -288,6 +338,7 @@ const Home = () => {
                   ) : (
                     <div>No hay información disponible</div>
                   )}
+                </div>
                 </div>
               </div>
           ):(

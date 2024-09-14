@@ -72,7 +72,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
       id_responsable: selectedResponsable,
       limit_date: limitDate.toISOString().split('T')[0],
     };
-    console.log(requestBody);
+    console.log(selectedAuditoria, requestBody);
 
     try {
       const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
@@ -113,6 +113,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
 
   return (
     <div className="popup-overlay">
+      
       <div className="popup form_control">
         <button className="popup-close" onClick={onClose}>
           <svg fill="none" viewBox="0 0 15 15" height="1em" width="1em">

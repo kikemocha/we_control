@@ -6,6 +6,7 @@ import axios from 'axios';
 import './Login.css';
 import logo from '../we_control.png' ;
 
+
 const LogIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,14 +20,18 @@ const LogIn = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const { isSignedIn, nextStep } = await signIn({ username: email, password });
+      const { isSignedIn, nextStep } = await signIn({username: email, password });
+      const session = await fetchAuthSession(); 
+      // Acceder directamente al idToken de la sesión
+      
 
       if (isSignedIn) {
         const session = await fetchAuthSession(); // Obtén la sesión actual
-        const idToken = session.tokens.idToken;
+        const token = session.tokens.accessToken;
+        const idToken = localStorage.getItem(`CognitoIdentityServiceProvider.${token.payload.client_id}.${token.payload.sub}.idToken`);
         setToken(idToken); // Guarda el token en el contexto
         
-        const id_cognito = idToken.payload.sub;
+        const id_cognito = token.payload.sub;
         setCognitoId(id_cognito);
 
         // Realizar la llamada a la API para obtener la información del usuario
@@ -82,7 +87,6 @@ const LogIn = () => {
       if (result.isSignedIn) {
         const session = await fetchAuthSession(); // Obtén la sesión actual
         const idToken = session.tokens.idToken;
-
         setToken(idToken); // Guarda el token en el contexto
         const id_cognito = idToken.payload.sub;
         setCognitoId(id_cognito);

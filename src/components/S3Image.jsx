@@ -4,48 +4,50 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { useAuth } from '../context/AuthContext';
 
 const S3Image = ({ bucketName, imgkey, token }) => {
-    const [imageUrl, setImageUrl] = useState(null);
-    const [error, setError] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [error, setError] = useState(null);
   
-    const { awsCredentials } = useAuth();
-    useEffect(() => {
-        const fetchAwsCredentialsAndImage = async () => {
-        try {
-            console.log('AWS Credentials:', awsCredentials); // Verifica las credenciales
-            console.log('Bucket Name:', bucketName); // Verifica que el nombre del bucket es correcto
-            console.log('Key:', imgkey); // Verifica que la clave no esté vacía o sea undefined
+  const { awsCredentials } = useAuth();
 
-            // Paso 2: Configurar el cliente S3
-            const s3Client = new S3Client({
-            region: 'eu-west-1',
-            credentials: {
-                accessKeyId: awsCredentials.AccessKeyId,
-                secretAccessKey: awsCredentials.SecretAccessKey,
-                sessionToken: awsCredentials.SessionToken, // Opcional, si se requiere
-            },
-            });
+  useEffect(() => {
+    const fetchAwsCredentialsAndImage = async () => {
+      try {
+        console.log('AWS Credentials:', awsCredentials); 
+        console.log('Bucket Name:', bucketName); 
+        console.log('Key:', imgkey); 
 
-            // Paso 3: Obtener la URL firmada de S3
-            const command = new GetObjectCommand({ Bucket: bucketName, Key: imgkey });
-            const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-            
-            // Paso 4: Establecer la URL de la imagen
-            setImageUrl(url);
-        } catch (err) {
-            // Si ocurre algún error, establecer el mensaje de error
-            setError('No tienes permisos para ver esta imagen o hubo un problema.');
-            console.error('Error fetching image from S3:', err);
-        }
+        // Paso 2: Configurar el cliente S3
+        const s3Client = new S3Client({
+          region: 'eu-west-1',
+          credentials: {
+            accessKeyId: awsCredentials.AccessKeyId,
+            secretAccessKey: awsCredentials.SecretAccessKey,
+            sessionToken: awsCredentials.SessionToken,
+          },
+        });
+
+        const encodedImgKey = encodeURIComponent(imgkey);
+
+        // Paso 3: Obtener la URL firmada de S3
+        const command = new GetObjectCommand({ Bucket: bucketName, Key: imgkey , ResponseContentType: 'application/pdf'});
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        
+        // Paso 4: Establecer la URL de la imagen
+        setImageUrl(url);
+      } catch (err) {
+        setError('No tienes permisos para ver esta imagen o hubo un problema.');
+        console.error('Error fetching image from S3:', err);
+      }
     };
 
     fetchAwsCredentialsAndImage();
-  }, [bucketName, imgkey, token]);
+  }, [bucketName, imgkey, token, awsCredentials]);
 
   if (error) {
     return <p>{error}</p>;
   }
 
-  return imageUrl ? <img src={imageUrl} alt="Imagen desde S3" /> : <p>Cargando imagen...</p>;
+  return imageUrl ? <iframe src={imageUrl} title="PDF desde S3" width="100%" height="600px"></iframe> : <p>Cargando imagen...</p>;
 };
 
 export default S3Image;

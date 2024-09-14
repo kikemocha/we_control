@@ -5,17 +5,46 @@ import { useAuth } from '../context/AuthContext';
 import AuditoriaForm from '../form/AuditoriaForm';
 import AuditoriaControlesForm from '../form/AuditoriaControlForm';
 
+import ShowFile from '../form/ShowFile';
+
 const Auditorias = () => {
-    const { selectedEmpresa } = useAuth();
+    const { selectedEmpresa, cognitoId, configureAwsCredentials, token } = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedAuditoria, setSelectedAuditoria] = useState(null);
     const [ selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
     const [AuditoriaData, setAuditoriaData] = useState(null);
-
+    
     const [showPopup, setShowPopup] = useState(false);
     const [popupFormType, setPopupFormType] = useState(''); // Nuevo estado para controlar qué formulario mostrar
+
+    const [isCredentialsFetched, setIsCredentialsFetched] = useState(false);
+
+    useEffect(() => {
+        console.log(token);
+        if (token && !isCredentialsFetched) {
+        const fetchAwsCredentials = async () => {
+            try {
+            const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+                timeout: 3000, // 3 segundos de timeout
+            });
+            const credentials = credentialsResponse.data;
+            configureAwsCredentials(credentials);
+            setIsCredentialsFetched(true); // Marcar como credenciales obtenidas
+            } catch (error) {
+            console.error('Error fetching AWS credentials:', error.response ? error.response.data : error.message);
+            }
+        };
+
+        fetchAwsCredentials();
+        }
+    }, [token, isCredentialsFetched, configureAwsCredentials]);
+
+    const [showIMGPopup, setshowIMGPopup] = useState(false);
 
 
     const handleOpenPopup = (formType) => {
@@ -43,7 +72,6 @@ const Auditorias = () => {
         if (selectedAuditoria) {
             try {
                 const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditoriaData?id_auditoria=${selectedAuditoria}`);
-                console.log(response.data);
                 setAuditoriaData(response.data);
             } catch (error) {
                 setError(error);
@@ -71,6 +99,7 @@ const Auditorias = () => {
     useEffect(() => {  
         fetchData();
     }, [AuditoriaData]);
+
     
     if (loading) {
         return <div>Loading...</div>; // Indicador de carga mientras se obtienen los datos
@@ -110,7 +139,7 @@ const Auditorias = () => {
                             )}
                             <div className='total_add'>
                                 <div className='upper_box'>
-                                    <div className='text'>Total de auditorías:</div>
+                                    <div className='text'>Total de controles:</div>
                                     <div className='number'>{AuditoriaData.length}</div>
                                 </div>
                                 <div onClick={() => handleOpenPopup('control')}>
@@ -149,7 +178,17 @@ const Auditorias = () => {
                                                     <td>{control[2]}</td>
                                                     <td>{control[3]}</td>
                                                     <td>{control[4]}</td>
-                                                    <td className='archive_responsable'><div className={control[5] ==='None' ? '' : 'archive'}>{control[5]}</div></td>
+                                                    <td className='archive_responsable'><div className={control[5] ==='None' ? '' : 'archive'}>
+                                                        <p onClick={() => setshowIMGPopup(true)}>{control[5]}</p>
+                                                        <ShowFile
+                                                            show={showIMGPopup}
+                                                            onClose={() => setshowIMGPopup(false)}
+                                                            imgkey={control[5]} // Pasamos el Key del archivo
+                                                            bucketName={`empresa-${control[7]}`}
+                                                            />    
+                                                        </div>
+                                                    </td>
+
                                                     <td>{control[6]}</td>
                                                 </tr>
                                             ))}
@@ -165,7 +204,7 @@ const Auditorias = () => {
                                 {popupFormType === 'control' && (
                                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
                                 )}
-                                {popupFormType === 'control' && (
+                                {popupFormType === 'auditoria' && (
                                     <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
                                 )}
                             <div className='total_add'>

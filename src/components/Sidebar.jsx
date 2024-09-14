@@ -29,7 +29,7 @@ const Sidebar = () => {
                     <Link to="/gestores">Gestores</Link>
                   </li>
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
-                    <Link to="/auditorias">Auditorías</Link>
+                    <Link to="/auditorias">Auditorías y<br /> Seguimientos</Link>
                   </li>
                 </ul>
               )}
@@ -39,7 +39,7 @@ const Sidebar = () => {
                     <Link to="/controles">Controles</Link>
                   </li>
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
-                    <Link to="/auditorias">Auditorías</Link>
+                    <Link to="/auditorias">Auditorías y<br /> Seguimientos</Link>
                   </li>
                   <li className={location.pathname === '/responsables' ? 'link_activate' : ''}>
                     <Link to="/responsables">Responsables</Link>

@@ -36,7 +36,7 @@
 .card_table thead {
     position: sticky;
     top: 0;
-    background-color: white; /* O el color que prefieras */
+    background-color: whitesmoke; /* O el color que prefieras */
     z-index: 1;
 }
 .table-row th {
@@ -77,19 +77,41 @@
     cursor: pointer;
 }
 
-.archive_responsable{
+.archive_responsable {
     padding: 0px 20px;
     cursor: pointer;
+    width: 200px;
 }
-.archive_responsable .archive{
+
+.archive_responsable .archive {
     background-color: yellow;
-    border-radius: 40px;
-    overflow: hidden;
-    height: 70%;
+    border-radius: 20px;
+    width: 150px; /* Ajusta el ancho de la caja */
+    height: 35px;
     display: flex;
-    justify-content: center;
     align-items: center;
 }
+
+.archive_responsable .archive p {
+    margin: 10px;
+    display: block; /* Cambiar de flex a block */
+    max-width: 100%; /* Asegura que el ancho máximo sea el del contenedor padre */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    overflow: hidden; /* Asegura que el contenido desbordante no se muestre */
+    text-overflow: ellipsis; /* Aplica los puntos suspensivos al final del texto */
+}
+
+.archive_responsable .archive_button{
+    background-color: whitesmoke;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.archive_responsable .archive_button:hover{
+    background-color: orange;
+}
+
 .home_hub{
     height: 100%;
     position: relative;
