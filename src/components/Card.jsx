@@ -42,46 +42,95 @@ const Card = ({name, singularName, href, index, apiURL}) => {
         };
         fetchData();
     }, [apiURL]);
+
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+          <div className="card_main">
+            <span>
+              <h3>{name}</h3>
+            </span>
+            <div className="card_content skeleton">
+              <div className="table-container">
+                <table className="card_table">
+                <tr className="table-row">
+                        <th className='no-top'></th>
+                    </tr>
+                  <tbody>
+                    {Array.from({ length: 5 }).map((_, rowIdx) => (
+                      <tr key={rowIdx} className="table-row"><td></td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
     }
     
     if (error) {
-        return <div>Error: {error.message}</div>;
+        return <div className="card_main">
+                    <span>
+                        <h3>{name}</h3>
+                    </span>
+                    <div className="card_content">
+                        <p>{data.length} {name} activos</p>
+                        <div className="table-container">
+                            <table className="card_table">
+                                <thead>
+                                    <tr className="table-row">
+                                        {index.map((header, idx) => (
+                                            <th className='no-top' key={idx}>{header}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="table-row">
+                                        {Array.from({ length: data.length }).map((_, idx) => (
+                                            <td></td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="div_button_Card">
+                            <Link to={`/${href}`} className="button_Card">+ Nuevo {singularName}</Link>
+                        </div>
+                    </div>
+                </div>;
     }
 
     return (
         <div className="card_main">
-    <span>
-        <h3>{name}</h3>
-    </span>
-    <div className="card_content">
-        <p>{data.length} {name} activos</p>
-        <div className="table-container">
-            <table className="card_table">
-                <thead>
-                    <tr className="table-row">
-                        {index.map((header, idx) => (
-                            <th className='no-top' key={idx}>{header}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((row, idx) => (
-                        <tr key={idx} className="table-row">
-                            {row.map((cell, cellIdx) => (
-                                <td key={cellIdx}>{cell}</td>
+            <span>
+                <h3>{name}</h3>
+            </span>
+            <div className="card_content">
+                <p>{data.length} {name} activos</p>
+                <div className="table-container">
+                    <table className="card_table">
+                        <thead>
+                            <tr className="table-row">
+                                {index.map((header, idx) => (
+                                    <th className='no-top' key={idx}>{header}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.map((row, idx) => (
+                                <tr key={idx} className="table-row">
+                                    {row.map((cell, cellIdx) => (
+                                        <td key={cellIdx}>{cell}</td>
+                                    ))}
+                                </tr>
                             ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+                <div className="div_button_Card">
+                    <Link to={`/${href}`} className="button_Card">+ Nuevo {singularName}</Link>
+                </div>
+            </div>
         </div>
-        <div className="div_button_Card">
-            <Link to={`/${href}`} className="button_Card">+ Nuevo {singularName}</Link>
-        </div>
-    </div>
-</div>
     );
 };
 export default Card;

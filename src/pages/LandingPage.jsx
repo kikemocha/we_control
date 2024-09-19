@@ -4,7 +4,6 @@ import './LandingPage.css';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import logo from '../we_control.png'
 
-
 const LandingPage = () => {
     
     const [name, setName] = useState('');

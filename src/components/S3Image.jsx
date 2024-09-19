@@ -6,15 +6,16 @@ import { useAuth } from '../context/AuthContext';
 const S3Image = ({ bucketName, imgkey, token }) => {
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
+
   const { awsCredentials } = useAuth();
 
   useEffect(() => {
     const fetchAwsCredentialsAndImage = async () => {
       try {
-        console.log('AWS Credentials:', awsCredentials); 
-        console.log('Bucket Name:', bucketName); 
-        console.log('Key:', imgkey); 
+        // console.log('AWS Credentials:', awsCredentials); 
+        // console.log('Bucket Name:', bucketName); 
+        // console.log('Key:', imgkey); 
 
         // Paso 2: Configurar el cliente S3
         const s3Client = new S3Client({
@@ -34,6 +35,7 @@ const S3Image = ({ bucketName, imgkey, token }) => {
         
         // Paso 4: Establecer la URL de la imagen
         setImageUrl(url);
+        setLoading(false);
       } catch (err) {
         setError('No tienes permisos para ver esta imagen o hubo un problema.');
         console.error('Error fetching image from S3:', err);
@@ -45,6 +47,10 @@ const S3Image = ({ bucketName, imgkey, token }) => {
 
   if (error) {
     return <p>{error}</p>;
+  }
+
+  if (loading) {
+    return <p>Cargando imagen...</p>; // Puedes reemplazarlo con un spinner si prefieres
   }
 
   return imageUrl ? <iframe src={imageUrl} title="PDF desde S3" width="100%" height="600px"></iframe> : <p>Cargando imagen...</p>;

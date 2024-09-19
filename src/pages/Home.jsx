@@ -88,12 +88,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (role === 'admin') {
-      getUserData();
-    } else if (role === 'gestor') {
-      getUserData();
-    } else if (role === 'responsable') {
-      getUserData();
+    if (role === 'responsable') {
       fetchUserAuditoriaData();
     }
   }, [role]);
@@ -124,17 +119,23 @@ const Home = () => {
       setLoading(false); // Finalizar estado de carga
     }
   };
+  useEffect(()=>{
+    getUserData();
+  }, []);
 
-  if (loading) {
-    return <div>Loading...</div>; // Indicador de carga mientras se obtienen los datos
+  if (loading && role === 'admin') {
+    return <div className='admin_boxes'>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div className='bussiness_boxes skeleton'></div>
+              ))}
+            </div>; // Indicador de carga mientras se obtienen los datos
   }
 
   return (
     <div className='home_main'>
-      <h3>Hola {name}</h3>
       {role === 'admin' && (
         <div className='admin_home'>
-          { selectedEmpresa ?(
+          {selectedEmpresa ?(
             <div>
               <div>
                 <svg 
@@ -196,42 +197,55 @@ const Home = () => {
             </div>
             
           ) : (
-            <div>
-              <EmpresasForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
-              <span>Empresas</span>
-              <div className='total_add'>
-                  <div onClick={handleOpenPopup}>
-                      <svg
-                          viewBox="0 0 1024 1024"
-                          fill="currentColor"
-                          height="2em"
-                          width="2em"
-                          >
-                          <defs>
-                              <style />
-                          </defs>
-                          <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
-                          <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
-                      </svg>
+                <div className='bussines_box'>
+                  <h3>Hola {name}</h3>
+                  <EmpresasForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
+                  <div className='total_add'>
+                    <div className='upper_box'>
+                        <div className='text'>Total de&nbsp;<strong>empresas</strong>:</div>
+                        {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
+                          <div className='number'>{UserInfo.data.empresas.length}</div>
+                        ):(
+                          <div></div>
+                        )}
+                        
+                    </div>
+                    <div onClick={handleOpenPopup}>
+                        <svg
+                            viewBox="0 0 1024 1024"
+                            fill="currentColor"
+                            height="2em"
+                            width="2em"
+                            >
+                            <defs>
+                                <style />
+                            </defs>
+                            <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                            <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                        </svg>
+                    </div>
+                  </div>
+                  <div className='bussines_div'>
+                    {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
+                      <div className='admin_boxes' >
+                        {UserInfo.data.empresas.map((empresas, index) => (
+                          <div className='bussiness_boxes' onClick={() => handleClick(empresas[0])}>
+                            <h3>{empresas[1]}</h3>
+                          </div>
+                        ))}
+                      </div>
+                      
+                    ) : (
+                          <div className='admin_boxes'>
+                            {Array.from({ length: 4 }).map((_, index) => (
+                              <div className='bussiness_boxes skeleton'></div>
+                            ))}
+                          </div>
+                    )}
                   </div>
                 </div>
-              <div>
-                
-                {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
-                  <div className='admin_boxes' >
-                    {UserInfo.data.empresas.map((empresas, index) => (
-                      <div className='bussiness_boxes' onClick={() => handleClick(empresas[0])}>
-                        <h3>{empresas[1]}</h3>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div>No hay información disponible</div>
-                )}
-              </div>
-            </div>
 
-          )}
+              )}
           
         </div>
       )}
@@ -273,67 +287,67 @@ const Home = () => {
           { UserInfo ? (
               <div className='responsable_main'>
                 <div className='length-responsable'>
-                  Controles Resultantes: {UserInfo.data.riesgos.length}
+                  Controles Asociados: {UserInfo.data.riesgos.length}
                 </div>
                 <div className='card_option'>
                 <div className="table-container">
                   {UserInfo && UserInfo.data && UserInfo.data.riesgos ? (
-                      <div>
-                        <table className="card_table">
-                          <tr className="table-row">
-                            <th>Número de Control</th>
-                            <th>Nombre</th>
-                            <th>Evidencias</th>
-                            <th>Responsable</th>
-                            <th>Fecha límite</th>
-                            <th>Fecha de creación</th>
-                            <th>Archivos subidos</th>
-                            <th>Estado</th>
+                    <div>
+                      <table className="card_table">
+                        <tr className="table-row">
+                          <th>Número de Control</th>
+                          <th>Nombre</th>
+                          <th>Evidencias</th>
+                          <th>Responsable</th>
+                          <th>Fecha límite</th>
+                          <th>Fecha de creación</th>
+                          <th>Archivos subidos</th>
+                          <th>Estado</th>
+                        </tr>
+                        {UserInfo.data.riesgos.map((riesgo, index) => (
+                          <tr key={index} className="table-row">
+                            <td>{riesgo[1]}</td>
+                            <td>{riesgo[2]}</td>
+                            <td>{riesgo[3]}</td>
+                            <td>{riesgo[4]}</td>
+                            <td>{riesgo[5]}</td>
+                            <td>{riesgo[6]}</td>
+                            <td className='archive_responsable'>
+                              <div className={riesgo[7] === 'None' ? '' : 'archive'}>
+                                  {riesgo[7] === 'None' ? (
+                                    <>
+                                      <button className='archive_button' onClick={() => {
+                                            setShowUploadPopup(true);
+                                            setSelectedControl(riesgo);
+                                          }
+                                      }>Subir Archivo</button>
+                                      <FileUploadPopup
+                                        show={showUploadPopup}
+                                        onClose={() => setShowUploadPopup(false)}
+                                        onUpload={handleUpload}
+                                        selectedControl={selectedControl}
+                                        selectedAuditoria={riesgo[9]}
+                                        userData = {UserAuditoriaData}
+                                      />
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p onClick={() => setshowIMGPopup(true)}>{riesgo[7]}</p>
+                                      <ShowFile
+                                        show={showIMGPopup}
+                                        onClose={() => setshowIMGPopup(false)}
+                                        imgkey={riesgo[7]} // Pasamos el Key del archivo
+                                        bucketName={`empresa-${riesgo[10]}`}
+                                      />
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                            <td>{riesgo[8]}</td>
                           </tr>
-                          {UserInfo.data.riesgos.map((riesgo, index) => (
-                            <tr key={index} className="table-row">
-                              <td>{riesgo[1]}</td>
-                              <td>{riesgo[2]}</td>
-                              <td>{riesgo[3]}</td>
-                              <td>{riesgo[4]}</td>
-                              <td>{riesgo[5]}</td>
-                              <td>{riesgo[6]}</td>
-                              <td className='archive_responsable'>
-                                <div className={riesgo[7] === 'None' ? '' : 'archive'}>
-                                    {riesgo[7] === 'None' ? (
-                                      <>
-                                        <button className='archive_button' onClick={() => {
-                                              setShowUploadPopup(true);
-                                              setSelectedControl(riesgo);
-                                            }
-                                        }>Subir Archivo</button>
-                                        <FileUploadPopup
-                                          show={showUploadPopup}
-                                          onClose={() => setShowUploadPopup(false)}
-                                          onUpload={handleUpload}
-                                          selectedControl={selectedControl}
-                                          selectedAuditoria={riesgo[9]}
-                                          userData = {UserAuditoriaData}
-                                        />
-                                      </>
-                                    ) : (
-                                      <>
-                                        <p onClick={() => setshowIMGPopup(true)}>{riesgo[7]}</p>
-                                        <ShowFile
-                                          show={showIMGPopup}
-                                          onClose={() => setshowIMGPopup(false)}
-                                          imgkey={riesgo[7]} // Pasamos el Key del archivo
-                                          bucketName={`empresa-${riesgo[10]}`}
-                                        />
-                                      </>
-                                    )}
-                                  </div>
-                                </td>
-                              <td>{riesgo[8]}</td>
-                            </tr>
-                          ))}
+                        ))}
                       </table>
-                      </div>
+                    </div>
 
                   ) : (
                     <div>No hay información disponible</div>
@@ -342,9 +356,42 @@ const Home = () => {
                 </div>
               </div>
           ):(
-            <div>
-              Todavía no tienes ningún riesgo asociado
-            </div>
+            <div className='responsable_main'>
+                <div className='length-responsable'>
+                  <p>Controles Asociados: <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div></p>
+                </div>
+
+                <div className='card_option'>
+                  <div className="table-container skeleton">
+                    <div>
+                      <table className="card_table">
+                        <tr className="table-row">
+                          <th>Número de Control</th>
+                          <th>Nombre</th>
+                          <th>Evidencias</th>
+                          <th>Responsable</th>
+                          <th>Fecha límite</th>
+                          <th>Fecha de creación</th>
+                          <th>Archivos subidos</th>
+                          <th>Estado</th>
+                        </tr>
+                        {Array.from({ length: 8 }).map((_, index) => (
+                          <tr key={index} className="table-row">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                          </tr>
+                        ))}
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
           )}
         </div>

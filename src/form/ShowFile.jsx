@@ -4,17 +4,81 @@ import { useAuth } from '../context/AuthContext';
 import S3Image from '../components/S3Image';
 
 
-const ShowFile = ({ show, onClose, imgkey, bucketName}) => {
+const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria, state, fetchAuditoriaData}) => {
   const [uploadError, setUploadError] = useState('');
-  const { awsCredentials } = useAuth(); // Credenciales AWS desde el contexto
+  const {role} = useAuth(); // Credenciales AWS desde el contexto
 
 
   const handleDelete = () => {
     console.log('Borrando... ');
   };
+
   const handleClose = () => {
     setUploadError('');
     onClose();
+  };
+
+  const handleVerify = async () => {
+    
+    const requestBody = {
+      id_control: id_control,
+      id_auditoria: id_auditoria,
+      state: 1
+    };
+
+    try {
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoriaState', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        await fetchAuditoriaData();
+        onClose();
+
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    handleClose();
+  };
+
+  const handleDeny = async () => {
+    
+    const requestBody = {
+      id_control: id_control,
+      id_auditoria: id_auditoria,
+      state: 2
+    };
+    try {
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoriaState', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        await fetchAuditoriaData();
+        onClose();
+
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    handleClose();
   };
 
   if (!show) return null;
@@ -37,11 +101,32 @@ const ShowFile = ({ show, onClose, imgkey, bucketName}) => {
         <div className="img_s3"> 
           <S3Image bucketName={bucketName} imgkey={imgkey} /> 
         </div>
-        
-        <div className="popup-buttons">
-          <button className="popup-button" onClick={handleDelete}>Eliminar</button>
-          <button className="popup-button" onClick={handleClose}>Cancelar</button>
-        </div>
+        {role === 'admin' ? (
+          <div className="popup-buttons">
+            { state === 'Verificado' ? (
+              <div style={{ width : '100%', display:'flex', justifyContent:'space-around'}}>
+                <button className="popup-button" onClick={handleDelete}>Eliminar</button>
+                <button className="popup-button" style={{backgroundColor:'rgba(255,0,0,0.5)'}} onClick={handleDeny}>Denegar</button>
+              </div>
+            ) : state === 'Denegado' ?(
+              <div style={{ width : '100%', display:'flex', justifyContent:'space-around'}}>
+                <button className="popup-button" onClick={handleDelete}>Eliminar</button>
+                <button className="popup-button" style={{backgroundColor:'rgba(0,145,2,0.29)'}} onClick={handleVerify}>Verificar</button>
+              </div>
+            ) : (
+              <div style={{ width : '100%', display:'flex', justifyContent:'space-around'}}>
+                <button className="popup-button" onClick={handleDelete}>Eliminar</button>
+                <button className="popup-button" style={{backgroundColor:'rgba(0,145,2,0.29)'}} onClick={handleVerify}>Verificar</button>
+                <button className="popup-button" style={{backgroundColor:'rgba(255,0,0,0.5)'}} onClick={handleDeny}>Denegar</button>
+              </div>
+            )}
+          </div>
+          ) : (
+            <div className="popup-buttons">
+              <button className="popup-button" onClick={handleDelete}>Eliminar</button>
+              <button className="popup-button" onClick={handleClose}>Cancelar</button>
+            </div>
+          )}
       </div>
     </div>
   );

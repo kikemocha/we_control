@@ -63,7 +63,7 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, userData, s
     try {
       const command = new PutObjectCommand(params);
       const data = await s3Client.send(command);
-      console.log('Archivo subido correctamente:', data);
+      // console.log('Archivo subido correctamente:', data);
       onUpload(selectedFile); // Llamada a onUpload después de la carga
 
       const requestBody = {

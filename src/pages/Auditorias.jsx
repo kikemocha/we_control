@@ -1,4 +1,4 @@
-// src/pages/Riesgos.js
+// src/pages/Adutorias.jsx
 import {React, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -13,38 +13,30 @@ const Auditorias = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedAuditoria, setSelectedAuditoria] = useState(null);
-    const [ selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
+    const [selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
     const [AuditoriaData, setAuditoriaData] = useState(null);
     
     const [showPopup, setShowPopup] = useState(false);
     const [popupFormType, setPopupFormType] = useState(''); // Nuevo estado para controlar qué formulario mostrar
 
-    const [isCredentialsFetched, setIsCredentialsFetched] = useState(false);
-
-    useEffect(() => {
-        console.log(token);
-        if (token && !isCredentialsFetched) {
-        const fetchAwsCredentials = async () => {
-            try {
-            const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
-                headers: {
-                Authorization: `Bearer ${token}`,
-                },
-                timeout: 3000, // 3 segundos de timeout
-            });
-            const credentials = credentialsResponse.data;
-            configureAwsCredentials(credentials);
-            setIsCredentialsFetched(true); // Marcar como credenciales obtenidas
-            } catch (error) {
-            console.error('Error fetching AWS credentials:', error.response ? error.response.data : error.message);
-            }
-        };
-
-        fetchAwsCredentials();
-        }
-    }, [token, isCredentialsFetched, configureAwsCredentials]);
 
     const [showIMGPopup, setshowIMGPopup] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null); // Estado para almacenar la imgkey seleccionada
+    const [selectedBucket, setSelectedBucket] = useState(null); // Estado para almacenar el bucketName seleccionado
+    const [selectedAuditoriaIMG, setSelectedAuditoriaIMG] = useState(null);
+    const [selectedControlIMG, setSelectedControlIMG] = useState(null);
+    const [selectedStateIMG, setSelectedStateIMG] = useState(null);
+    
+
+    // Función para abrir el popup y almacenar el archivo y bucket seleccionados
+    const handleShowFile = (fileKey, bucket, id_auditoria, id_control, state) => {
+        setSelectedFile(fileKey);
+        setSelectedBucket(bucket);
+        setSelectedAuditoriaIMG(id_auditoria);
+        setSelectedControlIMG(id_control);
+        setSelectedStateIMG(state);
+        setshowIMGPopup(true); // Abrir el popup
+    };
 
 
     const handleOpenPopup = (formType) => {
@@ -80,10 +72,6 @@ const Auditorias = () => {
             }
         }
     };
-    useEffect(() => {
-        fetchAuditoriaData();
-    }, [selectedAuditoria]);
-
     const fetchData = async () => {
         try {
             const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa="+selectedEmpresa);
@@ -97,12 +85,60 @@ const Auditorias = () => {
         }
     };
     useEffect(() => {  
+        fetchAuditoriaData();
         fetchData();
-    }, [AuditoriaData]);
+    }, [selectedAuditoria]);
 
     
     if (loading) {
-        return <div>Loading...</div>; // Indicador de carga mientras se obtienen los datos
+        return <div className='card_option'>
+                    <h3>Auditorías</h3>
+                    <div className='total_add'>
+                        <div className='upper_box'>
+                            <div className='text'>Total de&nbsp;<strong>auditorías</strong>:</div>
+                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
+                        </div>
+                        <div onClick={handleOpenPopup}>
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                fill="currentColor"
+                                height="2em"
+                                width="2em"
+                                >
+                                <defs>
+                                    <style />
+                                </defs>
+                                <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div className='responsable_home'>
+                        <div className='responsable_main'>
+                            <div className="table-container skeleton">
+                                <div>
+                                    <table className="card_table">
+                                    <tr className="table-row">
+                                        <th>Nombre</th>
+                                        <th>Progreso</th>
+                                        <th>Fecha de Creación</th>
+                                        <th>Detalle</th>
+                                    </tr>
+                                    {Array.from({ length: 8 }).map((_, index) => (
+                                        <tr key={index} className="table-row">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    ))}
+                                    
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     }
 
     
@@ -162,7 +198,8 @@ const Auditorias = () => {
                                     <div className="table-container">
                                         <div>
                                             <table className="card_table">
-                                            <tr className="table-row">
+                                            <thead className='no_main'>
+                                                <tr className="table-row">
                                                 <th>Número de Control</th>
                                                 <th>Nombre</th>
                                                 <th>Responsable</th>
@@ -170,37 +207,91 @@ const Auditorias = () => {
                                                 <th>Fecha de creación</th>
                                                 <th>Archivos subidos</th>
                                                 <th>Estado</th>
-                                            </tr>
-                                            {AuditoriaData.map((control, index) => (
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {AuditoriaData.map((control, index) => (
                                                 <tr key={index} className="table-row">
                                                     <td>{control[0]}</td>
                                                     <td>{control[1]}</td>
                                                     <td>{control[2]}</td>
                                                     <td>{control[3]}</td>
                                                     <td>{control[4]}</td>
-                                                    <td className='archive_responsable'><div className={control[5] ==='None' ? '' : 'archive'}>
-                                                        <p onClick={() => setshowIMGPopup(true)}>{control[5]}</p>
-                                                        <ShowFile
-                                                            show={showIMGPopup}
-                                                            onClose={() => setshowIMGPopup(false)}
-                                                            imgkey={control[5]} // Pasamos el Key del archivo
-                                                            bucketName={`empresa-${control[7]}`}
-                                                            />    
-                                                        </div>
+                                                    <td className="archive_responsable">
+                                                    <div className={control[5] === 'None' ? '' : 'archive'}>
+                                                        <p 
+                                                            
+                                                            onClick={control[5] !== 'None' ? () => handleShowFile(control[5], `empresa-${control[7]}`, control[8], control[9], control[6]) : null}
+                                                            style={{ cursor: control[5] !== 'None' ? 'pointer' : 'default' }} // Cambiar el cursor para indicar si es clicable
+                                                        >
+                                                            {control[5]}
+                                                        </p>
+                                                    </div>
                                                     </td>
-
                                                     <td>{control[6]}</td>
                                                 </tr>
-                                            ))}
-                                        </table>
+                                                ))}
+                                            </tbody>
+                                            </table>
                                         </div>
+                                        {showIMGPopup && (
+                                                        <ShowFile
+                                                        show={showIMGPopup}
+                                                        onClose={() => setshowIMGPopup(false)} // Cerrar el popup
+                                                        imgkey={selectedFile} // Pasar la imgkey almacenada en el estado
+                                                        bucketName={selectedBucket} // Pasar el bucketName almacenado en el estado
+                                                        id_auditoria={selectedAuditoriaIMG}
+                                                        id_control={selectedControlIMG}
+                                                        state={selectedStateIMG}
+                                                        fetchAuditoriaData={fetchAuditoriaData}
+                                                        />
+                                                    )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ):(
                         <div>
-                            <div>NO DATA</div>
+                            <div>
+                                <div className='upper_box'>
+                                    <div className='text'>Total de controles:</div>
+                                    <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
+                                </div>
+                            </div>
+                            <div className='responsable_home'>
+                                <div className='responsable_main'>
+                                    <div className="table-container skeleton">
+                                        <div>
+                                            <table className="card_table">
+                                            <thead className='no_main skeleton'>
+                                                <tr className="table-row">
+                                                <th>Número de Control</th>
+                                                <th>Nombre</th>
+                                                <th>Responsable</th>
+                                                <th>Fecha límite</th>
+                                                <th>Fecha de creación</th>
+                                                <th>Archivos subidos</th>
+                                                <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {Array.from({ length: 8 }).map((_, index) => (
+                                                <tr key={index} className="table-row">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                ))}
+                                            </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                                 {popupFormType === 'control' && (
                                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
                                 )}
