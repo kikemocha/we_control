@@ -124,13 +124,14 @@ const Responsables = () => {
                                     <th>Controles Asignados</th>
                                     <th>Ajustes</th>
                                 </tr>
+                                 {console.log(data)}
                                 {data.map((responsable, index) => (
                                     <tr key={index} className="table-row">
                                         <td>{responsable[2]}</td>
                                         <td>{responsable[3]}</td>
                                         <td>{responsable[5]}</td>
                                         <td>{responsable[4]}</td>
-                                        <td>{responsable[10]}</td>
+                                        <td>{responsable[11]}</td>
                                         <td>
                                             <svg
                                                 viewBox="0 0 24 24"

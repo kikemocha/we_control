@@ -4,7 +4,7 @@ import './Layout.css';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-    const { name } = useAuth();
+    const { name, surname, profileImg } = useAuth();
 
     return (
         <div className="navbar">
@@ -16,7 +16,14 @@ const Navbar = () => {
 
             </div>
             <div className="user-info">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="User" />
+                { profileImg ? (
+                    <div> img </div>
+                ): (
+                    <div class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full bg-gray-600">
+                        <span class="text-sm font-medium text-white">{name[0].toUpperCase()}{surname[0].toUpperCase()}</span>
+                    </div>
+                )}
+                
                 <div>{name}</div>
             </div>
         </div>

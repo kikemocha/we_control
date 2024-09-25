@@ -15,15 +15,12 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
-  const { setToken, setRole, setName, setCognitoId, setSelectedEmpresa } = useAuth();
+  const { setToken, setCognitoId, fetchUserData } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       const { isSignedIn, nextStep } = await signIn({username: email, password });
-      const session = await fetchAuthSession(); 
-      // Acceder directamente al idToken de la sesión
-      
 
       if (isSignedIn) {
         const session = await fetchAuthSession(); // Obtén la sesión actual
@@ -34,25 +31,7 @@ const LogIn = () => {
         const id_cognito = token.payload.sub;
         setCognitoId(id_cognito);
 
-        // Realizar la llamada a la API para obtener la información del usuario
-        const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserInfo?id_cognito=${id_cognito}`, {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-
-        const data = response.data;
-        if (data.is_gestor === 0 && data.is_responsable === 0) {
-          setSelectedEmpresa(null);
-          setRole('admin');
-        } else if (data.is_gestor === 1 && data.is_responsable === 0) {
-          setSelectedEmpresa(data.belongs_to);
-          setRole('gestor');
-        } else {
-          setSelectedEmpresa(data.belongs_to);
-          setRole('responsable');
-        }
-        setName(data.name);
+        await fetchUserData(id_cognito, token.jwtToken);
 
         // Navega a la página principal
         navigate('/home');
@@ -90,27 +69,6 @@ const LogIn = () => {
         setToken(idToken); // Guarda el token en el contexto
         const id_cognito = idToken.payload.sub;
         setCognitoId(id_cognito);
-
-        // Realizar la llamada a la API para obtener la información del usuario
-        const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserInfo?id_cognito=${id_cognito}`, {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-
-        const data = response.data;
-        if (data.is_gestor === 0 && data.is_responsable === 0) {
-          setSelectedEmpresa(null);
-          setRole('admin');
-        } else if (data.is_gestor === 1 && data.is_responsable === 0) {
-          setSelectedEmpresa(data.belongs_to);
-          setRole('gestor');
-        } else {
-          setSelectedEmpresa(data.belongs_to);
-          setRole('responsable');
-        }
-        setName(data.name);
-
         // Navega a la página principal
         navigate('/home');
       }
@@ -129,6 +87,7 @@ const LogIn = () => {
           <label>
             <p>Contraseña Actual</p>
             <input
+              className='text-black'
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -138,6 +97,7 @@ const LogIn = () => {
           <label>
             <p>Nueva Contraseña</p>
             <input
+              className='text-black'
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -147,19 +107,21 @@ const LogIn = () => {
           <label>
             <p>Confirmar Nueva Contraseña</p>
             <input
+              className='text-black'
               type="password"
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               required
             />
           </label>
-          <button type="submit" className='change_passw_button'>Cambiar <br /> Contraseña</button>
+          <button type="submit" className='change_passw_button text-black'>Cambiar <br /> Contraseña</button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       ) : (
         <form onSubmit={handleSubmit}>
           <label>
             <input
+              className='text-black'
               placeholder='E-mail'
               type="email"
               value={email}
@@ -169,6 +131,7 @@ const LogIn = () => {
           </label>
           <label>
             <input
+              className='text-black'
               placeholder='Contraseña'
               type="password"
               value={password}
@@ -176,7 +139,7 @@ const LogIn = () => {
               required
             />
           </label>
-          <button type="submit">Login</button>
+          <button type="submit" className='text-black'>Login</button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       )}

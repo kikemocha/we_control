@@ -13,7 +13,7 @@ const Sidebar = () => {
     return (
         <div className="sidebar">
           <Link to="/home">
-            <img className="logo_sidebar" src={logo} alt="" />
+            <img className="logo_sidebar mx-auto" src={logo} alt="" />
           </Link>
           {selectedEmpresa ? (
             <>

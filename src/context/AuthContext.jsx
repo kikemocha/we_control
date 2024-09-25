@@ -8,12 +8,17 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [role, setRole] = useState(() => localStorage.getItem('role') || null);
   const [name, setName] = useState(() => localStorage.getItem('name') || null);
+  const [surname, setSurname] = useState(() => localStorage.getItem('surname') || null);
+  
   const [cognitoId, setCognitoId] = useState(() => localStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => localStorage.getItem('selectedEmpresa') || null);
+  const [profileImg, setProfileImg] = useState(() => localStorage.getItem('profileImg') || null);
 
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
   const [isCredentialsFetched, setIsCredentialsFetched] = useState(false); // Estado para controlar si se obtuvieron credenciales
+
+  const [userData, setUserData] = useState(null); // Para almacenar la información del usuario
 
 
 
@@ -30,6 +35,15 @@ export const AuthProvider = ({ children }) => {
   }, [name]);
 
   useEffect(() => {
+    localStorage.setItem('profileImg', name);
+  }, [profileImg]);
+
+  useEffect(() => {
+    localStorage.setItem('surname', name);
+  }, [surname]);
+  
+
+  useEffect(() => {
     localStorage.setItem('cognitoId', cognitoId);
   }, [cognitoId]);
 
@@ -41,14 +55,13 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setRole(null);
     setName(null);
+    setSurname(null);
+    setProfileImg(null);
     setCognitoId(null);
     setSelectedEmpresa(null);
     setAwsCredentials(null);
-    localStorage.removeItem('selectedEmpresa');
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('name');
-    localStorage.removeItem('cognitoId');
+    setUserData(null);
+    localStorage.clear();
   };
 
   const configureAwsCredentials = (credentials) => {
@@ -89,6 +102,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchUserData = async (id_cognito, token) => {
+    try {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserInfo?id_cognito=${id_cognito}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      const data = response.data;
+      setUserData(data);
+      console.log('DATOS: ', data);
+
+      if (data.is_gestor === 0 && data.is_responsable === 0) {
+        setSelectedEmpresa(null);
+        setRole('admin');
+      } else if (data.is_gestor === 1 && data.is_responsable === 0) {
+        setSelectedEmpresa(data.belongs_to);
+        setRole('gestor');
+      } else {
+        setSelectedEmpresa(data.belongs_to);
+        setRole('responsable');
+      }
+      setName(data.name);
+      setSurname(data.surname);
+      setProfileImg(data.img);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
   useEffect(() => {
     if (token && !isCredentialsFetched) {
       fetchAwsCredentials();
@@ -110,6 +153,10 @@ export const AuthProvider = ({ children }) => {
     setRole,
     name,
     setName,
+    surname,
+    setSurname,
+    profileImg,
+    setProfileImg,
     cognitoId,
     setCognitoId,
     signOut,
@@ -117,6 +164,8 @@ export const AuthProvider = ({ children }) => {
     setSelectedEmpresa,
     awsCredentials,
     configureAwsCredentials,
+    fetchUserData, // Ahora disponible para obtener datos del usuario
+    userData
   };
 
   return (
