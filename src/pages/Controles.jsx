@@ -6,7 +6,7 @@ import ControlesForm from '../form/ControlesForm';
 
 
 const Controles = () => {
-    const {selectedEmpresa} = useAuth();
+    const {selectedEmpresa, token} = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,9 +18,15 @@ const Controles = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa="+selectedEmpresa);
+            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa="+selectedEmpresa,
+                {headers: {
+                    'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
             let data_clean = [];
             data_clean = response.data;
+            console.log(data_clean);
             setData(data_clean);
         } catch (error) {
             setError(error);
@@ -35,7 +41,6 @@ const Controles = () => {
 
     if (loading) {
         return <div className='card_option'>
-                    <h3>Controles</h3>
                     <div className='total_add'>
                         <div className='upper_box'>
                             <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>
@@ -63,11 +68,12 @@ const Controles = () => {
                                     <table className="card_table">
                                     <tr className="table-row">
                                         <th>Número</th>
-                                        <th>Riesgo Asociado</th>
                                         <th>Nombre</th>
+                                        <th>Riesgo Asociado</th>
+                                        <th>Valor de Control</th>
                                         <th>Evidencias</th>
                                         <th>Periodicidad</th>
-                                        <th>Valor de Control</th>
+                                        
                                     </tr>
                                     {Array.from({ length: 8 }).map((_, index) => (
                                         <tr key={index} className="table-row">
@@ -90,7 +96,6 @@ const Controles = () => {
 
     return <div className='card_option'>
             <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
-            <h3>Controles</h3>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>
@@ -123,20 +128,21 @@ const Controles = () => {
                                     <th>Nombre</th>
                                     <th>Evidencias</th>
                                     <th>Periodicidad</th>
-                                    <th>Valor de Control</th>
+                                    <th>Tipo de Control</th>
                                 </tr>
                                 {data.map((control, index) => (
                                     <tr key={index} className="table-row">
+                                        {console.log(control)}
                                         <td>{control[1]}</td>
                                         <td className='riesgos_controles'>
                                         {control[7].split(',').map((riesgo, index) => (
-                                            <div>{riesgo}</div>
+                                            <div key={index}>{riesgo}</div>
                                         ))}
                                         </td>
                                         <td>{control[2]}</td>
                                         <td>{control[3]}</td>
                                         <td>{control[4]}</td>
-                                        <td>{control[5]}</td>
+                                        <td>{control[5]}</td>   
                                     </tr>
                                 ))}
                             </table>

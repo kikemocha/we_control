@@ -6,7 +6,7 @@ import ResponsablesForm from '../form/ResponsablesForm';
 
 
 const Responsables = () => {
-    const {selectedEmpresa} = useAuth();
+    const {selectedEmpresa, token} = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,7 +18,11 @@ const Responsables = () => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa="+selectedEmpresa);
+            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa="+selectedEmpresa,
+                {headers : {
+                    'Authorization' : `Bearer ${token}`
+                }}
+            );
             let data_clean = [];
             data_clean = response.data
             setData(data_clean);
@@ -35,7 +39,6 @@ const Responsables = () => {
 
     if (loading) {
         return <div className='card_option'>
-                    <h3>Responsables</h3>
                     <div className='total_add'>
                         <div className='upper_box'>
                             <div className='text'>Total de&nbsp;<strong>responsables</strong>:</div>
@@ -89,7 +92,6 @@ const Responsables = () => {
 
     return <div className='card_option'>
             <ResponsablesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
-            <h3>Responsables</h3>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>responsables</strong>:</div>
@@ -130,7 +132,7 @@ const Responsables = () => {
                                         <td>{responsable[3]}</td>
                                         <td>{responsable[5]}</td>
                                         <td>{responsable[4]}</td>
-                                        <td>{responsable[10]}</td>
+                                        <td>{responsable[11]}</td>
                                         <td>
                                             <svg
                                                 viewBox="0 0 24 24"

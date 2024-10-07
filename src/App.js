@@ -24,7 +24,7 @@ const App = () => {
         <Route path="login" element={<LogIn />} />
         <Route path="/" element={<Layout />}>
           <Route path='home' element={<ProtectedRoute element={Home} allowedRoles={['admin', 'gestor', 'responsable']} />} /> 
-          <Route path="riesgos" element={<ProtectedRoute element={Riesgos} allowedRoles={['admin']} />} />
+          <Route path="riesgos" element={<ProtectedRoute element={Riesgos} allowedRoles={['admin', 'gestor']} />} />
           <Route path="controles" element={<ProtectedRoute element={Controles} allowedRoles={['admin', 'gestor']}  />} />
           <Route path="gestores" element={<ProtectedRoute element={Gestores} allowedRoles={['admin']} />} />
           <Route path="auditorias" element={<ProtectedRoute element={Auditorias} allowedRoles={['admin', 'gestor']} />} />

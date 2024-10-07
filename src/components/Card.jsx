@@ -5,24 +5,24 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const Card = ({name, singularName, href, index, apiURL}) => {
-    const { selectedEmpresa } = useAuth();
+    const { selectedEmpresa, token } = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         const fetchData = async () => {
+            
             try {
-                const response = await axios.get(apiURL+selectedEmpresa);
+                const response = await axios.get(apiURL+selectedEmpresa, {headers: {'Authorization': `Bearer ${token}`,}});
                 let data_clean = [];
                 if (name === 'Gestores'){
                     data_clean = response.data.map(item => [item[2], item[4]])
                 }
                 else if (name === 'Controles'){
-                    data_clean = response.data.map(item => [item[1], item[2], item[3], item[5], item[7]])
+                    data_clean = response.data.map(item => [item[1], item[2], item[3], item[5], item[8]])
                 }
                 else if (name === 'Riesgos'){
-                    data_clean = response.data.map(item => [item[1], item[3], item[7], item[7].split(',').length])
+                    data_clean = response.data.map(item => [item[1], item[3], item[4].split(',').length, item[5] === 'None' ? (item[3]) : item[5]])
                 }
                 else if (name === 'Auditorías'){
                     data_clean = response.data.map(item => [item[1], Math.floor(parseInt(item[2],10)/parseInt(item[1],10))+'%' ])

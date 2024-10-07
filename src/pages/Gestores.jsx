@@ -6,7 +6,7 @@ import GestoresForm from '../form/GestoresForm';
 
 
 const Gestores = () => {
-    const {selectedEmpresa} = useAuth();
+    const {selectedEmpresa, token} = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,7 +19,12 @@ const Gestores = () => {
     
     const fetchData = async () => {
         try {
-            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa="+selectedEmpresa);
+            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa="+selectedEmpresa, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
             let data_clean = [];
             data_clean = response.data
             setData(data_clean);
@@ -36,7 +41,6 @@ const Gestores = () => {
 
     if (loading) {
         return <div className='card_option'>
-                    <h3>Gestores</h3>
                     <div className='total_add'>
                         <div className='upper_box'>
                             <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
@@ -86,7 +90,6 @@ const Gestores = () => {
 
     return <div className='card_option'>
             <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
-            <h3>Gestores</h3>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
@@ -125,14 +128,10 @@ const Gestores = () => {
                                         <td>{control[5]}</td>
                                         <td>{control[4]}</td>
                                         <td>
-                                            <svg
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                height="2.5em"
-                                                width="2.5em"
-                                                >
-                                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                                            </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-8 mx-auto">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                        </svg>
+
                                         </td>
                                     </tr>
                                 ))}

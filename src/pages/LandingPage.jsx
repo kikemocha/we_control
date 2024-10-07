@@ -31,7 +31,6 @@ const LandingPage = () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
             },
             body: JSON.stringify(requestBody),
           });
@@ -73,7 +72,7 @@ const LandingPage = () => {
         <header>
             <span>WE</span>CTRL
             <Link to="/login">
-                <button className='login_button'>LOG IN</button>
+                <button className='login_button text-black'>LOG IN</button>
             </Link>
         </header>
         <div className='second_div'>
@@ -87,13 +86,15 @@ const LandingPage = () => {
                 <form onSubmit={handleSubmit}>
                     <p>Nombre</p>
                     <input  
+                        className='text-black'
                         type="text" 
                         name="name" 
                         value={name}
                         onChange={(e) => setName(e.target.value)} 
                         required/>
                     <p>Email</p>
-                    <input  
+                    <input
+                        className='text-black'
                         type="email" 
                         name="email" 
                         value={email}

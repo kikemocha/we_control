@@ -9,6 +9,7 @@
 }
 
 .card_content{
+    position: relative;
     background-color: whitesmoke;
     height: 110%;
     width: 95%;
@@ -28,7 +29,17 @@
     height: 70%;
     text-align: center;
 }
+/* Estilos para navegadores con scrollbar compatibles con pseudo-elementos */
+.table-container {
+  scrollbar-width: thin; /* Define un scrollbar más delgado para Firefox */
+  scrollbar-color: #a0a0a0 #f1f1f1; /* Color de la barra y el fondo */
+}
+  
 .div_button_Card {
+    position: absolute;
+    bottom: 0; /* Se coloca en la parte inferior */
+    left: 50%;
+    transform: translateX(-50%);
     display: flex; /* Hacer que el contenedor use flexbox */
     justify-content: center; /* Centrar horizontalmente */
     align-items: center; /* Centrar verticalmente */
@@ -36,7 +47,7 @@
 }
 
 .button_Card {
-    background-color: yellow;
+    background-color: #e5f301FF;
     color: black;
     border-radius: 40px;
     font-weight: bold;

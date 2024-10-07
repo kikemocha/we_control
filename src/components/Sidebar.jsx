@@ -13,7 +13,7 @@ const Sidebar = () => {
     return (
         <div className="sidebar">
           <Link to="/home">
-            <img className="logo_sidebar" src={logo} alt="" />
+            <img className="logo_sidebar mx-auto" src={logo} alt="" />
           </Link>
           {selectedEmpresa ? (
             <>
@@ -35,11 +35,14 @@ const Sidebar = () => {
               )}
               {role === 'gestor' && (
                 <ul>
+                  <li className={location.pathname === '/riesgos' ? 'link_activate' : ''}>
+                    <Link to="/riesgos">Riesgos</Link>
+                  </li>
                   <li className={location.pathname === '/controles' ? 'link_activate' : ''}>
                     <Link to="/controles">Controles</Link>
                   </li>
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
-                    <Link to="/auditorias">Auditorías y<br /> Seguimientos</Link>
+                    <Link to="/auditorias">Seguimientos<br /> y Auditorías</Link>
                   </li>
                   <li className={location.pathname === '/responsables' ? 'link_activate' : ''}>
                     <Link to="/responsables">Responsables</Link>

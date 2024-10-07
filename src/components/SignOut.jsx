@@ -21,7 +21,7 @@ function SignOutButton() {
 
   return (
     <button onClick={handleSignOut} className='signout_button'>
-      Sign Out
+      Cerrar Sesión
     </button>
   );
 }
