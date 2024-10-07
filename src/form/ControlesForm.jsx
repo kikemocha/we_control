@@ -9,7 +9,7 @@ import Input from '../components/common/Input';
 import SelectInput from '../components/common/SelectInput';
 
 const ControlesForm = ({ show, onClose, fetchData }) => {
-  const {selectedEmpresa} = useAuth();
+  const {selectedEmpresa, token} = useAuth();
   const [controlName, setControlName] = useState('');
   const [numberName, setNumberName] = useState('');
   const [evidences, setEvidences] = useState('');
@@ -30,10 +30,9 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
       try {
         const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}`, {
           headers: {
-            'Authorization': `Bearer `
+            'Authorization': `Bearer ${token}`
           }
         });
-        console.log(response.data);
         setRiesgos(response.data);
       } catch (error) {
         console.error('Error fetching riesgos:', error);
@@ -54,7 +53,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
     }
 
     const requestBody = {
-      number_name: numberName,
+      number_name: 'C'+numberName,
       name: controlName,
       evidences: evidences,
       periodicity: periocity,
@@ -68,7 +67,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer `, // Incluye el token de autorización si es necesario
+          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
         },
         body: JSON.stringify(requestBody),
       });

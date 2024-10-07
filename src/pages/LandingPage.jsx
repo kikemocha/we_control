@@ -31,7 +31,6 @@ const LandingPage = () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
             },
             body: JSON.stringify(requestBody),
           });

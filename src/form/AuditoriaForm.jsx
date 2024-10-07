@@ -7,7 +7,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
 const AuditoriaForm = ({ show, onClose, fetchData }) => {
-  const {selectedEmpresa} = useAuth();
+  const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ const AuditoriaForm = ({ show, onClose, fetchData }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+          'Authorization':`Bearer ${token}`, // Incluye el token de autorización si es necesario
         },
         body: JSON.stringify(requestBody),
       });

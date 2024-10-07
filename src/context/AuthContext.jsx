@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -20,8 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const [userData, setUserData] = useState(null); // Para almacenar la información del usuario
 
-
-
+  
   useEffect(() => {
     localStorage.setItem('token', token);
   }, [token]);
@@ -35,11 +33,11 @@ export const AuthProvider = ({ children }) => {
   }, [name]);
 
   useEffect(() => {
-    localStorage.setItem('profileImg', name);
+    localStorage.setItem('profileImg', profileImg);
   }, [profileImg]);
 
   useEffect(() => {
-    localStorage.setItem('surname', name);
+    localStorage.setItem('surname', surname);
   }, [surname]);
   
 
@@ -52,16 +50,26 @@ export const AuthProvider = ({ children }) => {
   }, [selectedEmpresa]);
 
   const signOut = () => {
-    setToken(null);
-    setRole(null);
-    setName(null);
-    setSurname(null);
-    setProfileImg(null);
-    setCognitoId(null);
-    setSelectedEmpresa(null);
-    setAwsCredentials(null);
-    setUserData(null);
-    localStorage.clear();
+    try {
+      // Limpiar el estado en el contexto de React
+      setToken(null);
+      setRole(null);
+      setName(null);
+      setSurname(null);
+      setProfileImg(null);
+      setCognitoId(null);
+      setSelectedEmpresa(null);
+      setAwsCredentials(null);
+      setUserData(null);
+  
+      // Limpiar el almacenamiento local
+      localStorage.clear(); // Eliminar todo del localStorage
+  
+      // Redirigir al usuario a la página de inicio de sesión
+      window.location.href = '/login'; // Forzar redirección a la página de inicio
+    } catch (error) {
+      console.error('Error al limpiar sesión:', error);
+    }
   };
 
   const configureAwsCredentials = (credentials) => {
@@ -71,7 +79,6 @@ export const AuthProvider = ({ children }) => {
 
   const fetchAwsCredentials = async () => {
     try {
-      console.log('TOKEN:: ',token);
       const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -83,7 +90,16 @@ export const AuthProvider = ({ children }) => {
       setIsCredentialsFetched(true);
       scheduleCredentialsRefresh(credentials.Expiration); // Programar renovación
     } catch (error) {
-      console.error('Error fetching AWS credentials:', error.response ? error.response.data : error.message);
+      if (error.response) {
+        console.log('Error response data:', error.response.data);
+        if (error.response.data.message === 'The incoming token has expired') {
+          console.log('El token ha expirado, cerrando sesión.');
+          signOut(); // Si el token ha expirado, se cierra la sesión automáticamente
+          window.location.reload();
+        }
+      } else {
+        console.error('Error fetching AWS credentials:', error.message || error.response);
+      }      
     }
   };
 
@@ -112,7 +128,6 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      console.log('DATOS: ', data);
 
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);

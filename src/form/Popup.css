@@ -53,7 +53,7 @@
     text-align: center;
 }
 .popup form button{
-    background-color: yellow;
+    background-color: #e5f301FF;
     border: none;
     border-radius: 30px;
     height: 60px;
@@ -61,6 +61,12 @@
     font-weight: bold;
     font-size: 1.1em;
     cursor: pointer;
+}
+.delete{
+    background-color: rgba(255, 0, 0, 0.507) !important;
+}
+.delete:hover{
+    background-color: rgba(255, 0, 0, 0.692) !important;
 }
 .popup form button:hover{
     background-color: rgb(255, 196, 0);
@@ -181,7 +187,7 @@
 .react-datepicker__navigation.react-datepicker__navigation--previous {
   width: 50px;  /* Cambiar el ancho a un tamaño más pequeño */
   height: 30px; /* Cambiar la altura a un tamaño más pequeño */
-  background-color: yellow; /* Mantener el fondo amarillo */
+  background-color: #e5f301FF; /* Mantener el fondo amarillo */
   border-radius: 20px; /* Darle una forma circular si es necesario */
   box-shadow: none; /* Eliminar cualquier sombra si existe */
   outline: none; /* Eliminar el contorno de enfoque si existe */
@@ -263,11 +269,11 @@ react-datepicker__navigation-icon--next{
 }
 
 .popup-button {
-    background-color: yellow;
+    background-color: #e5f301FF;
     border: none;
     border-radius: 30px;
-    height: 40px;
-    width: 100px;
+    height: 60px;
+    width: 140px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -281,9 +287,11 @@ react-datepicker__navigation-icon--next{
     width: 80%;
     margin: auto;
     margin-top: 40px;
-    margin-bottom: 40px;
+    margin-bottom: 80px;
 }
-
+.img_s3 iframe{
+    height: 100%;
+}
 /* HTML: <div class="loader"></div> */
 .loader {
     width: 50px;

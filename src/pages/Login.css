@@ -28,29 +28,6 @@
     
 }
 
-.form_login form input{
-    margin: 20px 0px;
-    width: 400px;
-    height: 60px;
-    font-size: 1.1em;
-    padding: 15px 20px;
-    border-radius: 30px;
-    border: none;
-    outline: none;
-}
-.form_login form button{
-    padding-top: 3px;
-    width: 150px;
-    margin: auto;
-    height: 40px;
-    border-radius: 30px;
-    border: none;
-    background-color: yellow;
-    font-weight: bold;
-    font-size: 20px;
-    letter-spacing: 2px;
-    cursor: pointer;
-}
 .form_login form button:hover{
     background-color: orange;
 }
@@ -62,3 +39,16 @@
 .form_login .change_passw_button:hover{
     background-color: orange;
 }
+
+@keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .spin-slow {
+    animation: spin 3s linear infinite; /* 3 segundos para un giro completo */
+  }

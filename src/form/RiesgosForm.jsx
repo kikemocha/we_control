@@ -7,8 +7,8 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
 
-const RiesgosForm = ({ show, onClose, fetchData }) => {
-  const {selectedEmpresa} = useAuth();
+const RiesgosForm = ({ show, onClose, fetchData, messagePopUp}) => {
+  const {selectedEmpresa, token} = useAuth();
   const [numberName, setNumberName] = useState('');
   const [description, setDescription] = useState('');
   const [riesgoValue, setRiesgoValue] = useState('');
@@ -17,24 +17,23 @@ const RiesgosForm = ({ show, onClose, fetchData }) => {
 
   const [loading, setLoading] = useState(false);
 
-  const formatDate = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
+  const handleClose = () =>{
+    setNumberName('');
+    setDescription('');
+    setRiesgoValue('');
+    setErrorMessage('');
+    setSuccessMessage('');
+    onClose();
+  }
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
 
     const requestBody = {
-      number_name: numberName,
+      number_name: 'R'+numberName,
       description: description,
       value: riesgoValue,
       belongs_to: selectedEmpresa,
-      create_date: formatDate(), // Formatear la fecha como ISO
     };
 
     try {
@@ -42,7 +41,7 @@ const RiesgosForm = ({ show, onClose, fetchData }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -53,10 +52,12 @@ const RiesgosForm = ({ show, onClose, fetchData }) => {
         fetchData();
         setSuccessMessage(result.message);
         setErrorMessage('');
+        messagePopUp('Riesgo Creado Correctamente', 'success')
         onClose();
       } else {
         setErrorMessage(result.message);
         setSuccessMessage('');
+        messagePopUp('Error Creando el Riesgo', 'error')
       }
     } catch (error) {
       setErrorMessage('Error al enviar los datos al servidor');
@@ -70,7 +71,7 @@ const RiesgosForm = ({ show, onClose, fetchData }) => {
   return (
     <div className="popup-overlay">
       <div className="popup">
-        <button className="popup-close" onClick={onClose}>
+        <button className="popup-close" onClick={handleClose}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -81,7 +82,7 @@ const RiesgosForm = ({ show, onClose, fetchData }) => {
           <div className="grid md:grid-cols-2 md:gap-6">
           <Input
               label="Número de riesgo"
-              type="text"
+              type="number"
               name="number_name"
               value={numberName}
               onChange={(e) => setNumberName(e.target.value)}

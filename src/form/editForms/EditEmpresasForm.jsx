@@ -1,20 +1,20 @@
-// RiesgosForm.js
+// EditEmpresaForm.js
 import React, { useState, useEffect } from 'react';
-import './Popup.css'; // Asegúrate de tener los estilos
-import { useAuth } from '../context/AuthContext';
+import '../Popup.css'; // Asegúrate de tener los estilos
+import { useAuth } from '../../context/AuthContext';
 
-import Button from '../components/common/Button';
-import Input from '../components/common/Input';
+import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
 
 
 
-const EmpresasForm = ({ show, onClose, fetchData }) => {
-  const {cognitoId, token} = useAuth();
+const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, phone, web, v_esp, v_trn, messagePopUp}) => {
+  const { token } = useAuth();
+  const [EmpresaId, setEmpresaId] = useState('');
   const [EmpresaName, setEmpresaName] = useState('');
   const [EmpresaEmail, setEmpresaEmail] = useState('');
   const [EmpresaPhone, setEmpresaPhone] = useState('');
   const [EmpresaWeb, setEmpresaWeb] = useState('');
-
   const [EmpresaValorEspecifico, setEmpresaValorEspecifico] = useState('');
   const [EmpresaValorTransversal, setEmpresaValorTransversal] = useState('');
 
@@ -24,14 +24,82 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    setEmpresaId(empresa_id || '');
+    setEmpresaName(name || '');
+    setEmpresaEmail(email || '');
+    setEmpresaPhone(phone || '');
+    setEmpresaWeb(web || '');
+    setEmpresaValorEspecifico(v_esp || '');
+    setEmpresaValorTransversal(v_trn || '');
+  }, [empresa_id, name, email, phone, web, v_esp, v_trn]); // Lista de dependencias
+
+
+
+  const handleClose = () =>{
+    setEmpresaId('');
+    setEmpresaName('');
+    setEmpresaEmail('');
+    setEmpresaPhone('');
+    setEmpresaWeb('');
+    setEmpresaValorEspecifico('');
+    setEmpresaValorTransversal('');
+    setErrorMessage('');
+    setSuccessMessage('');
+    onClose();
+  }
+
+  const handleEdit = async (e) => {
     setLoading(true);
     e.preventDefault();
 
 
     const requestBody = {
       name: EmpresaName,
-      cognito_id: cognitoId,
+      empresa_id: EmpresaId,
+      email: EmpresaEmail,
+      phone: EmpresaPhone,
+      web: EmpresaWeb,
+      valor_especifico: EmpresaValorEspecifico,
+      valor_transversal: EmpresaValorTransversal,
+    };
+    
+    try {
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateEmpresa', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        fetchData();
+        onClose();
+        setLoading(false);
+        messagePopUp('Empresa editada correctamente', 'success')
+      }
+      else{
+        messagePopUp('Error editando la empresa', 'error')
+      }
+    } catch (error) {
+      console.log(error);
+    } finally{
+      fetchData();
+      setLoading(false);
+      onClose();
+    }
+  };
+
+  const handleDelete = async (e) =>{
+    setLoading(true);
+    e.preventDefault();
+
+
+    const requestBody = {
+      name: EmpresaName,
+      empresa_id: EmpresaId,
       email: EmpresaEmail,
       phone: EmpresaPhone,
       web: EmpresaWeb,
@@ -40,26 +108,7 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
     };
 
     try {
-      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertEmpresa', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage(result.message);
-        setErrorMessage('');
-        fetchData(); // Recargar la lista de empresas
-        onClose();
-      } else {
-        setErrorMessage(result.message);
-        setSuccessMessage('');
-      }
+      console.log('Borrando Empresa: ', requestBody);
     } catch (error) {
       setErrorMessage('Error al enviar los datos al servidor');
       setSuccessMessage('');
@@ -70,13 +119,12 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
   };
 
 
-
   if (!show) return null;
 
   return (
-    <div className="popup-overlay">
+    <div className="popup-overlay" style={{ backgroundColor:'rgba(0, 0, 0, 0.1)'}}>
       <div className="popup form_control">
-        <button className="popup-close" onClick={onClose}>
+        <button className="popup-close" onClick={handleClose}>
           <svg fill="none" viewBox="0 0 15 15" height="1em" width="1em">
             <path
               fill="currentColor"
@@ -86,43 +134,45 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
             />
           </svg>
         </button>
-        <form className="form_controles"onSubmit={handleSubmit}>
-          <h4>NUEVA EMRESA</h4>
+        <form className="form_controles" onSubmit={handleEdit}>
+          <h4 className="text-lg font-semibold">EDITAR EMPRESA</h4>
           <Input
               label="Nombre Empresa"
               type="text"
               name="name"
-              value={EmpresaName}
+              value={EmpresaName == 'None' ? '' : EmpresaName}
               onChange={(e) => setEmpresaName(e.target.value)}
-              required
+              required={true}
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           <div className='w-full'>
-            <h4 className='mb-2 font-bold'>Contacto</h4>
+            <h4 className='mb-6 font-bold'>Contacto</h4>
             <Input
               label="e-mail"
               type="text"
               name="email"
-              value={EmpresaEmail}
+              value={EmpresaEmail == 'None' ? '' : EmpresaEmail}
               onChange={(e) => setEmpresaEmail(e.target.value)}
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              required={true}
+              className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
             <Input
               label="Web"
               type="text"
               name="web"
-              value={EmpresaWeb}
+              value={EmpresaWeb == 'None' ? '' : EmpresaWeb}
               onChange={(e) => setEmpresaWeb(e.target.value)}
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              required={true}
+              className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
             <Input
               label="Teléfono"
               type="text"
               name="phone"
-              value={EmpresaPhone}
+              value={EmpresaPhone == 'None' ? '' : EmpresaPhone}
               onChange={(e) => setEmpresaPhone(e.target.value)}
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              required
+              className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
           <h4 className='mb-2 font-bold'>Valor Controles</h4>
@@ -152,7 +202,29 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
           <div></div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
-          <button type="submit">{loading ? 'Cargando...' : 'Nueva Empresa'}</button>
+          
+          <div className='flex justify-around w-full'>
+          <Button
+            type='submit'
+            className={`text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Guardar Cambios'}
+          </Button>
+
+          <Button
+            onClick={handleDelete}
+            className={`delete text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Eliminar Empresa'}
+          </Button>
+          </div>
+
         </form>
         {loading && (
           <div className="rounded-3xl absolute top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
@@ -169,4 +241,4 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
   );
 };
 
-export default EmpresasForm;
+export default EditEmpresasForm;

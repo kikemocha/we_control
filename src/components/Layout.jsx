@@ -14,14 +14,14 @@ const Layout = () => {
                 <title>We Controol</title>
             </Helmet>
             <div className="layout-container">
-            <Sidebar />
-            <div className="content">
-                <Navbar />
-                <div className="content-padding">
-                    <Outlet />
+                <Sidebar />
+                <div className="content min-h-screen flex flex-col">
+                    <Navbar />
+                    <div className="content-padding flex-grow overflow-hidden">
+                        <Outlet />
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     );
 };

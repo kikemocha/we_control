@@ -8,7 +8,7 @@ import Input from '../components/common/Input';
 
 
 const ResponsablesForm = ({ show, onClose, fetchData }) => {
-  const {selectedEmpresa} = useAuth();
+  const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [titulo, setTitulo] = useState('');
@@ -40,7 +40,7 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
         },
         body: JSON.stringify(requestBody),
       });

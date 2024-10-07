@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css'; // Importa los estilos de D
 import Button from '../components/common/Button';
 
 const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria }) => {
-  const { selectedEmpresa } = useAuth();
+  const { selectedEmpresa, token } = useAuth();
   const [controlName, setControlName] = useState('');
   const [numberName, setNumberName] = useState('');
   const [evidences, setEvidences] = useState('');
@@ -34,7 +34,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
       try {
         const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa=${selectedEmpresa}`, {
           headers: {
-            'Authorization': `Bearer `
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -50,7 +50,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
       try {
         const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`, {
           headers: {
-            'Authorization': `Bearer `
+            'Authorization': `Bearer ${token}`
           }
         });
         console.log(response.data);
@@ -87,7 +87,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer `, // Incluye el token de autorización si es necesario
+          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
         },
         body: JSON.stringify(requestBody),
       });
