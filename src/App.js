@@ -8,7 +8,7 @@ import Controles from './pages/Controles';
 import Gestores from './pages/Gestores';
 import Auditorias from './pages/Auditorias';
 import Responsables from './pages/Responsables';
-import Home from './pages/Home';
+import Home from './pages/Home/Home';
 import LandingPage from './pages/LandingPage';
 import LogIn from './pages/LogIn';
 

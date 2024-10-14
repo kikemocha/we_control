@@ -26,7 +26,6 @@ const Controles = () => {
             );
             let data_clean = [];
             data_clean = response.data;
-            console.log(data_clean);
             setData(data_clean);
         } catch (error) {
             setError(error);
@@ -132,7 +131,6 @@ const Controles = () => {
                                 </tr>
                                 {data.map((control, index) => (
                                     <tr key={index} className="table-row">
-                                        {console.log(control)}
                                         <td>{control[1]}</td>
                                         <td className='riesgos_controles'>
                                         {control[7].split(',').map((riesgo, index) => (

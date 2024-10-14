@@ -40,7 +40,7 @@
     z-index: 1;
 }
 .card_table .no_main{
-    background-color: white;
+    background-color: whitesmoke;
 }
 .table-row th {
     text-align: center;
@@ -109,11 +109,12 @@
 }
 
 .archive_responsable .archive_button{
-    background-color: whitesmoke;
+    background-color: white;
     border: none;
     padding: 10px 10px;
     border-radius: 20px;
     cursor: pointer;
+    margin: auto;
 }
 .archive_responsable .archive_button:hover{
     background-color: orange;

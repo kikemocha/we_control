@@ -77,31 +77,42 @@ export const AuthProvider = ({ children }) => {
     setAwsCredentials(credentials);
   };
 
-  const fetchAwsCredentials = async () => {
-    try {
-      const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        timeout: 3000, // 3 segundos de timeout
-      });
-      const credentials = credentialsResponse.data;
-      configureAwsCredentials(credentials);
-      setIsCredentialsFetched(true);
-      scheduleCredentialsRefresh(credentials.Expiration); // Programar renovación
-    } catch (error) {
-      if (error.response) {
-        console.log('Error response data:', error.response.data);
-        if (error.response.data.message === 'The incoming token has expired') {
-          console.log('El token ha expirado, cerrando sesión.');
-          signOut(); // Si el token ha expirado, se cierra la sesión automáticamente
-          window.location.reload();
-        }
-      } else {
-        console.error('Error fetching AWS credentials:', error.message || error.response);
-      }      
+  const MAX_RETRIES = 3; // Número máximo de reintentos para obtener credenciales
+let retryCount = 0;
+
+const fetchAwsCredentials = async () => {
+  try {
+    const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 3000, // 3 segundos de timeout
+    });
+    const credentials = credentialsResponse.data;
+    configureAwsCredentials(credentials);
+    setIsCredentialsFetched(true);
+    retryCount = 0; // Reiniciar el contador de reintentos al obtener credenciales con éxito
+    scheduleCredentialsRefresh(credentials.Expiration); // Programar renovación
+  } catch (error) {
+    console.error('Error fetching AWS credentials:', error.message || error.response);
+
+    // Verificar si el token ha expirado y proceder a cerrar sesión si es necesario
+    if (error.response && error.response.data.message === 'The incoming token has expired') {
+      console.log('El token ha expirado, cerrando sesión.');
+      signOut();
+      return;
     }
-  };
+
+    // Implementar lógica de reintento
+    if (retryCount < MAX_RETRIES) {
+      retryCount++;
+      console.log(`Reintentando obtener credenciales AWS... Intento ${retryCount} de ${MAX_RETRIES}`);
+      setTimeout(() => fetchAwsCredentials(), 2000 * retryCount); // Aumentar el tiempo de espera entre reintentos
+    } else {
+      console.error('Error persistente al obtener credenciales AWS después de varios intentos.');
+    }
+  }
+};
 
   const scheduleCredentialsRefresh = (expiration) => {
     const currentTime = new Date().getTime();
