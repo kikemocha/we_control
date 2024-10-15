@@ -141,7 +141,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                           <div>
                             <p>Progeso Total</p>
                             <CircularProgress 
-                              value={empresas[12] === '0'
+                              value={empresas[12] === '0' || !(parseInt(empresas[13]) / (parseInt(empresas[14]) + parseInt(empresas[13])))
                                 ? 0 
                                 : parseInt(empresas[13]) / (parseInt(empresas[14]) + parseInt(empresas[13]))
                               }

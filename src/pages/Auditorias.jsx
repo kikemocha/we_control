@@ -176,7 +176,8 @@ const Auditorias = () => {
                     </svg>
                 </div>
                 <h3>{selectedAuditoriaName}</h3>
-                    {AuditoriaData ? (
+                    {console.log('AUDITORIA_DATA: ',AuditoriaData)}
+                    {AuditoriaData && !loading ? (
                         <div>
                             {popupFormType === 'control' && (
                                 <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} selectedAuditoria={selectedAuditoria}/>
@@ -364,7 +365,7 @@ const Auditorias = () => {
                             {data.map((auditoria, index) => (
                                 <tr key={index} className="table-row">
                                 <td>{auditoria[1]}</td>
-                                <td>{Math.floor(auditoria[3] / auditoria[2])}%</td>
+                                <td>{Math.floor(auditoria[3] / auditoria[2] * 100)}%</td>
                                 <td>{auditoria[4]}</td>
                                 <td >
                                     <svg

@@ -25,6 +25,18 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
   const [selectedRiesgos, setSelectedRiesgos] = useState([]); // Estado para almacenar los riesgos seleccionados
 
 
+  const resetValues = () =>{
+    setControlName('');
+    setNumberName('');
+    setEvidences('');
+    setPeriocity('Anual');
+    setValueControl('Transversal');
+    setSelectedRiesgos([]);
+  }
+  const handleClose = () =>{
+    resetValues();
+    onClose();
+  }
   useEffect(() => {
     const fetchRiesgos = async () => {
       try {
@@ -75,10 +87,11 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
       const result = await response.json();
 
       if (response.ok) {
+
         setSuccessMessage(result.message);
         setErrorMessage('');
         fetchData(); // Recargar la lista de controles
-        onClose();
+        handleClose();
       } else {
         setErrorMessage(result.message);
         setSuccessMessage('');
@@ -87,6 +100,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
       setErrorMessage('Error al enviar los datos al servidor');
       setSuccessMessage('');
     } finally{
+      resetValues();
       setLoading(false);
     }
   };
@@ -114,7 +128,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
   return (
     <div className="popup-overlay">
       <div className="popup form_control">
-      <button className="popup-close" onClick={onClose}>
+      <button className="popup-close" onClick={handleClose}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -125,7 +139,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
           <div className="grid md:grid-cols-2 md:gap-6">
             <Input
                 label="Número de control"
-                type="text"
+                type="number"
                 name="number_name"
                 value={numberName}
                 onChange={(e) => setNumberName(e.target.value)}
@@ -194,7 +208,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
           <button type="submit">{loading ? 'Cargando...' : 'Nuevo Control'}</button>
         </form>
         {loading && (
-          <div className="absolute top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+          <div className="absolute rounded-3xl top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
             <div role="status">
               <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
