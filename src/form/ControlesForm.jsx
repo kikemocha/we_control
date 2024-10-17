@@ -115,6 +115,8 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
 
   const periocity_options = [
     { value: 'Anual', label: 'Anual' },
+    { value: 'Semestral', label: 'Semestral' },
+    { value: 'Cuatrimestral', label: 'Cuatrimestral' },
     { value: 'Trimestral', label: 'Trimestral' },
   ];
 

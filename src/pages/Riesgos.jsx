@@ -136,14 +136,17 @@ const Riesgos = () => {
                             <div className="table-container">
                                 <div>
                                     <table className="card_table">
-                                        <tr className="table-row">
-                                            <th>Número de Riesgo</th>
-                                            <th>Descripción</th>
-                                            <th>Valor de Riesgo Inherente</th>
-                                            <th>Nº Controles Asociados</th>
-                                            <th>Valor de Riesgo Residual</th>
-                                            <th>Ajustes</th>
-                                        </tr>
+                                        <thead className='no_main'>
+                                            <tr className="table-row">
+                                                <th>Número de Riesgo</th>
+                                                <th>Nombre</th>
+                                                <th>Valor de Riesgo Inherente</th>
+                                                <th>Nº Controles Asociados</th>
+                                                <th>Valor de Riesgo Residual</th>
+                                                <th>Ajustes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                         {data.map((riesgos, index) => (
                                             <tr key={index} className="table-row">
                                                 <td className='riesgos_controles'><div className='bg-primary'>{riesgos[1]}</div></td>
@@ -173,6 +176,7 @@ const Riesgos = () => {
                                                 </td>
                                             </tr>
                                         ))}
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>

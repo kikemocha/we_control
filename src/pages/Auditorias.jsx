@@ -216,7 +216,7 @@ const Auditorias = () => {
                                                 <th>Nombre</th>
                                                 <th>Responsable</th>
                                                 <th>Fecha límite</th>
-                                                <th>Fecha de creación</th>
+                                                <th>Fecha de evidencia</th>
                                                 <th>Archivos subidos</th>
                                                 <th>Estado</th>
                                                 </tr>
@@ -224,11 +224,23 @@ const Auditorias = () => {
                                             <tbody>
                                                 {AuditoriaData.map((control, index) => (
                                                 <tr key={index} className="table-row">
-                                                    <td>{control[0]}</td>
+                                                    <td>
+                                                        {
+                                                        control[11] === 'Anual' ? (
+                                                            control[0]
+                                                        ) : control[11] === 'Semestral' ? (
+                                                            `${control[0]} - S${control[10]}`
+                                                        ): control[11] === 'Cuatrimestral' ? (
+                                                            `${control[0]} - ${control[10]}_Cuatr`
+                                                        ): control[11] === 'Trimestral' && (
+                                                            `${control[0]} - T${control[10]}`
+                                                        )
+                                                        }
+                                                    </td>
                                                     <td>{control[1]}</td>
                                                     <td>{control[2]}</td>
                                                     <td>{control[3]}</td>
-                                                    <td>{control[4]}</td>
+                                                    <td>{control[4] == 'None' ? '---' : control[4]}</td>
                                                     <td className="archive_responsable">
                                                     <div className={control[5] === 'None' ? '' : 'archive'}>
                                                         {control[5] === 'None' ? (

@@ -10,11 +10,7 @@ import Button from '../components/common/Button';
 
 const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria }) => {
   const { selectedEmpresa, token } = useAuth();
-  const [controlName, setControlName] = useState('');
-  const [numberName, setNumberName] = useState('');
-  const [evidences, setEvidences] = useState('');
   const [periocity, setPeriocity] = useState('Anual');
-  const [valueControl, setValueControl] = useState('Transversal');
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -23,10 +19,42 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
 
   const [controles, setControles] = useState([]); // Estado para almacenar los controles disponibles
   const [selectedControl, setSelectedControl] = useState(null); // Estado para almacenar el control seleccionado
+  const [selectedControlName, setSelectedControlName] = useState(null);
+
   const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
   const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
 
   const [limitDate, setLimitDate] = useState(new Date()); // Estado para la fecha límite seleccionada
+  const [limitDate2, setLimitDate2] = useState(new Date());
+  const [limitDate3, setLimitDate3] = useState(new Date());
+  const [limitDate4, setLimitDate4] = useState(new Date());
+  
+  useEffect(() => {
+    const today = new Date();
+    switch (periocity) {
+      case 'Anual':
+        setLimitDate(today);
+        break;
+      case 'Semestral':
+        setLimitDate(new Date(today.getFullYear(), 5, 30));
+        setLimitDate2(new Date(today.getFullYear(), 11, 31));
+        break;
+      case 'Cuatrimestral':
+        setLimitDate(new Date(today.getFullYear(), 3, 30));
+        setLimitDate2(new Date(today.getFullYear(), 7, 31));
+        setLimitDate3(new Date(today.getFullYear(), 11, 31));
+        break;
+      case 'Trimestral':
+        setLimitDate(new Date(today.getFullYear(), 2, 31));
+        setLimitDate2(new Date(today.getFullYear(), 5, 30));
+        setLimitDate3(new Date(today.getFullYear(), 8, 30));
+        setLimitDate4(new Date(today.getFullYear(), 11, 31));
+        break;
+      default:
+        setLimitDate(today);
+    }
+  }, [periocity]);
+
 
   useEffect(() => {
     const fetchControles = async () => {
@@ -73,46 +101,245 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
       setErrorMessage('Debes seleccionar un control y un responsable');
       return;
     }
-
-    const requestBody = {
-      id_auditoria: selectedAuditoria,
-      id_control: selectedControl,
-      id_responsable: selectedResponsable,
-      limit_date: limitDate.toISOString().split('T')[0],
-    };
-    console.log(selectedAuditoria, requestBody);
-
-    try {
-      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage(result.message);
-        setErrorMessage('');
-        fetchData(); // Recargar la lista de controles
-        onClose();
-      } else {
-        setErrorMessage(result.message);
+    if (periocity === 'Anual'){
+      const requestBody = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate.toISOString().split('T')[0],
+        order : 1,
+      };
+      console.log(selectedAuditoria, requestBody);
+  
+      try {
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok) {
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          onClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
         setSuccessMessage('');
+      } finally{
+        setLoading(false);
       }
-    } catch (error) {
-      setErrorMessage('Error al enviar los datos al servidor');
-      setSuccessMessage('');
-    } finally{
-      setLoading(false);
+    } else if (periocity === 'Semestral'){
+      const requestBody = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate.toISOString().split('T')[0],
+        order: 1
+      };
+      const requestBody2 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate2.toISOString().split('T')[0],
+        order: 2
+      };
+      try {
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
+        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody2),
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok) {
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          onClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+      } finally{
+        setLoading(false);
+      }
+    } else if (periocity === 'Cuatrimestral'){
+      const requestBody = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate.toISOString().split('T')[0],
+        order: 1,
+      };
+      const requestBody2 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate2.toISOString().split('T')[0],
+        order: 2,
+      };
+      const requestBody3 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate3.toISOString().split('T')[0],
+        order: 3
+      };
+      try {
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
+        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody2),
+        });
+        const response3 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody3),
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok) {
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          onClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+      } finally{
+        setLoading(false);
+      }
+    } else if (periocity === 'Trimestral'){
+      const requestBody = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate.toISOString().split('T')[0],
+        order: 1,
+      };
+      const requestBody2 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate2.toISOString().split('T')[0],
+        order: 2,
+      };
+      const requestBody3 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate3.toISOString().split('T')[0],
+        order: 3,
+      };
+      const requestBody4 = {
+        id_auditoria: selectedAuditoria,
+        id_control: selectedControl,
+        id_responsable: selectedResponsable,
+        limit_date: limitDate3.toISOString().split('T')[0],
+        order: 4
+      };
+      try {
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
+        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody2),
+        });
+        const response3 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody3),
+        });
+        const response4 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody4),
+        });
+  
+        const result = await response.json();
+  
+        if (response.ok) {
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          onClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+      } finally{
+        setLoading(false);
+      }
     }
   };
 
-  const handleControlClick = (controlId) => {
+  const handleControlClick = (controlId, Periocity, controlName) => {
+    setPeriocity(Periocity);
     setSelectedControl(controlId); // Selecciona solo un control
+    setSelectedControlName(controlName);
   };
 
   const handleResponsableClick = (responsableId) => {
@@ -123,8 +350,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
 
   return (
     <div className="popup-overlay">
-      
-      <div className="popup form_control">
+      <div className="popup form_control" style={{height:'90%'}}>
         <button className="popup-close" onClick={onClose}>
           <svg fill="none" viewBox="0 0 15 15" height="1em" width="1em">
             <path
@@ -144,7 +370,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
                 <div 
                   key={control[0]} 
                   className={`riesgo-item ${selectedControl === control[0] ? 'selected' : ''}`} 
-                  onClick={() => handleControlClick(control[0])}
+                  onClick={() => handleControlClick(control[0], control[4], control[1])}
                 >
                   <strong>{control[1]}</strong>
                   <p>{control[2]}</p>
@@ -170,14 +396,126 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           </label>
           <br />
           <label>
-            <p>Fecha Límite</p>
-            <DatePicker
-              selected={limitDate}
-              onChange={(date) => setLimitDate(date)}
-              dateFormat="yyyy-MM-dd"
-              className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
-              required
-            />
+            <p>Fecha Límite - ({periocity})</p>
+            {periocity === 'Anual' ? (
+              <div>
+                <DatePicker
+                  selected={limitDate}
+                  onChange={(date) => setLimitDate(date)}
+                  dateFormat="yyyy-MM-dd"
+                  className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                  required
+                />
+              </div>
+              ) : periocity === 'Semestral' ? 
+              (
+                <div>
+                  <div className='flex items-center justify-between w-full'>
+                  <p className='font-bold mr-5'>{selectedControlName} - S1</p>
+                    <DatePicker
+                      selected={limitDate}
+                      onChange={(date) => setLimitDate(date)}
+                      dateFormat="yyyy-MM-dd"
+                      className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                      required
+                    />
+                  </div>
+                  <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - S2</p>
+                      <DatePicker
+                        selected={limitDate2}
+                        onChange={(date) => setLimitDate2(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                        required
+                      />
+                  </div>
+                </div>
+              ) : periocity === 'Cuatrimestral' ? 
+              (
+                <div>
+                  <div>
+                  <div className='flex items-center justify-between w-full'>
+                    <p className='font-bold mr-5'>{selectedControlName} - 1_Cuatr</p>
+                      <DatePicker
+                        selected={limitDate}
+                        onChange={(date) => setLimitDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                        required
+                      />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - 2_Cuatr</p>
+                        <DatePicker
+                          selected={limitDate2}
+                          onChange={(date) => setLimitDate2(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - 3_Cuatr</p>
+                        <DatePicker
+                          selected={limitDate3}
+                          onChange={(date) => setLimitDate3(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                  </div>
+                </div>
+              ) : periocity === 'Trimestral' &&
+              (
+                <div>
+                  <div>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - T1</p>
+                      <DatePicker
+                        selected={limitDate}
+                        onChange={(date) => setLimitDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                        required
+                      />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - T2</p>
+                        <DatePicker
+                          selected={limitDate2}
+                          onChange={(date) => setLimitDate2(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - T3</p>
+                        <DatePicker
+                          selected={limitDate3}
+                          onChange={(date) => setLimitDate3(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                    <p className='font-bold mr-5'>{selectedControlName} - T4</p>
+                        <DatePicker
+                          selected={limitDate4}
+                          onChange={(date) => setLimitDate4(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+            
           </label>
           <br />
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}

@@ -77,7 +77,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                     <th>Evidencias</th>
                                     <th>Responsable</th>
                                     <th>Fecha límite</th>
-                                    <th>Fecha de creación</th>
+                                    <th>Fecha de evidencias</th>
                                     <th>Archivos subidos</th>
                                     <th>Estado</th>
                                     </tr>
@@ -89,7 +89,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                         <td>{riesgo[3]}</td>
                                         <td>{riesgo[4]}</td>
                                         <td>{riesgo[5]}</td>
-                                        <td>{riesgo[6]}</td>
+                                        <td>{riesgo[6] == 'None' ? '---' : riesgo[6]}</td>
                                         <td className='archive_responsable'>
                                         <div className={riesgo[7] === 'None' ? '' : 'archive mx-auto'}>
                                             {riesgo[7] === 'None' ? (
@@ -155,7 +155,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                 <th>Evidencias</th>
                                 <th>Responsable</th>
                                 <th>Fecha límite</th>
-                                <th>Fecha de creación</th>
+                                <th>Fecha de evidencias</th>
                                 <th>Archivos subidos</th>
                                 <th>Estado</th>
                                 </tr>

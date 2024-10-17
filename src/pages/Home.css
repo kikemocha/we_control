@@ -39,18 +39,21 @@
     background-color: whitesmoke; /* O el color que prefieras */
     z-index: 1;
 }
-.card_table .no_main{
-    background-color: whitesmoke;
+.card_table .no_main {
+    position: sticky; /* Fija la cabecera */
+    top: 0; /* Posiciona en la parte superior */
+    z-index: 2; /* Asegúrate de que el encabezado esté encima de otras partes */
 }
 .table-row th {
     text-align: center;
-    height: 60px; /* Altura fija para los th y td */
     border-top: none;
     font-weight: bold;
-    font-size: 0.9em;
-    text-align: left;
     padding: 8px; /* Añade padding si es necesario */
+    height: 60px;
+    font-size: 0.8em;
+    padding-left: 20px;
 }
+
 
 .table-row td {
     text-align: center;
@@ -60,13 +63,6 @@
     font-size: 0.9em;
     text-align: left;
     padding: 8px; /* Añade padding si es necesario */
-}
-
-.table-row th {
-    text-align: center;
-    height: 40px; /* Altura fija para el encabezado */
-    font-size: 0.8em;
-    padding-left: 20px;
 }
 
 .table-row td {
@@ -249,7 +245,7 @@
 .card_option .table-container{
     background-color: whitesmoke;
     height: 100%;
-    padding: 20px 0px;
+    padding: 0px 0px;
     border: 1px solid black;
     border-radius: 30px;
     box-shadow: 1px 1px 1px grey;

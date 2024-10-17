@@ -121,28 +121,32 @@ const Controles = () => {
                         <div className="table-container">
                             <div>
                                 <table className="card_table">
-                                <tr className="table-row">
-                                    <th>Número</th>
-                                    <th>Riesgos Asociados</th>
-                                    <th>Nombre</th>
-                                    <th>Evidencias</th>
-                                    <th>Periodicidad</th>
-                                    <th>Tipo de Control</th>
-                                </tr>
-                                {data.map((control, index) => (
-                                    <tr key={index} className="table-row">
-                                        <td>{control[1]}</td>
-                                        <td className='riesgos_controles'>
-                                        {control[7].split(',').map((riesgo, index) => (
-                                            <div key={index}>{riesgo}</div>
-                                        ))}
-                                        </td>
-                                        <td>{control[2]}</td>
-                                        <td>{control[3]}</td>
-                                        <td>{control[4]}</td>
-                                        <td>{control[5]}</td>   
+                                <thead className='no_main'>
+                                    <tr className="table-row">
+                                        <th>Número</th>
+                                        <th>Riesgos Asociados</th>
+                                        <th>Nombre</th>
+                                        <th>Evidencias</th>
+                                        <th>Periodicidad</th>
+                                        <th>Tipo de Control</th>
                                     </tr>
-                                ))}
+                                </thead>
+                                <tbody>
+                                    {data.map((control, index) => (
+                                        <tr key={index} className="table-row">
+                                            <td>{control[1]}</td>
+                                            <td className='riesgos_controles'>
+                                            {control[7].split(',').map((riesgo, index) => (
+                                                <div key={index}>{riesgo}</div>
+                                            ))}
+                                            </td>
+                                            <td>{control[2]}</td>
+                                            <td>{control[3]}</td>
+                                            <td>{control[4]}</td>
+                                            <td>{control[5]}</td>   
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
                             </div>
                         </div>
