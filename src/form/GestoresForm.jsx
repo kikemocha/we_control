@@ -7,7 +7,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
 const GestoresForm = ({ show, onClose, fetchData }) => {
-  const {selectedEmpresa} = useAuth();
+  const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [titulo, setTitulo] = useState('');
