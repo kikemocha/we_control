@@ -1,7 +1,7 @@
 // GestoresForm.js
 import React, { useState } from 'react';
 import './Popup.css'; // Asegúrate de tener los estilos
-import { useAuth } from '../context/AuthContext';
+import { useAuth, token } from '../context/AuthContext';
 
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
@@ -40,7 +40,7 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token', // Incluye el token de autorización si es necesario
+          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
         },
         body: JSON.stringify(requestBody),
       });
