@@ -1,10 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken') || null);
+  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken') || null);
+  
   const [role, setRole] = useState(() => localStorage.getItem('role') || null);
   const [name, setName] = useState(() => localStorage.getItem('name') || null);
   const [surname, setSurname] = useState(() => localStorage.getItem('surname') || null);
@@ -15,14 +19,22 @@ export const AuthProvider = ({ children }) => {
 
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
-  const [isCredentialsFetched, setIsCredentialsFetched] = useState(false); // Estado para controlar si se obtuvieron credenciales
 
   const [userData, setUserData] = useState(null); // Para almacenar la información del usuario
 
-  
+
+  useEffect(() => {
+    localStorage.setItem('accessToken', accessToken);
+  }, [accessToken]);
+
+  useEffect(() => {
+    localStorage.setItem('refreshToken', refreshToken);
+  }, [refreshToken]);
+
   useEffect(() => {
     localStorage.setItem('token', token);
   }, [token]);
+  
 
   useEffect(() => {
     localStorage.setItem('role', role);
@@ -49,10 +61,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('selectedEmpresa', selectedEmpresa);
   }, [selectedEmpresa]);
 
+
+
   const signOut = () => {
     try {
+      console.log('Cerrando sesión...')
       // Limpiar el estado en el contexto de React
       setToken(null);
+      setAccessToken(null);
+      setRefreshToken(null);
       setRole(null);
       setName(null);
       setSurname(null);
@@ -61,7 +78,7 @@ export const AuthProvider = ({ children }) => {
       setSelectedEmpresa(null);
       setAwsCredentials(null);
       setUserData(null);
-  
+      
       // Limpiar el almacenamiento local
       localStorage.clear(); // Eliminar todo del localStorage
   
@@ -72,65 +89,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const configureAwsCredentials = (credentials) => {
-    console.log('Tienes credenciales!');
-    setAwsCredentials(credentials);
-  };
-
-  const MAX_RETRIES = 3; // Número máximo de reintentos para obtener credenciales
-let retryCount = 0;
-
-const fetchAwsCredentials = async () => {
-  try {
-    const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      timeout: 3000, // 3 segundos de timeout
-    });
-    const credentials = credentialsResponse.data;
-    configureAwsCredentials(credentials);
-    setIsCredentialsFetched(true);
-    retryCount = 0; // Reiniciar el contador de reintentos al obtener credenciales con éxito
-    scheduleCredentialsRefresh(credentials.Expiration); // Programar renovación
-  } catch (error) {
-    console.error('Error fetching AWS credentials:', error.message || error.response);
-
-    // Verificar si el token ha expirado y proceder a cerrar sesión si es necesario
-    if (error.response && error.response.data.message === 'The incoming token has expired') {
-      console.log('El token ha expirado, cerrando sesión.');
-      signOut();
+  const fetchAwsCredentials = async (tokenAWS) => {
+    if (!tokenAWS) {
+      console.error('No token available to fetch AWS credentials.');
       return;
     }
-
-    // Implementar lógica de reintento
-    if (retryCount < MAX_RETRIES) {
-      retryCount++;
-      console.log(`Reintentando obtener credenciales AWS... Intento ${retryCount} de ${MAX_RETRIES}`);
-      setTimeout(() => fetchAwsCredentials(), 2000 * retryCount); // Aumentar el tiempo de espera entre reintentos
-    } else {
-      console.error('Error persistente al obtener credenciales AWS después de varios intentos.');
-    }
-  }
-};
-
-  const scheduleCredentialsRefresh = (expiration) => {
-    const currentTime = new Date().getTime();
-    const expirationTime = new Date(expiration).getTime();
-    const timeLeft = expirationTime - currentTime;
-    const refreshTime = timeLeft - 5 * 60 * 1000; // Renovar 5 minutos antes de expirar
-
-    if (refreshTime > 0) {
-      setTimeout(() => {
-        fetchAwsCredentials();
-      }, refreshTime);
-    } else {
-      fetchAwsCredentials(); // Si está muy cerca de expirar, renovarlas de inmediato
+    try {
+      const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
+        headers: {
+          Authorization: `Bearer ${tokenAWS}`,
+        },
+        timeout: 3000, // 3 segundos de timeout
+      });
+      const credentials = credentialsResponse.data;
+      setAwsCredentials(credentials);
+      console.log('Credenciales concedidas');
+    } catch (error) {
+      console.error('Error fetching AWS credentials:', error.message || error.response);
     }
   };
 
   const fetchUserData = async (id_cognito, token) => {
     try {
+      
       const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserInfo?id_cognito=${id_cognito}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -139,7 +120,7 @@ const fetchAwsCredentials = async () => {
       
       const data = response.data;
       setUserData(data);
-
+      fetchAwsCredentials();
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');
@@ -159,12 +140,6 @@ const fetchAwsCredentials = async () => {
   };
 
   useEffect(() => {
-    if (token && !isCredentialsFetched) {
-      fetchAwsCredentials();
-    }
-  }, [token, isCredentialsFetched]);
-
-  useEffect(() => {
     if (selectedEmpresa !== null) {
       localStorage.setItem('selectedEmpresa', selectedEmpresa);
     } else {
@@ -172,9 +147,39 @@ const fetchAwsCredentials = async () => {
     }
   }, [selectedEmpresa]);
 
+  const refreshAccessToken = async () => {
+    try {
+      // Forzar la renovación de la sesión utilizando el refresh token
+      const session = await fetchAuthSession({ forceRefresh: true });
+      // Extraer el cognitoId del payload del access token actualizado
+      const cognitoId = session.tokens.accessToken.payload.sub;
+      const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // Reemplaza con tu App Client ID
+      // Obtén los tokens actualizados desde el Local Storage
+      const newAccessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+      const newRefreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+      const newIdToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+    
+      // Actualizar el estado y el Local Storage con los nuevos tokens
+      setAccessToken(newAccessToken);
+      setToken(newIdToken); // Guarda el ID token en el contexto
+      setRefreshToken(newRefreshToken);
+      console.log('Tokens renovados con éxito');
+    } catch (error) {
+      console.error('Error al renovar los tokens:', error);
+    }
+  };
+  
+  
+  
+  
+
   const value = {
     token,
     setToken,
+    accessToken,
+    setAccessToken,
+    refreshToken,
+    setRefreshToken,
     role,
     setRole,
     name,
@@ -189,10 +194,13 @@ const fetchAwsCredentials = async () => {
     selectedEmpresa,
     setSelectedEmpresa,
     awsCredentials,
-    configureAwsCredentials,
     fetchUserData, // Ahora disponible para obtener datos del usuario
-    userData
+    userData,
+    fetchAwsCredentials,
+    refreshAccessToken
   };
+
+  
 
   return (
     <AuthContext.Provider value={value}>

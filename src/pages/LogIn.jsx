@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { signIn, fetchAuthSession, confirmSignIn } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
 import './Login.css';
 import logo from '../we_control.png' ;
+import { signOut } from 'aws-amplify/auth';
+
 
 import Button from '../components/common/Button';
-import Input from '../components/common/Input';
+
 
 
 const LogIn = () => {
@@ -18,31 +19,56 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
-  const { setToken, setCognitoId, fetchUserData } = useAuth();
+  const [token, setJWTToken] = useState(null);
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials } = useAuth();
 
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event) => {
-    setLoading(true);
-    event.preventDefault();
-    try {
-      const { isSignedIn, nextStep } = await signIn({username: email, password });
+  useEffect(() => {
+    // Verificamos que el token no sea null o undefined
+    if (token) {
+      const fetchAWS = async () => {
+        try {
+          await fetchAwsCredentials(token);
+        } catch (error) {
+          console.error('Error fetching AWS credentials:', error);
+        }
+      };
+      fetchAWS();
+    }
+  }, [token]);
 
+  const handleSubmit = async (event, providedPassword = null) => {
+    if (event) event.preventDefault();
+    setLoading(true);
+  
+    try {
+      // Usa la contraseña proporcionada si existe, de lo contrario usa la del estado.
+      const passwordToUse = providedPassword || password;
+      const { isSignedIn, nextStep } = await signIn({ username: email, password: passwordToUse });
+  
       if (isSignedIn) {
         const session = await fetchAuthSession(); // Obtén la sesión actual
         const token = session.tokens.accessToken;
-        const idToken = localStorage.getItem(`CognitoIdentityServiceProvider.${token.payload.client_id}.${token.payload.sub}.idToken`);
+        const cognitoId = token.payload.sub;
+  
+        const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
+        const accessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+        const refreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+        const idToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+  
         setToken(idToken); // Guarda el token en el contexto
-        
-        const id_cognito = token.payload.sub;
-        setCognitoId(id_cognito);
-
-        await fetchUserData(id_cognito, idToken);
-
+        setJWTToken(idToken);
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+        setCognitoId(cognitoId);
+  
+        await fetchUserData(cognitoId, idToken);
+  
         // Navega a la página principal
         navigate('/home');
       } else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        setIsNewPasswordRequired(true); // Muestra el form de nueva contraseña
+        setIsNewPasswordRequired(true); // Muestra el formulario de nueva contraseña
       } else {
         setError(`Debe completar el siguiente paso: ${nextStep.signInStep}`);
       }
@@ -53,17 +79,19 @@ const LogIn = () => {
       setLoading(false);
     }
   };
+  
 
   const handleNewPasswordSubmit = async (event) => {
     setLoading(true);
     event.preventDefault();
-
+    
     // Validar que la nueva contraseña y la confirmación coincidan
     if (newPassword !== confirmNewPassword) {
       setError("Las contraseñas no coinciden.");
+      setLoading(false); // Detener el loading si las contraseñas no coinciden
       return;
     }
-
+    
     try {
       // Completa el cambio de contraseña en Cognito
       const user = await signIn({ username: email, password });
@@ -71,15 +99,17 @@ const LogIn = () => {
         challengeResponse: newPassword,
         userAttributes: {} // Aquí puedes pasar cualquier atributo del usuario si es necesario
       });
-
+  
       if (result.isSignedIn) {
-        const session = await fetchAuthSession(); // Obtén la sesión actual
-        const idToken = session.tokens.idToken;
-        setToken(idToken); // Guarda el token en el contexto
-        const id_cognito = idToken.payload.sub;
-        setCognitoId(id_cognito);
-        // Navega a la página principal
-        navigate('/home');
+        console.log('Contraseña cambiada con éxito, cerrando sesión para iniciar sesión con la nueva contraseña...');
+        
+        // Cierra la sesión actual antes de volver a iniciar sesión
+        await signOut();
+  
+        // Llama a handleSubmit con la nueva contraseña para iniciar sesión nuevamente
+        await handleSubmit(null, newPassword);
+      } else {
+        setError("No se pudo cambiar la contraseña.");
       }
     } catch (error) {
       setError(error.message || "Error al cambiar la contraseña.");
@@ -88,6 +118,8 @@ const LogIn = () => {
       setLoading(false);
     }
   };
+    
+  
 
   return (
     <div className='login-container'>
@@ -107,7 +139,7 @@ const LogIn = () => {
                 className={`block py-2.5 px-2 w-full text-lg text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
               {/* Label that "floats" */}
-              <div className=" flex px-2 peer-focus:font-medium absolute text-lg text-gray-800 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9">
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"password"}
                   >
@@ -128,7 +160,7 @@ const LogIn = () => {
                 className={`block py-2.5 px-2 w-full text-lg text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
               {/* Label that "floats" */}
-              <div className=" flex px-2 peer-focus:font-medium absolute text-lg text-gray-800 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9">
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"new_password"}
                   >
@@ -150,7 +182,7 @@ const LogIn = () => {
                 className={`block py-2.5 px-2 w-full text-lg text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
               {/* Label that "floats" */}
-              <div className=" flex px-2 peer-focus:font-medium absolute text-lg text-gray-800 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9">
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"new_password"}
                   >
@@ -185,7 +217,7 @@ const LogIn = () => {
                 className={`block py-2.5 px-4 w-full h-14 text-md text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
               {/* Label that "floats" */}
-              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9">
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"email"}
                   >
@@ -208,7 +240,7 @@ const LogIn = () => {
                 className={`block py-2.5 px-4 w-full h-14 text-md text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
               {/* Label that "floats" */}
-              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9">
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"password"}
                   >

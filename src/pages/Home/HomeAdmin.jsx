@@ -9,7 +9,6 @@ import CircularProgress from "../../components/CircularProgress";
 import Card from "../../components/Card";
 
 const HomeAdmin = ({getUserData, UserInfo}) => {
-    console.log(UserInfo);
     const { name, setSelectedEmpresa, selectedEmpresa} = useAuth();
     
     const [showPopup, setShowPopup] = useState(false);

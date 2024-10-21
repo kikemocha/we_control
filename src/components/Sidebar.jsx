@@ -1,15 +1,28 @@
 // src/components/Sidebar.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link , useLocation } from 'react-router-dom';
 import logo from '../we_control.png'
 import SignOutButton from './SignOut';
 import './Layout.css';
-import { useAuth, selectedEmpresa } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-    const {role, selectedEmpresa, setSelectedEmpresa} = useAuth();
+    const {role, selectedEmpresa, signOut} = useAuth();
     const location = useLocation();
-    console.log(role);
+  
+  useEffect(() => {
+    // Verifica que signOut está definido
+    if (!signOut) {
+      console.error('signOut function is not defined');
+      return;
+    }
+
+    // Ejecutar signOut si el role es null
+    if (role === 'null') {
+      console.log('Role is null, signing out...');
+      signOut();
+    }
+  }, [role, signOut]);
     return (
         <div className="sidebar">
           <Link to="/home">

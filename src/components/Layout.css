@@ -68,8 +68,9 @@ body {
 }
 .signout_button {
     background-color: #e5f301FF;
+    font-size: 0.8em;
     width: 80%;
-    padding: 10px 30px;
+    padding: 10px 10px;
     border-radius: 30px;
     border: none;
     font-weight: bold;

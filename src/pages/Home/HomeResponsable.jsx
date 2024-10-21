@@ -5,8 +5,6 @@ import axios from "axios";
 
 import FileUploadPopup from "../../form/UploadFile";
 import ShowFile from "../../form/ShowFile";
-import { setConflictHandler } from "aws-amplify/in-app-messaging";
-
 
 const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const {role, cognitoId, token, configureAwsCredentials} = useAuth();
@@ -67,11 +65,12 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                     Controles Asociados: {UserInfo.data.riesgos.length}
                     </div>
                     <div className='card_option'>
-                        <div className="table-container">
+                    <div className="table-container">
                         {UserInfo && UserInfo.data && UserInfo.data.riesgos ? (
                             <div>
-                                <table className="card_table">
-                                    <tr className="table-row">
+                            <table className="card_table">
+                                <thead>
+                                <tr className="table-row">
                                     <th>Número de Control</th>
                                     <th>Nombre</th>
                                     <th>Evidencias</th>
@@ -80,57 +79,63 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                     <th>Fecha de evidencias</th>
                                     <th>Archivos subidos</th>
                                     <th>Estado</th>
-                                    </tr>
-                                    {UserInfo.data.riesgos.map((riesgo, index) => (
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {UserInfo.data.riesgos.map((riesgo, index) => (
                                     <tr key={index} className="table-row">
-                                        {console.log(riesgo)}
-                                        <td>{riesgo[1]}</td>
-                                        <td>{riesgo[2]}</td>
-                                        <td>{riesgo[3]}</td>
-                                        <td>{riesgo[4]}</td>
-                                        <td>{riesgo[5]}</td>
-                                        <td>{riesgo[6] == 'None' ? '---' : riesgo[6]}</td>
-                                        <td className='archive_responsable'>
+                                    <td>{riesgo[1]}</td>
+                                    <td>{riesgo[2]}</td>
+                                    <td>{riesgo[3]}</td>
+                                    <td>{riesgo[4]}</td>
+                                    <td>{riesgo[5]}</td>
+                                    <td>{riesgo[6] === 'None' ? '---' : riesgo[6]}</td>
+                                    <td className='archive_responsable'>
                                         <div className={riesgo[7] === 'None' ? '' : 'archive mx-auto'}>
-                                            {riesgo[7] === 'None' ? (
-                                                <>
-                                                <button className='archive_button' onClick={() => {
-                                                        setShowUploadPopup(true);
-                                                        setSelectedControl(riesgo);
-                                                    }
-                                                }>Subir Archivo</button>
-                                                <FileUploadPopup
-                                                    show={showUploadPopup}
-                                                    onClose={() => setShowUploadPopup(false)}
-                                                    onUpload={handleUpload}
-                                                    selectedControl={selectedControl}
-                                                    selectedAuditoria={riesgo[9]}
-                                                    userData = {UserAuditoriaData}
-                                                    fetchData={getUserData}
-                                                />
-                                                </>
-                                            ) : (
-                                                <>
-                                                <p onClick={() => handleShowIMGPopup(riesgo)}>{riesgo[7].split('/').slice(1).join('')}</p>
-                                                <ShowFile
-                                                    show={showIMGPopup}
-                                                    onClose={() => setshowIMGPopup(false)}
-                                                    imgkey={imgkey} // Pasamos el Key del archivo
-                                                    bucketName={bucketName}
-                                                    control_name={controlName}
-                                                    message_admin= {messageAdmin}
-                                                    fetchData={getUserData}
-                                                    id_control={id_control}
-                                                    id_auditoria={id_auditoria}
-                                                />
-                                                </>
-                                            )}
-                                            </div>
-                                        </td>
-                                        <td className={riesgo[8] === 'Denegado' ? 'text-red-500' : ''}>{riesgo[8] === 'Denegado' ? ('No Validado'): (riesgo[8])}</td>
+                                        {riesgo[7] === 'None' ? (
+                                            <>
+                                            <button className='archive_button' onClick={() => {
+                                                setShowUploadPopup(true);
+                                                setSelectedControl(riesgo);
+                                                }}
+                                            >
+                                                Subir Archivo
+                                            </button>
+                                            <FileUploadPopup
+                                                show={showUploadPopup}
+                                                onClose={() => setShowUploadPopup(false)}
+                                                onUpload={handleUpload}
+                                                selectedControl={selectedControl}
+                                                selectedAuditoria={riesgo[9]}
+                                                userData={UserAuditoriaData}
+                                                fetchData={getUserData}
+                                            />
+                                            </>
+                                        ) : (
+                                            <>
+                                            <p onClick={() => handleShowIMGPopup(riesgo)}>{riesgo[7].split('/').slice(1).join('')}</p>
+                                            <ShowFile
+                                                show={showIMGPopup}
+                                                onClose={() => setshowIMGPopup(false)}
+                                                imgkey={imgkey}
+                                                bucketName={bucketName}
+                                                control_name={controlName}
+                                                message_admin={messageAdmin}
+                                                fetchData={getUserData}
+                                                id_control={id_control}
+                                                id_auditoria={id_auditoria}
+                                            />
+                                            </>
+                                        )}
+                                        </div>
+                                    </td>
+                                    <td className={riesgo[8] === 'Denegado' ? 'text-red-500' : ''}>
+                                        {riesgo[8] === 'Denegado' ? 'No Validado' : riesgo[8]}
+                                    </td>
                                     </tr>
-                                    ))}
-                                </table>
+                                ))}
+                                </tbody>
+                            </table>
                             </div>
                         ) : (
                             <div>No hay información disponible</div>
@@ -141,9 +146,9 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
             ):(
                 <div className='responsable_main'>
                     <div className='length-responsable'>
-                        <p>Controles Asociados: 
-                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
-                        </p>
+                        <div>Controles Asociados: 
+                            <p className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></p>
+                        </div>
                     </div>
                     <div className='card_option'>
                         <div className="table-container skeleton">
