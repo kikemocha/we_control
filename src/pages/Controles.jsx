@@ -65,15 +65,18 @@ const Controles = () => {
                             <div className="table-container skeleton">
                                 <div>
                                     <table className="card_table">
-                                    <tr className="table-row">
-                                        <th>Número</th>
-                                        <th>Nombre</th>
-                                        <th>Riesgo Asociado</th>
-                                        <th>Valor de Control</th>
-                                        <th>Evidencias</th>
-                                        <th>Periodicidad</th>
-                                        
-                                    </tr>
+                                    <thead>
+                                        <tr className="table-row">
+                                            <th>Número</th>
+                                            <th>Nombre</th>
+                                            <th>Riesgo Asociado</th>
+                                            <th>Valor de Control</th>
+                                            <th>Evidencias</th>
+                                            <th>Periodicidad</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     {Array.from({ length: 8 }).map((_, index) => (
                                         <tr key={index} className="table-row">
                                             <td></td>
@@ -84,6 +87,7 @@ const Controles = () => {
                                             <td></td>
                                         </tr>
                                     ))}
+                                    </tbody>
                                     
                                 </table>
                                 </div>

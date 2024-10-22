@@ -9,7 +9,7 @@ import HomeGestor from './HomeGestor';
 import HomeResponsable from './HomeResponsable';
 
 const Home = () => {
-  const {role, cognitoId, token} = useAuth();
+  const {role, cognitoId, token, awsCredentials, fetchAwsCredentials} = useAuth();
   const [UserInfo, setUserInfo] = useState(null); // State para guardar los datos
   const [loading, setLoading] = useState(false); // Estado de carga
   const [error, setError] = useState(null);
@@ -59,6 +59,41 @@ const Home = () => {
   useEffect(()=>{
     getUserData();
   }, []);
+
+
+  useEffect(() => {
+    // Definir una función asíncrona dentro del useEffect
+    const checkAndFetchAwsCredentials = async () => {
+      if (!awsCredentials || Object.keys(awsCredentials).length === 0) {
+        console.log('No tienes credenciales');
+        let attempts = 3; // Número de intentos permitidos
+        let success = false;
+  
+        for (let i = 0; i < attempts; i++) {
+          try {
+            console.log(`Intento ${i + 1} de ${attempts}`);
+            setLoading(true);
+            await fetchAwsCredentials(token);
+            success = true;
+            console.log('Credenciales obtenidas con éxito');
+            break; // Si se obtienen las credenciales, salir del bucle
+          } catch (error) {
+            console.error(`Error al obtener las credenciales en el intento ${i + 1}:`, error);
+          } finally {
+            setLoading(false);
+          }
+        }
+  
+        if (!success) {
+          console.error('No se pudieron obtener las credenciales después de 3 intentos.');
+        }
+      }
+    };
+  
+    // Llamar a la función asíncrona
+    checkAndFetchAwsCredentials();
+  }, [awsCredentials, token]);
+  
 
   if (loading && role === 'admin') {
     return <div>

@@ -20,7 +20,7 @@ const LogIn = () => {
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
   const [token, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials } = useAuth();
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime} = useAuth();
 
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +51,9 @@ const LogIn = () => {
         const session = await fetchAuthSession(); // Obtén la sesión actual
         const token = session.tokens.accessToken;
         const cognitoId = token.payload.sub;
+        const exp = session.tokens.idToken.payload.exp;
+        setExpirationTime(new Date(exp * 1000));
+        console.log('EXP_TIME: ', new Date(exp * 1000));
   
         const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
         const accessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);

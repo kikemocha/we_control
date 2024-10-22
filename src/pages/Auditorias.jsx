@@ -129,12 +129,15 @@ const Auditorias = () => {
                             <div className="table-container skeleton">
                                 <div>
                                     <table className="card_table">
+                                    <thead>
                                     <tr className="table-row">
                                         <th>Nombre</th>
                                         <th>Progreso</th>
                                         <th>Fecha de Creación</th>
                                         <th>Detalle</th>
                                     </tr>
+                                    </thead>
+                                    <tbody>
                                     {Array.from({ length: 8 }).map((_, index) => (
                                         <tr key={index} className="table-row">
                                             <td></td>
@@ -143,6 +146,7 @@ const Auditorias = () => {
                                             <td></td>
                                         </tr>
                                     ))}
+                                    </tbody>
                                     
                                 </table>
                                 </div>

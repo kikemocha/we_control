@@ -154,7 +154,6 @@ const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria,
 
   return (
     <div className="popup-overlay">
-      {console.log(id_auditoria, id_control)}
       <div className="popup_img">
       {loading && (
           <div className="absolute rounded-3xl top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">

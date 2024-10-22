@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 
 const AuthContext = createContext();
 
@@ -8,6 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken') || null);
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken') || null);
+  const [expirationTime, setExpirationTime] = useState(() => {
+    const storedTime = localStorage.getItem('expirationTime');
+    return storedTime ? new Date(storedTime) : null;
+  });
+  const [refreshTimeout, setRefreshTimeout] = useState(null);
   
   const [role, setRole] = useState(() => localStorage.getItem('role') || null);
   const [name, setName] = useState(() => localStorage.getItem('name') || null);
@@ -61,11 +66,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('selectedEmpresa', selectedEmpresa);
   }, [selectedEmpresa]);
 
+  useEffect(() => {
+    localStorage.setItem('expirationTime', expirationTime?.toString() || '');
+  }, [expirationTime]);
 
 
-  const signOut = () => {
+
+  const signOut = async () => {
     try {
-      console.log('Cerrando sesión...')
+      console.log('Cerrando sesión...');
+      await awsSignOut(); // Sign out from AWS Cognito
+      clearTimeout(refreshTimeout);
       // Limpiar el estado en el contexto de React
       setToken(null);
       setAccessToken(null);
@@ -149,25 +160,54 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      // Forzar la renovación de la sesión utilizando el refresh token
       const session = await fetchAuthSession({ forceRefresh: true });
-      // Extraer el cognitoId del payload del access token actualizado
       const cognitoId = session.tokens.accessToken.payload.sub;
-      const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // Reemplaza con tu App Client ID
-      // Obtén los tokens actualizados desde el Local Storage
+      const appClientId = '3p4sind7orh97u1urvh9fktpmr';
+
       const newAccessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
       const newRefreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
       const newIdToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
-    
-      // Actualizar el estado y el Local Storage con los nuevos tokens
+      const newExpTime = session.tokens.idToken.payload.exp;
+
       setAccessToken(newAccessToken);
-      setToken(newIdToken); // Guarda el ID token en el contexto
+      setToken(newIdToken);
       setRefreshToken(newRefreshToken);
-      console.log('Tokens renovados con éxito');
+      setExpirationTime(new Date(newExpTime * 1000));
     } catch (error) {
       console.error('Error al renovar los tokens:', error);
+      // Aquí podrías manejar el caso de que la renovación falle, por ejemplo, cerrando la sesión del usuario.
     }
   };
+
+
+  const scheduleTokenRefresh = (expTime) => {
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+    }
+  
+    const now = Date.now();
+    const expTimeMs = new Date(expTime).getTime();
+    const timeUntilRefresh = expTimeMs - now - 1000; // 1 minuto antes de que expire
+  
+    if (timeUntilRefresh > 0) {
+      // Timeout para refrescar el token
+      const timeoutId = setTimeout(() => {
+        refreshAccessToken();
+      }, timeUntilRefresh);
+  
+      setRefreshTimeout(timeoutId);
+    } else {
+      console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
+      refreshAccessToken();
+    }
+  };
+
+
+  useEffect(() => {
+    if (expirationTime) {
+      scheduleTokenRefresh(expirationTime);
+    }
+  }, [expirationTime]);
   
   
   
@@ -197,7 +237,8 @@ export const AuthProvider = ({ children }) => {
     fetchUserData, // Ahora disponible para obtener datos del usuario
     userData,
     fetchAwsCredentials,
-    refreshAccessToken
+    refreshAccessToken,
+    setExpirationTime
   };
 
   
