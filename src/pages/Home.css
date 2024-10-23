@@ -59,17 +59,13 @@
     text-align: center;
     height: 60px; /* Altura fija para los th y td */
     border-top: 1px solid black;
-    font-weight: lighter;
+    font-weight: normal;
     font-size: 0.9em;
     text-align: left;
     padding: 8px; /* Añade padding si es necesario */
-}
-
-.table-row td {
-    text-align: center;
-    height: 60px;
     padding-left: 20px;
 }
+
 
 .table-row svg{
     background-color: rgba(128, 128, 128, 0.555);
@@ -161,7 +157,7 @@
   
 .bussiness_boxes {
     cursor: pointer;
-    height: 280px;
+    height: 260px;
     width: 80%;
     padding: 10px;
     margin: 20px;

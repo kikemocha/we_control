@@ -42,7 +42,7 @@ const Sidebar = () => {
                     <Link to="/gestores">Gestores</Link>
                   </li>
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
-                    <Link to="/auditorias">Auditorías y<br /> Seguimientos</Link>
+                    <Link to="/auditorias">Seguimientos y<br /> Auditorías</Link>
                   </li>
                 </ul>
               )}

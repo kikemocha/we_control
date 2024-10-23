@@ -109,19 +109,19 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
           />
 
           <div className="grid md:grid-cols-2 md:gap-6">
             <Input
-              label="Título"
-              placeholder="(CTO, RRHH)"
+              label="Cargo"
+              placeholder="CTO, RRHH"
               type="text"
               name="titulo"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
             />
             <Input
               label="Teléfono"
@@ -130,7 +130,7 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
             />
           </div>
 

@@ -112,39 +112,30 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                     <div className='bussiness_boxes flex flex-col relative' >
                       <h3 className='font-bold'>{empresas[1]}</h3>
                       <div className='grow flex' onClick={() => setSelectedEmpresa(empresas[0])}>
-                        <div className='w-1/2 h-full flex-col flex'>
+                        <div className='w-3/4 mx-auto h-full flex-col flex'>
                           <h4 className='border-b-2 border-black w-3/4 mx-auto'>
                             <span className='px-3'>Contacto</span>
                           </h4>
                           <div className='flex flex-col justify-around grow h-full'>
                             <div>{empresas[8] === 'None' ? '------' : empresas[8]}</div>
                             <div>{empresas[10] === 'None' ? '------' : empresas[10]}</div>
-                            <div><a href={empresas[9] === 'None' ? ' ' : empresas[9]}>{empresas[9] === 'None' ? '------' : empresas[9]}</a></div>
-                            <div className='h-12 w-3/4  mx-auto'>
-                              <tr className='flex justify-between'>
-                                <td><p className='text-center font-semibold'>V.Transversal</p></td>
-                                <td><p className='text-center font-semibold'>V.Específico</p></td>
-                              </tr>
-                              <tr className='flex justify-around'>
-                                <td><p className='text-center'>{empresas[6] === 'None' ? 0 : empresas[6]}</p></td>
-                                <td><p className='text-center'>{empresas[7] === 'None' ? 0 : empresas[7]}</p></td>
-                              </tr>
+                            <div>
+                              <a 
+                                className='z-99 text-blue-800 hover:text-purple-800' 
+                                href={
+                                  empresas[9] === 'None' 
+                                    ? ' ' 
+                                    : empresas[9].startsWith('http') 
+                                      ? empresas[9] 
+                                      : `https://${empresas[9]}`
+                                } 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                              >
+                                {empresas[9] === 'None' ? '------' : empresas[9]}
+                              </a>
                             </div>
-                          </div>
-                        </div>
-                        <div className='w-1/2 flex flex-col justify-around'>
-                          <div>
-                            <p>Total Auditorías</p>
-                            <p>{empresas[12]}</p>
-                          </div>
-                          <div>
-                            <p>Progeso Total</p>
-                            <CircularProgress 
-                              value={empresas[12] === '0' || !(parseInt(empresas[13]) / (parseInt(empresas[14]) + parseInt(empresas[13])))
-                                ? 0 
-                                : parseInt(empresas[13]) / (parseInt(empresas[14]) + parseInt(empresas[13]))
-                              }
-                            />
+  
                           </div>
                         </div>
                       </div>

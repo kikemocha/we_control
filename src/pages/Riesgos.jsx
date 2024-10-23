@@ -156,12 +156,12 @@ const Riesgos = () => {
                                                 <td>{riesgos[2]}</td>
                                                 <td>{riesgos[3]}</td>
                                                 <td>{ (riesgos[4] && riesgos[4] !== 'None' ? riesgos[4].split(',').length : 0) }</td>
-                                                <td className={
-                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 1 ? 'text-green-500' : 
-                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 1 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 2 ? 'text-yellow-400' :
-                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 2 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 3 ? 'text-orange-400' :
-                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 3 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 4 ? 'text-red-300' :
-                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 4 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 5 ? 'text-red-900' : ''
+                                                <td style={{ fontWeight: 700 }} className={
+                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 1 ? 'text-green-700' : 
+                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 1 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 2 ? 'text-blue-500' :
+                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 2 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 3 ? 'text-yellow-600' :
+                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 3 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 4 ? 'text-red-500' :
+                                                    (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 4 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 5 ? 'text-black' : ''
                                                     }>
                                                     {riesgos[5] === 'None' ? riesgos[3] : riesgos[5]}
                                                 </td>
@@ -185,13 +185,13 @@ const Riesgos = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='absolute right-10 w-32 h-56 '>
+                    <div className='absolute right-0 h-56 ml-4' style={{'width' : '8vw'}}>
                                     <div ><p className='w-full text-center mb-3'>Riesgo</p></div>
-                                    <div className='flex mb-2'><div className='bg-red-900 w-12 h-3 rounded-full'></div><p className='ml-2 text-red-900 text-sm'>Muy Alto</p></div>
-                                    <div className='flex mb-2'><div className='bg-red-300 w-12 h-3 rounded-full'></div><p className='ml-2 text-red-300 text-sm'>Alto</p></div>
-                                    <div className='flex mb-2'><div className='bg-orange-400 w-12 h-3 rounded-full'></div><p className='ml-2 text-orange-400 text-sm'>Medio</p></div>
-                                    <div className='flex mb-2'><div className='bg-yellow-400 w-12 h-3 rounded-full'></div><p className='ml-2 text-yellow-400 text-sm'>Bajo</p></div>
-                                    <div className='flex mb-2'><div className='bg-green-500 w-12 h-3 rounded-full'></div><p className='ml-2 text-green-500 text-sm'>Muy Bajo</p></div>
+                                    <div className='flex mb-2'><div className='bg-black w-12 h-3 rounded-full'></div><p className='ml-2 text-black text-sm'>Muy Alto</p></div>
+                                    <div className='flex mb-2'><div className='bg-red-500 w-12 h-3 rounded-full'></div><p className='ml-2 text-red-500 text-sm'>Alto</p></div>
+                                    <div className='flex mb-2'><div className='bg-yellow-600 w-12 h-3 rounded-full'></div><p className='ml-2 text-yellow-600 text-sm'>Medio</p></div>
+                                    <div className='flex mb-2'><div className='bg-blue-500 w-12 h-3 rounded-full'></div><p className='ml-2 text-blue-500 text-sm'>Bajo</p></div>
+                                    <div className='flex mb-2'><div className='bg-green-700 w-12 h-3 rounded-full'></div><p className='ml-2 text-green-700 text-sm'>Muy Bajo</p></div>
                                     
                     </div>
                 </div>
