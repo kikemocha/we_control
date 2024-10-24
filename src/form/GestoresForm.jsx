@@ -6,7 +6,7 @@ import { useAuth, token } from '../context/AuthContext';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
-const GestoresForm = ({ show, onClose, fetchData }) => {
+const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
   const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
@@ -18,6 +18,24 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  const handleEmailChange = (e) => {
+    const newValue = e.target.value;
+    setEmail(newValue);
+    checkEmail(newValue);
+  };
+
+  const checkEmail = (newEmail) => {
+    // Obtenemos todos los primeros elementos de actualRiesgos
+    const primerosElementos = actualGestores.map(subarray => subarray[4]);
+    // Comprobamos si el valor existe en el array
+    if (primerosElementos.includes(newEmail)) {
+        setErrorMessage('Este email ya existe');
+    } else {
+        setErrorMessage(''); // Limpiar el mensaje de error si no existe
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -107,7 +125,7 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
             type="text"
             name="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             required
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
           />
@@ -133,22 +151,32 @@ const GestoresForm = ({ show, onClose, fetchData }) => {
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
             />
           </div>
-
-          {errorMessage && <div className="text-red-500 mt-4">{errorMessage}</div>}
-          {successMessage && <div className="text-green-500 mt-4">{successMessage}</div>}
-
           {/* Botón de enviar */}
           <Button
-            type="submit"
-            className={`text-black bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={loading}
+              type="submit"
+              className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={loading || Boolean(errorMessage)} // Deshabilita si loading es true o si errorMessage tiene un valor
           >
-            {loading ? 'Cargando...' : 'Nuevo Gestor'}
+              {loading ? 'Cargando...' : 'Nuevo Gestor'}
           </Button>
         </form>
+        {
+          errorMessage ? (
+            <p className='h-7 text-center' style={{ color: 'red' }}>{errorMessage}</p>
+            ): (
+              <p className='h-7'></p>
+            )}
+          {
+          successMessage ? 
+          (
+          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
 
+          ):(
+            <p className='h7'></p>
+          )
+        }
         {loading && (
           <div className="absolute top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10 rounded-3xl">
             <div role="status">

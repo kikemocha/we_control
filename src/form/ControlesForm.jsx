@@ -8,7 +8,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import SelectInput from '../components/common/SelectInput';
 
-const ControlesForm = ({ show, onClose, fetchData }) => {
+const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const {selectedEmpresa, token} = useAuth();
   const [controlName, setControlName] = useState('');
   const [numberName, setNumberName] = useState('');
@@ -24,6 +24,23 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
   const [riesgos, setRiesgos] = useState([]); // Estado para almacenar los riesgos disponibles
   const [selectedRiesgos, setSelectedRiesgos] = useState([]); // Estado para almacenar los riesgos seleccionados
 
+  const handleNumberNameChange = (e) => {
+    const newValue = e.target.value;
+    setNumberName(newValue);
+    checkControlName(newValue);
+  };
+
+  const checkControlName = (newNumberName) => {
+    // Obtenemos todos los primeros elementos de actualRiesgos
+    const primerosElementos = actualControles.map(subarray => subarray[1]);
+
+    // Comprobamos si el valor existe en el array
+    if (primerosElementos.includes('C' + newNumberName)) {
+        setErrorMessage('Ese Control ya existe');
+    } else {
+        setErrorMessage(''); // Limpiar el mensaje de error si no existe
+    }
+  };
 
   const resetValues = () =>{
     setControlName('');
@@ -144,7 +161,7 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
                 type="number"
                 name="number_name"
                 value={numberName}
-                onChange={(e) => setNumberName(e.target.value)}
+                onChange={handleNumberNameChange}
                 required
                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               />
@@ -204,11 +221,31 @@ const ControlesForm = ({ show, onClose, fetchData }) => {
                 options={value_control_options}
               />
           </div>
-          
-          {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
-          {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
-          <button type="submit">{loading ? 'Cargando...' : 'Nuevo Control'}</button>
+          <Button
+              type="submit"
+              className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={loading || Boolean(errorMessage)} // Deshabilita si loading es true o si errorMessage tiene un valor
+          >
+              {loading ? 'Cargando...' : 'Nuevo Control'}
+          </Button>
         </form>
+        {
+          errorMessage ? (
+            <p className='h-7 text-center' style={{ color: 'red' }}>{errorMessage}</p>
+            ): (
+              <p className='h-7'></p>
+            )}
+          {
+          successMessage ? 
+          (
+          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
+
+          ):(
+            <p className='h7'></p>
+          )
+        }
         {loading && (
           <div className="absolute rounded-3xl top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
             <div role="status">

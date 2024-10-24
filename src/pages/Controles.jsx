@@ -98,7 +98,7 @@ const Controles = () => {
     }
 
     return <div className='card_option'>
-            <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
+            <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data}/>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>

@@ -7,11 +7,12 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
 
-const RiesgosForm = ({ show, onClose, fetchData, messagePopUp}) => {
+const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) => {
   const {selectedEmpresa, token} = useAuth();
   const [numberName, setNumberName] = useState('');
   const [description, setDescription] = useState('');
   const [riesgoValue, setRiesgoValue] = useState('');
+
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -25,6 +26,26 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp}) => {
     setSuccessMessage('');
     onClose();
   }
+
+
+  const handleNumberNameChange = (e) => {
+    const newValue = e.target.value;
+    setNumberName(newValue);
+    checkRiesgo(newValue);
+  };
+
+
+  const checkRiesgo = (newNumberName) => {
+    // Obtenemos todos los primeros elementos de actualRiesgos
+    const primerosElementos = actualRiesgos.map(subarray => subarray[1]);
+
+    // Comprobamos si el valor existe en el array
+    if (primerosElementos.includes('R' + newNumberName)) {
+        setErrorMessage('Ese Riesgo ya existe');
+    } else {
+        setErrorMessage(''); // Limpiar el mensaje de error si no existe
+    }
+};
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -85,7 +106,7 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp}) => {
               type="number"
               name="number_name"
               value={numberName}
-              onChange={(e) => setNumberName(e.target.value)}
+              onChange={handleNumberNameChange}
               required
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
@@ -110,20 +131,31 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp}) => {
             className="block py-2.5 px-0 w-full h-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           
           />
-          <div></div>
-          {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
-          {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
           <Button
-            type="submit"
-            className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={loading}
+              type="submit"
+              className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={loading || Boolean(errorMessage)} // Deshabilita si loading es true o si errorMessage tiene un valor
           >
-            {loading ? 'Cargando...' : 'Nuevo Riesgo'}
+              {loading ? 'Cargando...' : 'Nuevo Riesgo'}
           </Button>
         </form>
+        {
+          errorMessage ? (
+            <p className='h-7 text-center' style={{ color: 'red' }}>{errorMessage}</p>
+            ): (
+              <p className='h-7'></p>
+            )}
+          {
+          successMessage ? 
+          (
+          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
 
+          ):(
+            <p className='h7'></p>
+          )
+        }
         {loading && (
           <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
             <div role="status">

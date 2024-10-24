@@ -111,7 +111,7 @@ const Riesgos = () => {
     }
 
     return <div className='card_option'>
-            <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp}/>
+            <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp} actualRiesgos={data}/>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>riesgos</strong>:</div>
@@ -208,6 +208,7 @@ const Riesgos = () => {
                         description={selectedRiesgo[2]} 
                         riesgoValue={selectedRiesgo[3]}
                         messagePopUp={handleCloseMessagePopUp}
+                        actualRiesgos={data}
                     />    
                 )}
                 {showMessagePopUp && (

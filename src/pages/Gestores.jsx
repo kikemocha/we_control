@@ -89,7 +89,7 @@ const Gestores = () => {
     }
 
     return <div className='card_option'>
-            <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData}/>
+            <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualGestores={data}/>
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
@@ -124,9 +124,9 @@ const Gestores = () => {
                                 </tr>
                                 {data.map((control, index) => (
                                     <tr key={index} className="table-row">
-                                        <td>{control[2]}</td>
-                                        <td>{control[5]}</td>
-                                        <td>{control[4]}</td>
+                                        <td><p className='text-center'>{control[2]}</p></td>
+                                        <td><p className='text-center'>{control[5]}</p></td>
+                                        <td><p className='text-center'>{control[4]}</p></td>
                                         <td>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-8 mx-auto">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
