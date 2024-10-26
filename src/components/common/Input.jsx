@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Input = ({ label, type, name, value, onChange, required = false, step = false, className = '', placeholder = '', disabled = false}) => (
+const Input = ({ label, type, name, value, onChange, required = false, step = undefined, className = '', placeholder = '', disabled = false}) => (
   <div className="relative z-0 w-full mb-5 group">
     {/* Input field */}
     <input

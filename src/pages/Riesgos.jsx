@@ -89,11 +89,13 @@ const Riesgos = () => {
                                                 <th>Valor de Riesgo Inherente</th>
                                                 <th>Nº Controles Asociados</th>
                                                 <th>Valor de Riesgo Residual</th>
+                                                <th>Ajustes</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {Array.from({ length: 8 }).map((_, index) => (
                                             <tr key={index} className="table-row">
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

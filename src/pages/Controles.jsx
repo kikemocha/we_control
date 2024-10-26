@@ -3,7 +3,7 @@ import {React, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import ControlesForm from '../form/ControlesForm';
-
+import EditControlesForm from '../form/editForms/EditControlesForm';
 
 const Controles = () => {
     const {selectedEmpresa, token} = useAuth();
@@ -15,6 +15,13 @@ const Controles = () => {
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
 
+    const handleCloseEditPopup = () => setshowEditPopup(false);
+    const [showEditPopup, setshowEditPopup] = useState(false);
+    const [selectedControl, setSelectedControl] = useState(null);
+    const handleOpenEditPopup = (control) => {
+        setSelectedControl(control);  // Guardar el item seleccionado
+        setshowEditPopup(true);
+    };
 
     const fetchData = async () => {
         try {
@@ -73,12 +80,14 @@ const Controles = () => {
                                             <th>Valor de Control</th>
                                             <th>Evidencias</th>
                                             <th>Periodicidad</th>
+                                            <th>Ajustes</th>
                                             
                                         </tr>
                                     </thead>
                                     <tbody>
                                     {Array.from({ length: 8 }).map((_, index) => (
                                         <tr key={index} className="table-row">
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -133,6 +142,7 @@ const Controles = () => {
                                         <th>Evidencias</th>
                                         <th>Periodicidad</th>
                                         <th>Tipo de Control</th>
+                                        <th>Ajustes</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,7 +157,19 @@ const Controles = () => {
                                             <td>{control[2]}</td>
                                             <td>{control[3]}</td>
                                             <td>{control[4]}</td>
-                                            <td>{control[5]}</td>   
+                                            <td>{control[5]}</td>
+                                            <td>
+                                                    <svg 
+                                                        xmlns="http://www.w3.org/2000/svg" 
+                                                        fill="none" 
+                                                        viewBox="0 0 24 24" 
+                                                        strokeWidth="2.5" 
+                                                        stroke="currentColor" 
+                                                        className="size-8 mx-auto" 
+                                                        onClick={(e) => handleOpenEditPopup(control)}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                    </svg>
+                                                </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -157,6 +179,22 @@ const Controles = () => {
                     </div>
                 </div>) : (
                     <div> Loading ...</div>
+                )}
+                {showEditPopup && selectedControl && (
+                    <EditControlesForm
+                        show={showEditPopup}
+                        onClose={handleCloseEditPopup}
+                        fetchData={fetchData}
+
+                        id_control={selectedControl[0]}
+                        name={selectedControl[2]}
+                        numberName={selectedControl[1]}
+                        riesgosAsociados={selectedControl[7]}
+                        evidences={selectedControl[3]}
+                        periocity={selectedControl[4]}
+                        value={selectedControl[5]}
+                    />
+
                 )}
         
     </div>

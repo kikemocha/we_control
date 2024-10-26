@@ -161,7 +161,7 @@
     width: 80%;
     padding: 10px;
     margin: 20px;
-    background-color: rgba(255, 230, 0, 0.39);
+    background-color: rgba(128, 128, 128, 0.26);
     border: 1px solid #ccc;
     border-radius: 30px;
     text-align: center;
@@ -172,7 +172,7 @@
     margin-top: 10px;
 }
 .bussiness_boxes:hover{
-    background-color: rgba(255, 230, 0, 0.623);
+    background-color: rgba(184, 184, 184, 0.26);
 }
 
 

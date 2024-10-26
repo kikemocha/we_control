@@ -20,13 +20,18 @@ const LogIn = () => {
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
   const [token, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime} = useAuth();
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime, accessToken} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(null);
   const [showNewPassword, setShowNewPassword ] = useState(null);
   const [showNewConfirmPassword, setShowNewConfirmPassword ] = useState(null);
 
+  useEffect(() => {
+    if (accessToken) {
+      navigate('/home'); // Redirige si ya tienes el token
+    }
+  }, [token, navigate]);
 
   useEffect(() => {
     // Verificamos que el token no sea null o undefined
