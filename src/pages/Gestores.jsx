@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import GestoresForm from '../form/GestoresForm';
 
+import EditPersonForm from '../form/editForms/EditPersonForm';
 
 const Gestores = () => {
     const {selectedEmpresa, token} = useAuth();
@@ -14,6 +15,36 @@ const Gestores = () => {
     const [showPopup, setShowPopup] = useState(false);
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
+
+    const [messagePopUp, setMessagePopUp] = useState('');
+    const [messageStatePopUp, setMessageStatePopUp] = useState('');
+    const [messageIsVisible, setMessageIsVisible] = useState(false);
+    const [showMessagePopUp, setShowMessagePopUp] = useState(false);
+
+    const handleCloseMessagePopUp = (message, messageState) => {
+        setMessageStatePopUp(messageState); 
+        setMessagePopUp(message); // Establece el mensaje que se mostrará
+        setShowMessagePopUp(true); // Muestra el popup
+        setMessageIsVisible(true); // Controla la animación de entrada
+    
+        // Después de 2 segundos, empieza la animación de salida y cierra el popup
+        setTimeout(() => {
+            setMessageIsVisible(false); // Activamos la animación de salida
+          setTimeout(() => {
+            setShowMessagePopUp(false); // Remueve el popup después de que la animación termine
+            setMessagePopUp(''); // Limpia el mensaje
+          }, 500); // 500 ms es la duración de la animación de salida
+        }, 2000); // El popup permanece visible durante 2 segundos
+    };
+
+
+    const [showEditPopup, setshowEditPopup] = useState(false);
+    const [selectedGestor, setSelectedGestor] = useState(null); // Riesgo seleccionado para editar
+    const handleOpenEditPopup = (gestor) => {
+        setSelectedGestor(gestor);  // Guardar el item seleccionado
+        setshowEditPopup(true);
+      };
+    const handleCloseEditPopup = () => setshowEditPopup(false);
 
 
     
@@ -68,6 +99,7 @@ const Gestores = () => {
                                     <table className="card_table">
                                     <tr className="table-row">
                                         <th>Nombre</th>
+                                        <th>Apellido</th>
                                         <th>Título</th>
                                         <th>E-mail</th>
                                         <th>Ajustes</th>
@@ -118,17 +150,27 @@ const Gestores = () => {
                                 <table className="card_table">
                                 <tr className="table-row">
                                     <th>Nombre</th>
+                                    <th>Apellido</th>
                                     <th>Título</th>
                                     <th>E-mail</th>
                                     <th>Ajustes</th>
                                 </tr>
-                                {data.map((control, index) => (
+                                {data.map((gestor, index) => (
                                     <tr key={index} className="table-row">
-                                        <td><p className='text-center'>{control[2]}</p></td>
-                                        <td><p className='text-center'>{control[5]}</p></td>
-                                        <td><p className='text-center'>{control[4]}</p></td>
+                                        <td><p className='text-center'>{gestor[2]}</p></td>
+                                        <td><p className='text-center'>{gestor[9]}</p></td>
+                                        <td><p className='text-center'>{gestor[5]}</p></td>
+                                        <td><p className='text-center'>{gestor[4]}</p></td>
                                         <td>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="size-8 mx-auto">
+                                        <svg
+                                         
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            fill="none" 
+                                            viewBox="0 0 24 24" 
+                                            strokeWidth="2.5" 
+                                            stroke="currentColor" 
+                                            className="size-8 mx-auto"
+                                            onClick={(e) => handleOpenEditPopup(gestor)}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                         </svg>
 
@@ -142,7 +184,37 @@ const Gestores = () => {
                 </div>) : (
                     <div> Loading ...</div>
                 )}
-        
+        {showEditPopup && selectedGestor && (
+                    <EditPersonForm
+
+                        show={showEditPopup}
+                        onClose={handleCloseEditPopup}
+                        fetchData={fetchData}
+                        id_person={selectedGestor[0]} 
+                        first_name={selectedGestor[2]} 
+                        last_name={selectedGestor[9]} 
+                        cargo={selectedGestor[5]}
+                        email={selectedGestor[4]}
+                        phone={selectedGestor[3]}
+                        messagePopUp={handleCloseMessagePopUp}
+                        
+                    />    
+                )}
+                {showMessagePopUp && (
+                    <div
+                    className={`fixed w-1/2 h-24 left-1/4 bottom-2 transform -translate-x-1/2 z-50 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+                        messageIsVisible ? 'animate-fadeIn' : 'animate-fadeOut'
+                      } ${messageStatePopUp === 'success' ? 'bg-green-400' : 'bg-red-400'}`}
+                    style={{ zIndex: 99 }}
+                    >
+                    <button className="absolute right-2 top-2 text-red-600" onClick={() => setShowMessagePopUp(false)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <p className="text-black">{messagePopUp}</p>
+                    </div>
+                )}
     </div>
 };
 

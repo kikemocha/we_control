@@ -6,7 +6,7 @@ import ControlesForm from '../form/ControlesForm';
 import EditControlesForm from '../form/editForms/EditControlesForm';
 
 const Controles = () => {
-    const {selectedEmpresa, token} = useAuth();
+    const {selectedEmpresa, token, refreshAccessToken} = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -110,6 +110,7 @@ const Controles = () => {
 
     return <div className='card_option'>
             <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data}/>
+            {/* <button onClick={()=>{refreshAccessToken()}} >BUTTON</button> */}
             <div className='total_add'>
                 <div className='upper_box'>
                     <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>

@@ -35,6 +35,7 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
     setControlPeriocity('Anual');
     setControlValue('Transversal');
     setControlSelectedRiesgos([]);
+    setDescriptionRiesgos([]);
   }
   const handleClose = () =>{
     resetValues();

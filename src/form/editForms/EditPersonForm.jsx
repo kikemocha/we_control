@@ -7,32 +7,40 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import DeleteForm from '../DeleteForm';
 
-const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, description, riesgoValue, messagePopUp }) => {
+const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_name, cargo, email, phone, messagePopUp }) => {
   const { token} = useAuth();
 
-  const [idRiesgo, setIdRiesgo] = useState(id_riesgo);
-  const [numberRiesgoName, setNumberRiesgoName] = useState(numberName);
-  const [riesgoDescription, setRiesgoDescription] = useState(description);
-  const [riesgoValor, setRiesgoValor] = useState(riesgoValue);
+  const [idPerson, setIdPerson] = useState(id_person);
+  const [firstName, setFirstName] = useState(first_name);
+  const [lastName, setLastName] = useState(last_name);
+  const [cargoPerson, setCargoPerson] = useState(cargo);
+  const [emailPerson, setEmail] = useState(email);
+  const [phonePerson, setPhonePerson] = useState(phone);
+
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
 
   useEffect(() => {
-    setIdRiesgo(id_riesgo);
-    setNumberRiesgoName(numberName);
-    setRiesgoDescription(description);
-    setRiesgoValor(riesgoValue);
-  }, [id_riesgo, numberName, description, riesgoValue]);
+    setIdPerson(id_person);
+    setFirstName(first_name);
+    setLastName(last_name);
+    setCargoPerson(cargo);
+    setEmail(email);
+    setPhonePerson(phone)
+  }, [id_person, first_name, last_name, cargo, email, phone]);
 
   const [loading, setLoading] = useState(false)
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
 
   const handleClose = () => {
-    setNumberRiesgoName('');
-    setRiesgoDescription('');
-    setRiesgoValor('');
+    setIdPerson('');
+    setFirstName('');
+    setLastName('');
+    setCargoPerson('');
+    setEmail('');
+    setPhonePerson('');
     setErrorMessage('');
     setSuccessMessage('');
     onClose();
@@ -43,13 +51,15 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
     e.preventDefault();
 
     const requestBody = {
-      description: riesgoDescription,
-      value: riesgoValor,
-      id_riesgo: idRiesgo,
+      firstName: firstName,
+      lastName: lastName,
+      cargoPerson: cargoPerson,
+      id_person: idPerson,
+      phone: phonePerson
     };
 
     try {
-      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateRiesgo', {
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/updateUser', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +72,7 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
         fetchData();
         onClose();
         setLoading(false);
-        messagePopUp('Riesgo editado correctamente', 'success')
+        messagePopUp('Gestor editado correctamente', 'success')
       } else{
         messagePopUp('Error editando el riesgo', 'error')
       }
@@ -78,7 +88,7 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
   const confirmDelete = async () => {
     setLoading(true);
       const requestBody = {
-        id_riesgo: id_riesgo,
+        id_person: id_person,
       }
       try {
       //   const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteControles', {
@@ -129,75 +139,112 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
   if (!show) return null;
 
   return (
-    <div className="popup-overlay" style={{ backgroundColor:'rgba(0, 0, 0, 0.1)'}}>
-      <div className="popup">
-        <button className="popup-close" onClick={handleClose}>
+    <div className="popup-overlay">
+      <div className="popup relative">
+        {/* Botón para cerrar */}
+        <button className="popup-close" onClick={onClose}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
+        {/* Contenido del formulario */}
         <form className="max-w-md mx-auto">
-          <h4 className="text-lg font-semibold mb-5">EDITAR RIESGO</h4>
+          <h4 className="text-lg font-semibold mb-5">Editar GESTOR</h4>
+
           <div className="grid md:grid-cols-2 md:gap-6">
-          <Input
-              label="Número de riesgo"
+            <Input
+              label="Nombre"
               type="text"
-              name="number_name"
-              value={numberRiesgoName}
-              onChange={()=>{}}
+              name="name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               required
-              disabled={true}
-              className="block py-2.5 px-0 w-full text-md text-gray-600 bg-gray-300 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
             <Input
-              label="Valor inherente"
-              type="number"
-              name="riesgo_value"
-              value={riesgoValor}
-              onChange={(e) => setRiesgoValor(e.target.value)}
-              step=".01"
+              label="Apellido"
+              type="text"
+              name="surname"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               required
-              className="block py-2.5 px-0 w-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
-          <Input
-            label="Descripción"
-            type="text"
-            name="description"
-            value={riesgoDescription}
-            onChange={(e) => setRiesgoDescription(e.target.value)}
-            required
-            className="block py-2.5 px-0 w-full h-full text-md text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           
+          <Input
+            label="Email"
+            placeholder="example@wecontrool.com"
+            type="text"
+            name="email"
+            value={emailPerson}
+            onChange={null}
+            disabled={true}
+            required
+            className="block bg-gray-200 py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
           />
-          {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
-          {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
-          <div className='flex justify-around w-full'>
-            <Button
-              onClick={handleEdit}
-              className={`text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              disabled={loading}
-            >
-              {loading ? 'Cargando...' : 'Guardar Cambios'}
-            </Button>
 
-            <Button
-              onClick={handleDelete}
-              className={`delete text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              disabled={loading}
-            >
-              {loading ? 'Cargando...' : 'Eliminar Riesgo'}
-            </Button>
+          <div className="grid md:grid-cols-2 md:gap-6">
+            <Input
+              label="Cargo"
+              placeholder="CTO, RRHH"
+              type="text"
+              name="cargo"
+              value={cargoPerson}
+              onChange={(e) => setCargoPerson(e.target.value)}
+              required
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+            />
+            <Input
+              label="Teléfono"
+              type="text"
+              name="phone"
+              value={phonePerson}
+              onChange={(e) => setPhonePerson(e.target.value)}
+              required
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+            />
+          </div>
+          <div className='flex justify-around w-full'>
+          <Button
+            onClick={handleEdit}
+            className={`text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Guardar Cambios'}
+          </Button>
+
+          <Button
+            onClick={handleDelete}
+            className={`delete text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Eliminar Gestor'}
+          </Button>
           </div>
         </form>
+        {
+          errorMessage ? (
+            <p className='h-7 text-center' style={{ color: 'red' }}>{errorMessage}</p>
+            ): (
+              <p className='h-7'></p>
+            )}
+          {
+          successMessage ? 
+          (
+          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
 
+          ):(
+            <p className='h7'></p>
+          )
+        }
         {loading && (
-          <div className="absolute rounded-3xl top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10 rounded-3xl">
             <div role="status">
               <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -206,21 +253,20 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
             </div>
           </div>
         )}
-
       </div>
       {showDeletePopup && (
         <DeleteForm
           show={showDeletePopup}
           onClose={()=>{setShowDeletePopup(false)}}
           deleteFunction={confirmDelete}
-          message={'Al borrar este riesgo también se borrarán los controles y los controles de las auditorías'}
+          message={'Al borrar este gestor también se archivarán las evidencias y controles de las auditorías'}
           onCloseFather={()=>{onClose()}}
           loading={loading}
-          bottomMessage={'¿Estás seguro que quieres eliminar el riesgo?'}
+          bottomMessage={'¿Estás seguro que quieres eliminar el gestor?'}
         />
       )}
     </div>
   );
 };
 
-export default EditRiesgosForm;
+export default EditPersonForm;

@@ -179,20 +179,30 @@ export const AuthProvider = ({ children }) => {
   
     const now = Date.now();
     const expTimeMs = new Date(expTime).getTime();
-    const timeUntilRefresh = expTimeMs - now - 1000; // 1 minuto antes de que expire
+    let timeUntilRefresh = expTimeMs - now - 1000; // 1 segundo antes de que expire
   
     if (timeUntilRefresh > 0) {
-      // Timeout para refrescar el token
-      const timeoutId = setTimeout(() => {
-        refreshAccessToken();
-      }, timeUntilRefresh);
+      // Intervalo para actualizar e imprimir el tiempo restante
+      const intervalId = setInterval(() => {
+        timeUntilRefresh -= 1000; // Reduce 1 segundo (1000 ms)
   
-      setRefreshTimeout(timeoutId);
+        // Imprime el tiempo hasta el próximo refresh en segundos
+        console.log(`Tiempo hasta el próximo refresh: ${timeUntilRefresh / 1000} segundos`);
+  
+        if (timeUntilRefresh <= 0) {
+          clearInterval(intervalId); // Limpia el intervalo al alcanzar el tiempo
+          refreshAccessToken(); // Llama a la función de refresh
+        }
+      }, 1000);
+  
+      setRefreshTimeout(intervalId);
     } else {
       console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
       refreshAccessToken();
     }
   };
+  
+  
 
 
   useEffect(() => {
