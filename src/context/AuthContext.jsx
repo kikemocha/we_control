@@ -70,8 +70,6 @@ export const AuthProvider = ({ children }) => {
   }, [expirationTime]);
   
 
-
-
   const signOut = async () => {
     try {
       console.log('Cerrando sesión...');
@@ -153,32 +151,23 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
+      // Llama a fetchAuthSession para forzar la renovación de los tokens
       const session = await fetchAuthSession({ forceRefresh: true });
-      const cognitoId = session.tokens.accessToken.payload.sub;
-      const appClientId = '3p4sind7orh97u1urvh9fktpmr';
-
-      const newAccessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-      const newRefreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-      const newIdToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
-      const newExpTime = session.tokens.idToken.payload.exp;
-
-      sessionStorage.setItem('accessToken', newAccessToken);
-      sessionStorage.setItem('refreshToken', newRefreshToken);
-      sessionStorage.setItem('idToken', newIdToken);
+      
+      const cognitoId = session.userSub;
+      const exp = session.tokens.idToken.payload.exp;
+      const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
+      const newAccessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+      const newRefreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+      const newIdToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
 
       setAccessToken(newAccessToken);
       setToken(newIdToken);
       setRefreshToken(newRefreshToken);
-      setExpirationTime(new Date(newExpTime * 1000));
-
-      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
-
-
+  
+      console.log('Tokens renovados con éxito');
     } catch (error) {
-      console.error('Error al renovar los tokens:', error);
-      // Aquí podrías manejar el caso de que la renovación falle, por ejemplo, cerrando la sesión del usuario.
+      console.error('Error al renovar el token:', error);
     }
   };
 

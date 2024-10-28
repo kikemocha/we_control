@@ -17,6 +17,7 @@ const Input = ({ label, type, name, value, onChange, required = false, step = un
     {/* Label that "floats" */}
     <div className=" flex absolute text-lg text-gray-800 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-black peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:font-bold peer-focus:-translate-y-9">
       <label
+        className="w-full max-w-xs overflow-hidden text-ellipsis whitespace-nowrap"
         htmlFor={name}
         >
         {label}

@@ -47,6 +47,7 @@ const Controles = () => {
 
     if (loading) {
         return <div className='card_option'>
+            
                     <div className='total_add'>
                         <div className='upper_box'>
                             <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>
@@ -71,6 +72,7 @@ const Controles = () => {
                         <div className='responsable_main'>
                             <div className="table-container skeleton">
                                 <div>
+                                
                                     <table className="card_table">
                                     <thead>
                                         <tr className="table-row">
@@ -107,7 +109,6 @@ const Controles = () => {
     }
 
     return <div className='card_option'>
-        {console.log(data)  }
             <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data}/>
             <div className='total_add'>
                 <div className='upper_box'>
@@ -135,46 +136,55 @@ const Controles = () => {
                         <div className="table-container">
                             <div>
                                 <table className="card_table">
-                                <thead className='no_main'>
-                                    <tr className="table-row">
-                                        <th>Número</th>
-                                        <th>Riesgos Asociados</th>
-                                        <th>Nombre</th>
-                                        <th>Evidencias</th>
-                                        <th>Periodicidad</th>
-                                        <th>Tipo de Control</th>
-                                        <th>Ajustes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {data.map((control, index) => (
-                                        <tr key={index} className="table-row">
-                                            <td>{control[1]}</td>
-                                            <td className='riesgos_controles'>
-                                            {control[8].split(',').map((riesgo, index) => (
-                                                <div key={index}>{riesgo}</div>
-                                            ))}
-                                            </td>
-                                            <td>{control[2]}</td>
-                                            <td>{control[3]}</td>
-                                            <td>{control[4]}</td>
-                                            <td>{control[5]}</td>
-                                            <td>
-                                                    <svg 
-                                                        xmlns="http://www.w3.org/2000/svg" 
-                                                        fill="none" 
-                                                        viewBox="0 0 24 24" 
-                                                        strokeWidth="2.5" 
-                                                        stroke="currentColor" 
-                                                        className="size-8 mx-auto" 
-                                                        onClick={(e) => handleOpenEditPopup(control)}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                                    </svg>
-                                                </td>
+                                    <thead className='no_main'>
+                                        <tr className="table-row">
+                                            <th>Número</th>
+                                            <th className='w-1/5 overflow-x-hidden'>Riesgos Asociados</th>
+                                            <th>Nombre</th>
+                                            <th>Evidencias</th>
+                                            <th>Periodicidad</th>
+                                            <th>Tipo de Control</th>
+                                            <th>Ajustes</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {data.map((control, index) => (
+                                            <tr key={index}>
+                                                <td className="text-center font-bold border-t border-black h-16 text-sm py-2 px-5">{control[1]}</td>
+                                                
+                                                <td className="w-1/5 min-w-[200px] max-w-[200px] overflow-hidden whitespace-nowrap border-t border-black h-16 text-sm py-2 px-5 text-left">
+                                                    <div className="flex justify-around items-center space-x-2 overflow-x-auto max-w-full align-middle">
+                                                        {control[8].split(',').map((riesgo, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="bg-primary px-3 py-2 rounded-full flex-shrink-0"
+                                                            >
+                                                                {riesgo}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </td>
+
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[2]}</td>
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[3]}</td>
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[4]}</td>
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[5]}</td>
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5">
+                                                        <svg 
+                                                            xmlns="http://www.w3.org/2000/svg" 
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            strokeWidth="2.5" 
+                                                            stroke="currentColor" 
+                                                            className="bg-gray-400 bg-opacity-60 rounded-full p-1 cursor-pointer mx-auto size-8"
+                                                            onClick={(e) => handleOpenEditPopup(control)}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                        </svg>
+                                                    </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -191,9 +201,12 @@ const Controles = () => {
                         name={selectedControl[2]}
                         numberName={selectedControl[1]}
                         riesgosAsociados={selectedControl[8]}
+                        descriptionsAsociadas={selectedControl[9]}
                         evidences={selectedControl[3]}
                         periocity={selectedControl[4]}
                         value={selectedControl[5]}
+
+                        data={data}
                     />
 
                 )}

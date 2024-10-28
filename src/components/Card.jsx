@@ -52,9 +52,11 @@ const Card = ({name, singularName, href, index, apiURL}) => {
             <div className="card_content skeleton">
               <div className="table-container">
                 <table className="card_table">
+                <thead>
                 <tr className="table-row">
                         <th className='no-top'></th>
                     </tr>
+                </thead>
                   <tbody>
                     {Array.from({ length: 5 }).map((_, rowIdx) => (
                       <tr key={rowIdx} className="table-row"><td></td></tr>

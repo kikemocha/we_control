@@ -36,7 +36,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
     // Comprobamos si el valor existe en el array
     if (primerosElementos.includes('C' + newNumberName)) {
-        setErrorMessage('Ese Control ya existe');
+        setErrorMessage('Este Control ya existe');
     } else {
         setErrorMessage(''); // Limpiar el mensaje de error si no existe
     }
@@ -163,7 +163,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
                 value={numberName}
                 onChange={handleNumberNameChange}
                 required
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer "
               />
             <Input
               label="Nombre"
@@ -172,7 +172,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
               value={controlName}
               onChange={(e) => setControlName(e.target.value)}
               required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer"
             />
           </div>
           <label className='riesgos_div'>

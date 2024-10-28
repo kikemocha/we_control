@@ -41,7 +41,7 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) =
 
     // Comprobamos si el valor existe en el array
     if (primerosElementos.includes('R' + newNumberName)) {
-        setErrorMessage('Ese Riesgo ya existe');
+        setErrorMessage('Este Riesgo ya existe');
     } else {
         setErrorMessage(''); // Limpiar el mensaje de error si no existe
     }

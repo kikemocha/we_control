@@ -59,14 +59,13 @@ const LogIn = () => {
   
       if (isSignedIn) {
         const session = await fetchAuthSession(); // Obtén la sesión actual
-        const token = session.tokens.accessToken;
-        const cognitoId = token.payload.sub;
+        const cognitoId = session.userSub;
         const exp = session.tokens.idToken.payload.exp;
 
         const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
-        const accessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-        const refreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-        const idToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+        const accessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+        const refreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+        const idToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
   
         sessionStorage.setItem('accessToken', accessToken);
         sessionStorage.setItem('refreshToken', refreshToken);
@@ -78,11 +77,6 @@ const LogIn = () => {
         setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
-
-        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
-
   
         await fetchUserData(cognitoId, idToken);
         navigate('/home');

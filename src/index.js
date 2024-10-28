@@ -3,10 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Amplify } from 'aws-amplify';
-import awsconfig from './aws-exports';
 
-Amplify.configure(awsconfig);
+import { Amplify } from 'aws-amplify';
+import awsExports from './aws-exports';
+import { sessionStorage } from 'aws-amplify/utils';
+import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
+
+// Configura Amplify con sessionStorage
+Amplify.configure(awsExports);
+
+// Configura el proveedor de tokens para almacenar en sessionStorage
+cognitoUserPoolsTokenProvider.setKeyValueStorage(sessionStorage);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

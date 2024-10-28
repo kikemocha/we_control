@@ -9,12 +9,15 @@ import SelectInput from '../../components/common/SelectInput';
 
 import DeleteForm from '../DeleteForm';
 
-const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, name, riesgosAsociados, evidences, periocity, value }) => {
+const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, name, riesgosAsociados, descriptionsAsociadas, evidences, periocity, value, data}) => {
   const {token} = useAuth();
 
   const [ControlNumberName, setControlNumberName] = useState(numberName);
   const [controlName, setControlName] = useState(name);
+  
   const [controlSelectedRiesgos, setControlSelectedRiesgos] = useState(riesgosAsociados.split(','));
+  const [descriptionRiesgos, setDescriptionRiesgos] = useState(descriptionsAsociadas.split(','));
+
   const [controlEvidences, setControlEvidences] = useState(evidences);
   const [controlPeriocity, setControlPeriocity] = useState(periocity);
   const [controlValue, setControlValue] = useState(value);
@@ -169,10 +172,13 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
           </div>
           <label className='riesgos_div '>
             <p>Riesgos Asociados</p>
-            <div className='control_disabled flex justify-around relative'>
+            <div className='control_disabled flex flex-col justify-around relative'>
               {controlSelectedRiesgos.map((control, index) => (
                 <div key={index} className='mx-4 flex justify-center'>
-                  <strong className='bg-primary rounded-full my-auto p-4'>R{control[1]}</strong>
+                  <div className='bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap'>
+                    <strong >R{control[1]}</strong>
+                    <span className='ml-2'>{descriptionRiesgos[index]}</span>
+                  </div>
                 </div>
               ))}
               <div className='overlay_control'></div>
@@ -266,6 +272,7 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
           message={'Al borrar este control también se borrarán de las auditorías con sus evidencias'}
           onCloseFather={()=>{onClose()}}
           loading={loading}
+          bottomMessage={'¿Estás seguro que quieres eliminar el control?'}
         />
       )}
     </div>

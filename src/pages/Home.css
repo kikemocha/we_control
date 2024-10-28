@@ -230,13 +230,26 @@
     cursor: pointer;
 }
 
-.card_option .table-container{
+.card_option .table-container {
     background-color: whitesmoke;
     height: 100%;
-    padding: 0px 0px;
+    padding: 0;
     border: 1px solid black;
     border-radius: 30px;
     box-shadow: 1px 1px 1px grey;
+    
+    /* Oculta el scrollbar en navegadores modernos */
+    overflow: scroll;
+}
+
+/* Opcional: elimina el scrollbar en navegadores basados en Webkit (Chrome, Safari, Edge) */
+.card_option .table-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Opcional: elimina el scrollbar en Firefox */
+.card_option .table-container {
+    scrollbar-width: none; /* Firefox */
 }
 
 .skeleton {

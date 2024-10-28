@@ -6,7 +6,7 @@ import Button from '../components/common/Button';
 
 
 
-const DeleteForm = ({ show, onClose, onCloseFather, deleteFunction, message}) => {
+const DeleteForm = ({ show, onClose, onCloseFather, deleteFunction, message, bottomMessage}) => {
 
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ const DeleteForm = ({ show, onClose, onCloseFather, deleteFunction, message}) =>
           <div className='h-2/4'>
             <p className='text-lg py-10 px-12 text-center'>{message}</p>
           </div>
-          <p className='h-1/4 text-md font-bold flex justify-center items-center'> ¿Quieres borrarlo?</p>
+          <p className='h-1/4 text-md font-bold flex justify-center items-center'> {bottomMessage}</p>
         </div>
         <form>
           <div className='flex justify-around w-full'>
