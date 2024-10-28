@@ -155,10 +155,10 @@ const Riesgos = () => {
                                         {data.map((riesgos, index) => (
                                             <tr key={index} className="table-row">
                                                 <td className='riesgos_controles'><div className='bg-primary'>{riesgos[1]}</div></td>
-                                                <td>{riesgos[2]}</td>
-                                                <td>{riesgos[3]}</td>
-                                                <td>{ (riesgos[4] && riesgos[4] !== 'None' ? riesgos[4].split(',').length : 0) }</td>
-                                                <td style={{ fontWeight: 700 }} className={
+                                                <td><p className='text-center'>{riesgos[2]}</p></td>
+                                                <td><p className='text-center'>{riesgos[3]}</p></td>
+                                                <td><p className='text-center'>{ (riesgos[4] && riesgos[4] !== 'None' ? riesgos[4].split(',').length : 0) }</p></td>
+                                                <td style={{ fontWeight: 700, textAlign:'center' }} className={
                                                     (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 1 ? 'text-green-700' : 
                                                     (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 1 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 2 ? 'text-blue-500' :
                                                     (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) > 2 && (riesgos[5] === 'None' ? riesgos[3] : riesgos[5]) <= 3 ? 'text-yellow-600' :

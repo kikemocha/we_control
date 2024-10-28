@@ -107,6 +107,7 @@ const Controles = () => {
     }
 
     return <div className='card_option'>
+        {console.log(data)  }
             <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data}/>
             <div className='total_add'>
                 <div className='upper_box'>
@@ -150,7 +151,7 @@ const Controles = () => {
                                         <tr key={index} className="table-row">
                                             <td>{control[1]}</td>
                                             <td className='riesgos_controles'>
-                                            {control[7].split(',').map((riesgo, index) => (
+                                            {control[8].split(',').map((riesgo, index) => (
                                                 <div key={index}>{riesgo}</div>
                                             ))}
                                             </td>
@@ -189,7 +190,7 @@ const Controles = () => {
                         id_control={selectedControl[0]}
                         name={selectedControl[2]}
                         numberName={selectedControl[1]}
-                        riesgosAsociados={selectedControl[7]}
+                        riesgosAsociados={selectedControl[8]}
                         evidences={selectedControl[3]}
                         periocity={selectedControl[4]}
                         value={selectedControl[5]}

@@ -5,22 +5,22 @@ import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
-  const [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken') || null);
-  const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken') || null);
+  const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
+  const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem('accessToken') || null);
+  const [refreshToken, setRefreshToken] = useState(() => sessionStorage.getItem('refreshToken') || null);
   const [expirationTime, setExpirationTime] = useState(() => {
-    const storedTime = localStorage.getItem('expirationTime');
+    const storedTime = sessionStorage.getItem('expirationTime');
     return storedTime ? new Date(storedTime) : null;
   });
   const [refreshTimeout, setRefreshTimeout] = useState(null);
   
-  const [role, setRole] = useState(() => localStorage.getItem('role') || null);
-  const [name, setName] = useState(() => localStorage.getItem('name') || null);
-  const [surname, setSurname] = useState(() => localStorage.getItem('surname') || null);
+  const [role, setRole] = useState(() => sessionStorage.getItem('role') || null);
+  const [name, setName] = useState(() => sessionStorage.getItem('name') || null);
+  const [surname, setSurname] = useState(() => sessionStorage.getItem('surname') || null);
   
-  const [cognitoId, setCognitoId] = useState(() => localStorage.getItem('cognitoId') || null);
-  const [selectedEmpresa, setSelectedEmpresa] = useState(() => localStorage.getItem('selectedEmpresa') || null);
-  const [profileImg, setProfileImg] = useState(() => localStorage.getItem('profileImg') || null);
+  const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
+  const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
+  const [profileImg, setProfileImg] = useState(() => sessionStorage.getItem('profileImg') || null);
 
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
@@ -29,46 +29,46 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
-    localStorage.setItem('accessToken', accessToken);
+    sessionStorage.setItem('accessToken', accessToken);
   }, [accessToken]);
 
   useEffect(() => {
-    localStorage.setItem('refreshToken', refreshToken);
+    sessionStorage.setItem('refreshToken', refreshToken);
   }, [refreshToken]);
 
   useEffect(() => {
-    localStorage.setItem('token', token);
+    sessionStorage.setItem('token', token);
   }, [token]);
   
 
   useEffect(() => {
-    localStorage.setItem('role', role);
+    sessionStorage.setItem('role', role);
   }, [role]);
 
   useEffect(() => {
-    localStorage.setItem('name', name);
+    sessionStorage.setItem('name', name);
   }, [name]);
 
   useEffect(() => {
-    localStorage.setItem('profileImg', profileImg);
+    sessionStorage.setItem('profileImg', profileImg);
   }, [profileImg]);
 
   useEffect(() => {
-    localStorage.setItem('surname', surname);
+    sessionStorage.setItem('surname', surname);
   }, [surname]);
-  
 
   useEffect(() => {
-    localStorage.setItem('cognitoId', cognitoId);
+    sessionStorage.setItem('cognitoId', cognitoId);
   }, [cognitoId]);
 
   useEffect(() => {
-    localStorage.setItem('selectedEmpresa', selectedEmpresa);
+    sessionStorage.setItem('selectedEmpresa', selectedEmpresa);
   }, [selectedEmpresa]);
 
   useEffect(() => {
-    localStorage.setItem('expirationTime', expirationTime?.toString() || '');
+    sessionStorage.setItem('expirationTime', expirationTime?.toString() || '');
   }, [expirationTime]);
+  
 
 
 
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
       setUserData(null);
       
       // Limpiar el almacenamiento local
-      localStorage.clear(); // Eliminar todo del localStorage
+      sessionStorage.clear();
   
       // Redirigir al usuario a la página de inicio de sesión
       window.location.href = '/login'; // Forzar redirección a la página de inicio
@@ -150,13 +150,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (selectedEmpresa !== null) {
-      localStorage.setItem('selectedEmpresa', selectedEmpresa);
-    } else {
-      localStorage.removeItem('selectedEmpresa'); // Eliminar si es null
-    }
-  }, [selectedEmpresa]);
 
   const refreshAccessToken = async () => {
     try {
@@ -169,10 +162,20 @@ export const AuthProvider = ({ children }) => {
       const newIdToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
       const newExpTime = session.tokens.idToken.payload.exp;
 
+      sessionStorage.setItem('accessToken', newAccessToken);
+      sessionStorage.setItem('refreshToken', newRefreshToken);
+      sessionStorage.setItem('idToken', newIdToken);
+
       setAccessToken(newAccessToken);
       setToken(newIdToken);
       setRefreshToken(newRefreshToken);
       setExpirationTime(new Date(newExpTime * 1000));
+
+      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+      localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+
+
     } catch (error) {
       console.error('Error al renovar los tokens:', error);
       // Aquí podrías manejar el caso de que la renovación falle, por ejemplo, cerrando la sesión del usuario.
@@ -234,7 +237,7 @@ export const AuthProvider = ({ children }) => {
     selectedEmpresa,
     setSelectedEmpresa,
     awsCredentials,
-    fetchUserData, // Ahora disponible para obtener datos del usuario
+    fetchUserData, 
     userData,
     fetchAwsCredentials,
     refreshAccessToken,

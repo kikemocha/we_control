@@ -5,11 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import './Login.css';
 import logo from '../we_control.png' ;
 import { signOut } from 'aws-amplify/auth';
-
-
 import Button from '../components/common/Button';
-
-
 
 const LogIn = () => {
   const [email, setEmail] = useState('');
@@ -19,8 +15,8 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
-  const [token, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime, accessToken} = useAuth();
+  const [JWTtoken, setJWTToken] = useState(null);
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime,token, accessToken, refreshToken, role} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(null);
@@ -28,24 +24,29 @@ const LogIn = () => {
   const [showNewConfirmPassword, setShowNewConfirmPassword ] = useState(null);
 
   useEffect(() => {
-    if (accessToken) {
-      navigate('/home'); // Redirige si ya tienes el token
+    // Comprueba si alguno de los tokens o el role está presente en sessionStorage
+    const isAuthenticated = sessionStorage.getItem('token')| sessionStorage.getItem('accessToken')  || sessionStorage.getItem('refreshToken') ;
+    const userRole = sessionStorage.getItem('role') !== 'null';
+
+    if (isAuthenticated && userRole) {
+      // Redirige a /home si la sesión está activa
+      navigate('/home');
     }
-  }, [token, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     // Verificamos que el token no sea null o undefined
-    if (token) {
+    if (JWTtoken) {
       const fetchAWS = async () => {
         try {
-          await fetchAwsCredentials(token);
+          await fetchAwsCredentials(JWTtoken);
         } catch (error) {
           console.error('Error fetching AWS credentials:', error);
         }
       };
       fetchAWS();
     }
-  }, [token]);
+  }, [JWTtoken]);
 
   const handleSubmit = async (event, providedPassword = null) => {
     if (event) event.preventDefault();
@@ -61,24 +62,31 @@ const LogIn = () => {
         const token = session.tokens.accessToken;
         const cognitoId = token.payload.sub;
         const exp = session.tokens.idToken.payload.exp;
-        setExpirationTime(new Date(exp * 1000));
-        console.log('EXP_TIME: ', new Date(exp * 1000));
-  
+
         const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
         const accessToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
         const refreshToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
         const idToken = localStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
   
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
+        sessionStorage.setItem('idToken', idToken);
+        
         setToken(idToken); // Guarda el token en el contexto
         setJWTToken(idToken);
         setAccessToken(accessToken);
         setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
+        setExpirationTime(new Date(exp * 1000));
+
+        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+        localStorage.removeItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+
   
         await fetchUserData(cognitoId, idToken);
-  
-        // Navega a la página principal
         navigate('/home');
+
       } else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
         setIsNewPasswordRequired(true); // Muestra el formulario de nueva contraseña
       } else {

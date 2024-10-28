@@ -20,14 +20,6 @@
     height: 10%;
 }
 
-
-.table-container {
-    height: 260px; /* Ajusta la altura según tus necesidades */
-    overflow-y: auto;
-    border-radius: 30px;
-    position: relative;
-}
-
 .card_table {
     border-collapse: collapse;
     width: 100%;

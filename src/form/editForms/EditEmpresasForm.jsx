@@ -134,7 +134,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             />
           </svg>
         </button>
-        <form className="form_controles" onSubmit={handleEdit}>
+        <form className="form_controles w-3/5 mx-auto" onSubmit={handleEdit}>
           <h4 className="text-lg font-semibold">EDITAR EMPRESA</h4>
           <Input
               label="Nombre Empresa"

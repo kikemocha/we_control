@@ -29,12 +29,35 @@
     height: 70%;
     text-align: center;
 }
-/* Estilos para navegadores con scrollbar compatibles con pseudo-elementos */
 .table-container {
-  scrollbar-width: thin; /* Define un scrollbar más delgado para Firefox */
-  scrollbar-color: #a0a0a0 #f1f1f1; /* Color de la barra y el fondo */
+    height: 260px; /* Ajusta la altura según tus necesidades */
+    overflow-y: auto;
+    border-radius: 30px;
+    position: relative;
+
+    /* Scrollbar personalizada para Firefox */
+    scrollbar-width: thin; /* Define un scrollbar más delgado */
+    scrollbar-color: #a0a0a0 #f1f1f1; /* Color de la barra y el fondo */
 }
-  
+
+/* Scrollbar personalizada para Chrome, Edge y Safari */
+.table-container::-webkit-scrollbar {
+    width: 8px; /* Ancho de la scrollbar */
+    height: 8px; /* Alto de la scrollbar horizontal */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Color del scroll */
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #999; /* Color al pasar el ratón */
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: transparent; /* Fondo de la pista */
+}
 .div_button_Card {
     position: absolute;
     bottom: 0; /* Se coloca en la parte inferior */
