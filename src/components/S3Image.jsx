@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 const S3Image = ({ bucketName, imgkey, token }) => {
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const { awsCredentials } = useAuth();
 
@@ -50,7 +50,7 @@ const S3Image = ({ bucketName, imgkey, token }) => {
   }
 
   if (loading) {
-    return <p>Cargando imagen...</p>; // Puedes reemplazarlo con un spinner si prefieres
+    return <iframe className='skeleton' width="100%" height="600px"></iframe>; // Puedes reemplazarlo con un spinner si prefieres
   }
 
   return imageUrl ? <iframe src={imageUrl} title="PDF desde S3" width="100%" height="600px"></iframe> : <p>Cargando imagen...</p>;

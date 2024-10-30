@@ -8,9 +8,12 @@ import EditPersonForm from '../form/editForms/EditPersonForm';
 
 const Gestores = () => {
     const {selectedEmpresa, token} = useAuth();
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState({ activo: [], eliminado: [] });
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+
+    const [gestoresState, setGestoresState] = useState('activo');
 
     const [showPopup, setShowPopup] = useState(false);
     const handleOpenPopup = () => setShowPopup(true);
@@ -70,12 +73,26 @@ const Gestores = () => {
         fetchData();
     }, [selectedEmpresa]);
 
-    if (loading) {
+    if (loading | !data.activo) {
         return <div className='card_option'>
                     <div className='total_add'>
-                        <div className='upper_box'>
-                            <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
-                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
+                        <div className='flex'>
+                            <div className={gestoresState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
+                                <div className='text'>Total de&nbsp;<strong>controles</strong> {gestoresState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
+                                <div className='number'>{gestoresState === 'activo' ? data.activo.length : data.eliminado.length}</div>
+                            </div>
+                            <div className='paperbin'>
+                                <svg
+                                    onClick={()=>{gestoresState === 'activo' ? setGestoresState('eliminado') : setGestoresState('activo')}}
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    strokeWidth={1.5} 
+                                    stroke="currentColor" 
+                                    className={gestoresState === 'activo' ? '' : 'selected'}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </div>
                         </div>
                         <div onClick={handleOpenPopup}>
                             <svg
@@ -110,6 +127,7 @@ const Gestores = () => {
                                             <td></td>
                                             <td></td>
                                             <td></td>
+                                            <td></td>
                                         </tr>
                                     ))}
                                 </table>
@@ -121,46 +139,66 @@ const Gestores = () => {
     }
 
     return <div className='card_option'>
-            <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualGestores={data}/>
+        {console.log(data)}
+            <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualGestores={data.activo}/>
             <div className='total_add'>
-                <div className='upper_box'>
-                    <div className='text'>Total de&nbsp;<strong>gestores</strong>:</div>
-                    <div className='number'>{data.length}</div>
-                </div>
-                <div onClick={handleOpenPopup}>
-                    <svg
-                        viewBox="0 0 1024 1024"
-                        fill="currentColor"
-                        height="2em"
-                        width="2em"
-                        >
-                        <defs>
-                            <style />
-                        </defs>
-                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
-                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
-                    </svg>
-                </div>
-            </div>
+                        <div className='flex'>
+                            <div className={gestoresState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
+                                <div className='text'>Total de&nbsp;<strong>gestores</strong> {gestoresState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
+                                <div className='number'>{gestoresState === 'activo' ? data.activo.length : data.eliminado.length}</div>
+                            </div>
+                            <div className='paperbin'>
+                                <svg
+                                    onClick={()=>{gestoresState === 'activo' ? setGestoresState('eliminado') : setGestoresState('activo')}}
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    strokeWidth={1.5} 
+                                    stroke="currentColor" 
+                                    className={gestoresState === 'activo' ? '' : 'selected'}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div onClick={handleOpenPopup}>
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                fill="currentColor"
+                                height="2em"
+                                width="2em"
+                                >
+                                <defs>
+                                    <style />
+                                </defs>
+                                <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                            </svg>
+                        </div>
+                    </div>
             {data ? (
                 <div className='responsable_home'>
                     <div className='responsable_main'>
                         <div className="table-container">
                             <div>
                                 <table className="card_table">
+                                <thead>
                                 <tr className="table-row">
                                     <th>Nombre</th>
                                     <th>Apellido</th>
-                                    <th>Título</th>
+                                    <th>Cargo   </th>
                                     <th>E-mail</th>
+                                    <th>Teléfono</th>
                                     <th>Ajustes</th>
                                 </tr>
-                                {data.map((gestor, index) => (
+                                </thead>
+                                <tbody>
+                                {data[gestoresState].map((gestor, index) => (
                                     <tr key={index} className="table-row">
-                                        <td><p className='text-center'>{gestor[2]}</p></td>
-                                        <td><p className='text-center'>{gestor[9]}</p></td>
-                                        <td><p className='text-center'>{gestor[5]}</p></td>
-                                        <td><p className='text-center'>{gestor[4]}</p></td>
+                                        <td><p className='text-center'>{gestor.name}</p></td>
+                                        <td><p className='text-center'>{gestor.surname}</p></td>
+                                        <td><p className='text-center'>{gestor.role}</p></td>
+                                        <td><p className='text-center'>{gestor.email}</p></td>
+                                        <td><p className='text-center'>{gestor.phone}</p></td>
                                         <td>
                                         <svg
                                          
@@ -177,6 +215,7 @@ const Gestores = () => {
                                         </td>
                                     </tr>
                                 ))}
+                                </tbody>
                             </table>
                             </div>
                         </div>
@@ -190,12 +229,12 @@ const Gestores = () => {
                         show={showEditPopup}
                         onClose={handleCloseEditPopup}
                         fetchData={fetchData}
-                        id_person={selectedGestor[0]} 
-                        first_name={selectedGestor[2]} 
-                        last_name={selectedGestor[9]} 
-                        cargo={selectedGestor[5]}
-                        email={selectedGestor[4]}
-                        phone={selectedGestor[3]}
+                        id_person={selectedGestor.id_user} 
+                        first_name={selectedGestor.name} 
+                        last_name={selectedGestor.surname} 
+                        cargo={selectedGestor.role}
+                        email={selectedGestor.email}
+                        phone={selectedGestor.phone}
                         messagePopUp={handleCloseMessagePopUp}
                         
                     />    

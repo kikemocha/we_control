@@ -130,23 +130,22 @@
     width: 100%;
     height: 150px;
     overflow-y: scroll;
-    padding: 10px;
-
-    /* Ocultar scrollbar en navegadores compatibles */
-    scrollbar-width: none; /* Firefox */
+    position: relative; /* Para que el overlay se ajuste al contenedor */
 }
 
 .control_disabled::-webkit-scrollbar {
-    display: none; /* Chrome, Safari y Edge */
+    display: none; /* Oculta el scrollbar en Chrome, Safari y Edge */
 }
-.control_disabled .overlay_control {
-    position: absolute;
+
+.overlay_control {
+    position: sticky; /* Permite que el overlay se quede en su lugar */
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    min-height: 150px; /* Ajusta el tamaño mínimo del overlay para cubrir todo el contenedor */
     background-color: rgba(0, 0, 0, 0.2); /* Color gris con opacidad */
-    z-index: 0; /* Asegúrate de que esté por debajo de otros elementos */
+    z-index: 1; /* Asegúrate de que esté encima del contenido */
+    pointer-events: none; /* Para que no interfiera con el scroll */
 }
   
   /* Ocultar barra de scroll en WebKit */

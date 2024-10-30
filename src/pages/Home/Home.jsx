@@ -62,37 +62,25 @@ const Home = () => {
 
 
   useEffect(() => {
-    // Definir una función asíncrona dentro del useEffect
-    const checkAndFetchAwsCredentials = async () => {
-      if (!awsCredentials || Object.keys(awsCredentials).length === 0) {
-        console.log('No tienes credenciales');
-        let attempts = 3; // Número de intentos permitidos
-        let success = false;
-  
-        for (let i = 0; i < attempts; i++) {
-          try {
-            console.log(`Intento ${i + 1} de ${attempts}`);
-            setLoading(true);
-            await fetchAwsCredentials(token);
-            success = true;
-            console.log('Credenciales obtenidas con éxito');
-            break; // Si se obtienen las credenciales, salir del bucle
-          } catch (error) {
-            console.error(`Error al obtener las credenciales en el intento ${i + 1}:`, error);
-          } finally {
-            setLoading(false);
-          }
-        }
-  
-        if (!success) {
-          console.error('No se pudieron obtener las credenciales después de 3 intentos.');
+    let attemptCount = 0;
+    // Función para verificar y obtener credenciales
+    const checkAwsCredentials = async () => {
+      if (!awsCredentials.AccessKeyId && attemptCount < 3) {
+        setLoading(true);
+        attemptCount += 1;
+        await fetchAwsCredentials(token);
+
+        // Si todavía no hay credenciales después del intento, espera 1 segundo y vuelve a intentar
+        if (!awsCredentials && attemptCount < 3) {
+          setTimeout(checkAwsCredentials, 1000);
+        } else {
+          setLoading(false); // Deja de cargar si las credenciales están presentes o se agotaron los intentos
         }
       }
     };
-  
-    // Llamar a la función asíncrona
-    checkAndFetchAwsCredentials();
-  }, [awsCredentials, token]);
+
+    checkAwsCredentials();
+  }, [awsCredentials, fetchAwsCredentials]);
   
 
   if (loading && role === 'admin') {

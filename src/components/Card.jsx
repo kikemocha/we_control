@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const Card = ({name, singularName, href, index, apiURL}) => {
     const { selectedEmpresa, token } = useAuth();
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
@@ -19,10 +19,10 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                     data_clean = response.data.map(item => [item[2], item[4]])
                 }
                 else if (name === 'Controles'){
-                    data_clean = response.data.map(item => [item[1], item[2], item[3], item[5], item[8]])
+                    data_clean = response.data.activo.map(item => [item[1], item[2], item[3], item[5], item[8]])
                 }
                 else if (name === 'Riesgos'){
-                    data_clean = response.data.map(item => [item[1], item[3], item[4].split(',').length, item[5] === 'None' ? (item[3]) : item[5]])
+                    data_clean = response.data.activo.map(item => [item[1], item[3], item[4].split(',').length, item[5] === 'None' ? (item[3]) : item[5]])
                 }
                 else if (name === 'Auditorías'){
                     data_clean = response.data.map(item => [item[1], Math.floor(parseInt(item[2],10)/parseInt(item[1],10))+'%' ])

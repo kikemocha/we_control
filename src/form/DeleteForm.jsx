@@ -39,7 +39,7 @@ const DeleteForm = ({ show, onClose, onCloseFather, deleteFunction, message, bot
         <div className='w-full' style={{height:'80%'}}>
           <p className='h-1/4 text-xl font-bold flex justify-center items-center'>¡CUIDADO!</p>
           <div className='h-2/4'>
-            <p className='text-lg py-10 px-12 text-center'>{message}</p>
+            <p className='text-lg py-10 px-36 text-center'>{message}</p>
           </div>
           <p className='h-1/4 text-md font-bold flex justify-center items-center'> {bottomMessage}</p>
         </div>

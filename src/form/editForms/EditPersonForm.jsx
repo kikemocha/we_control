@@ -22,12 +22,12 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
 
 
   useEffect(() => {
-    setIdPerson(id_person);
-    setFirstName(first_name);
-    setLastName(last_name);
-    setCargoPerson(cargo);
-    setEmail(email);
-    setPhonePerson(phone)
+    setIdPerson(id_person || '');
+    setFirstName(first_name || '');
+    setLastName(last_name || '');
+    setCargoPerson(cargo || '');
+    setEmail(email || '');
+    setPhonePerson(phone || '');
   }, [id_person, first_name, last_name, cargo, email, phone]);
 
   const [loading, setLoading] = useState(false)
@@ -88,46 +88,38 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
   const confirmDelete = async () => {
     setLoading(true);
       const requestBody = {
-        id_person: id_person,
+        id_user: id_person,
       }
       try {
-      //   const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteControles', {
-      //     method: 'DELETE',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-      //     },
-      //     body: JSON.stringify(requestBody),
-      //   });
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteUser', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
   
-      //   const result = await response.json();
+        const result = await response.json();
   
-      //   if (response.ok) {
+        if (response.ok) {
   
-      //     setSuccessMessage(result.message);
-      //     setErrorMessage('');
-      //     fetchData(); // Recargar la lista de controles
-      //     handleClose();
-      //   } else {
-      //     setErrorMessage(result.message);
-      //     setSuccessMessage('');
-      //   }
-      // } catch (error) {
-      //   setErrorMessage('Error al enviar los datos al servidor');
-      //   setSuccessMessage('');
-      // } finally{
-      //   resetValues();
-      //   setLoading(false);
-      // }
-        console.log(requestBody);
-        
-    } catch{
-      console.log(requestBody);
-    } finally{
-      setLoading(false);
-      setLoading(false);
-      handleClose();
-    }
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          handleClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+      } finally{
+        fetchData();
+        handleClose();
+        setLoading(false);
+      }
   };
 
   const handleDelete = (e) => {
@@ -182,7 +174,7 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
             onChange={null}
             disabled={true}
             required
-            className="block bg-gray-200 py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+            className="block py-2.5 px-0 w-full text-sm border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
           />
 
           <div className="grid md:grid-cols-2 md:gap-6">
@@ -259,10 +251,10 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
           show={showDeletePopup}
           onClose={()=>{setShowDeletePopup(false)}}
           deleteFunction={confirmDelete}
-          message={'Al borrar este gestor también se archivarán las evidencias y controles de las auditorías'}
+          message={'Al borrar este usuario también se archivarán las evidencias y controles de las auditorías, no podrá iniciar sesión por lo que tampoco tendrá permiso para acceder a los documentos'}
           onCloseFather={()=>{onClose()}}
           loading={loading}
-          bottomMessage={'¿Estás seguro que quieres eliminar el gestor?'}
+          bottomMessage={'¿Estás seguro que quieres eliminar el usuario?'}
         />
       )}
     </div>

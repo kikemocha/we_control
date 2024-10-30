@@ -7,10 +7,11 @@ import EditRiesgosForm from '../form/editForms/EditRiesgosForm';
 
 const Riesgos = () => {
     const {selectedEmpresa, token} = useAuth();
-    const [data, setData] = useState([]);
+    const [data, setData] = useState({ activo: [], eliminado: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [riesgosState, setRiesgosState] = useState('activo');
     const [messagePopUp, setMessagePopUp] = useState('');
     const [messageStatePopUp, setMessageStatePopUp] = useState('');
     const [messageIsVisible, setMessageIsVisible] = useState(false);
@@ -112,13 +113,78 @@ const Riesgos = () => {
                 </div>
     }
 
+    if (!data.activo) {
+        return <div className='card_option'>
+                    <div className='total_add'>
+                        <div className='upper_box'>
+                            <div className='text'>Total de&nbsp;<strong>riesgos</strong>:</div>
+                            <div className='number' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
+                        </div>
+                        <div onClick={handleOpenPopup} style={{height : '40px', width : '40px'}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div className='responsable_home'>
+                        <div className='responsable_main'>
+                            <div className="table-container">
+                                <div>
+                                    <table className="card_table">
+                                        <thead>
+                                            <tr className="table-row">
+                                                <th>Número de Riesgo</th>
+                                                <th>Descripción</th>
+                                                <th>Valor de Riesgo Inherente</th>
+                                                <th>Nº Controles Asociados</th>
+                                                <th>Valor de Riesgo Residual</th>
+                                                <th>Ajustes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.from({ length: 1 }).map((_, index) => (
+                                            <tr key={index} className="table-row">
+                                                <td> Ha habido un problema con la red</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                
+                                            </tr>
+                                            ))}
+                                        </tbody>                                    
+                                </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    }
+    
+
     return <div className='card_option'>
             <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp} actualRiesgos={data}/>
             <div className='total_add'>
-                <div className='upper_box'>
-                    <div className='text'>Total de&nbsp;<strong>riesgos</strong>:</div>
-                    <div className='number'>{data.length}</div>
+                <div className='flex'>
+                <div className={riesgosState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
+                        <div className='text'>Total de&nbsp;<strong>riesgos</strong> {riesgosState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
+                        <div className='number'>{riesgosState === 'activo' ? data.activo.length : data.eliminado.length}</div>
+                    </div>
+                    <div className='paperbin'>
+                        <svg
+                            onClick={()=>{riesgosState === 'activo' ? setRiesgosState('eliminado') : setRiesgosState('activo')}}
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            strokeWidth={1.5} 
+                            stroke="currentColor" 
+                            className={riesgosState === 'activo' ? '' : 'selected'}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                    </div>
                 </div>
+                
                 <div onClick={handleOpenPopup}>
                     <svg
                         viewBox="0 0 1024 1024"
@@ -140,7 +206,7 @@ const Riesgos = () => {
                         <div className='responsable_main'>
                             <div className="table-container">
                                 <div>
-                                    <table className="card_table">
+                                    <table className='card_table'>
                                         <thead className='no_main'>
                                             <tr className="table-row">
                                                 <th>Número de Riesgo</th>
@@ -152,7 +218,7 @@ const Riesgos = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {data.map((riesgos, index) => (
+                                        {data[riesgosState].map((riesgos, index) => (
                                             <tr key={index} className="table-row">
                                                 <td className='riesgos_controles'><div className='bg-primary'>{riesgos[1]}</div></td>
                                                 <td><p className='text-center'>{riesgos[2]}</p></td>
@@ -175,7 +241,7 @@ const Riesgos = () => {
                                                         strokeWidth="2.5" 
                                                         stroke="currentColor" 
                                                         className="size-8 mx-auto" 
-                                                        onClick={(e) => handleOpenEditPopup(riesgos)}>
+                                                        onClick={riesgosState === 'activo' ? (e) => handleOpenEditPopup(riesgos) : null}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                                     </svg>
                                                 </td>

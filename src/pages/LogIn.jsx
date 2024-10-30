@@ -16,7 +16,7 @@ const LogIn = () => {
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
   const [JWTtoken, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime,token, accessToken, refreshToken, role} = useAuth();
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(null);

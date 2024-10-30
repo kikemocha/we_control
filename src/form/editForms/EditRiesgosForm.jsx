@@ -81,44 +81,35 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
         id_riesgo: id_riesgo,
       }
       try {
-      //   const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteControles', {
-      //     method: 'DELETE',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-      //     },
-      //     body: JSON.stringify(requestBody),
-      //   });
+        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteRiesgo', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+          },
+          body: JSON.stringify(requestBody),
+        });
   
-      //   const result = await response.json();
+        const result = await response.json();
   
-      //   if (response.ok) {
+        if (response.ok) {
   
-      //     setSuccessMessage(result.message);
-      //     setErrorMessage('');
-      //     fetchData(); // Recargar la lista de controles
-      //     handleClose();
-      //   } else {
-      //     setErrorMessage(result.message);
-      //     setSuccessMessage('');
-      //   }
-      // } catch (error) {
-      //   setErrorMessage('Error al enviar los datos al servidor');
-      //   setSuccessMessage('');
-      // } finally{
-      //   resetValues();
-      //   setLoading(false);
-      // }
-        console.log(requestBody);
-        
-    } catch{
-      console.log(requestBody);
-    } finally{
-      setLoading(false);
-      setLoading(false);
-      handleClose();
-    }
-  };
+          setSuccessMessage(result.message);
+          setErrorMessage('');
+          fetchData(); // Recargar la lista de controles
+          handleClose();
+        } else {
+          setErrorMessage(result.message);
+          setSuccessMessage('');
+        }
+      } catch (error) {
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+      } finally{
+        setLoading(false);
+        handleClose();
+      }
+        console.log(requestBody);  };
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -213,7 +204,7 @@ const EditRiesgosForm = ({ show, onClose, fetchData, id_riesgo, numberName, desc
           show={showDeletePopup}
           onClose={()=>{setShowDeletePopup(false)}}
           deleteFunction={confirmDelete}
-          message={'Al borrar este riesgo también se borrarán los controles y los controles de las auditorías'}
+          message={'Al borrar este riesgo también se borrarán de los controles asociados'}
           onCloseFather={()=>{onClose()}}
           loading={loading}
           bottomMessage={'¿Estás seguro que quieres eliminar el riesgo?'}

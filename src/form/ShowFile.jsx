@@ -6,13 +6,34 @@ import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria, state, fetchData, control_name, message_admin}) => {
   const [uploadError, setUploadError] = useState('');
-  const {role, token, awsCredentials} = useAuth(); // Credenciales AWS desde el contexto
+  const {role, token, awsCredentials, fetchAwsCredentials} = useAuth(); // Credenciales AWS desde el contexto
   const [message, setMessage] = useState('');
 
   const [showTextPopup, setShowTextPopup] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    let attemptCount = 0;
+    // Función para verificar y obtener credenciales
+    const checkAwsCredentials = async () => {
+      if (!awsCredentials.AccessKeyId && attemptCount < 3) {
+        setLoading(true);
+        attemptCount += 1;
+        await fetchAwsCredentials(token);
+
+        // Si todavía no hay credenciales después del intento, espera 1 segundo y vuelve a intentar
+        if (!awsCredentials && attemptCount < 3) {
+          setTimeout(checkAwsCredentials, 1000);
+        } else {
+          setLoading(false); // Deja de cargar si las credenciales están presentes o se agotaron los intentos
+        }
+      }
+    };
+
+    checkAwsCredentials();
+  }, [awsCredentials, fetchAwsCredentials]);
+  
   const s3Client = new S3Client({
     region: 'eu-west-1',
     credentials: {

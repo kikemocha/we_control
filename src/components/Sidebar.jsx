@@ -7,9 +7,11 @@ import './Layout.css';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-    const {role, selectedEmpresa, signOut} = useAuth();
+    const {role, selectedEmpresa, signOut, checkTokenValidity} = useAuth();
     const location = useLocation();
   
+  
+
   useEffect(() => {
     // Verifica que signOut está definido
     if (!signOut) {

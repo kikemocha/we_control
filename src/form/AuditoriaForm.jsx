@@ -49,6 +49,7 @@ const AuditoriaForm = ({ show, onClose, fetchData }) => {
       setSuccessMessage('');
     } finally{
       setLoading(false);
+      fetchData();
     }
   };
   if (!show) return null;

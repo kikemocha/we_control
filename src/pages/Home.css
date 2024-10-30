@@ -46,14 +46,12 @@
     padding-left: 20px;
 }
 
-
 .table-row td {
-    text-align: center;
     height: 60px; /* Altura fija para los th y td */
     border-top: 1px solid black;
     font-weight: normal;
     font-size: 0.9em;
-    text-align: left;
+    text-align: center;
     padding: 8px; /* Añade padding si es necesario */
     padding-left: 20px;
 }
@@ -111,7 +109,7 @@
     grid-template-columns: repeat(2, 1fr); /* Divide en 4 columnas iguales */
 }
 .close-icon {
-    z-index: 9999;
+    z-index: 9989;
     position: absolute;
     top: 10%;
     right: 10%;
@@ -228,6 +226,29 @@
     height: 40px;
     width: 40px;
     cursor: pointer;
+}
+
+.paperbin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.paperbin svg{
+    margin-left: 2em;
+    height: 4em;
+    width: 4em;
+    padding: 1em;
+    border-radius: 10px;
+    background-color: rgba(128, 128, 128, 0.452);
+}
+.paperbin svg.selected{
+    margin-left: 2em;
+    height: 4em;
+    width: 4em;
+    padding: 1em;
+    border-radius: 10px;
+    color: white;
+    background-color: rgb(184, 46, 46);
 }
 
 .card_option .table-container {

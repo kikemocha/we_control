@@ -65,8 +65,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log(response.data);
-        setControles(response.data);
+        setControles(response.data.activo);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching controles:', error);
@@ -81,7 +80,6 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log(response.data);
         setResponsables(response.data);
         setLoading(false);
       } catch (error) {
@@ -109,7 +107,6 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
         limit_date: limitDate.toISOString().split('T')[0],
         order : 1,
       };
-      console.log(selectedAuditoria, requestBody);
   
       try {
         const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
@@ -366,7 +363,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           <label className='w-full'>
             <p>Controles Disponibles</p>
             <div className='control_riesgos w-full'>
-              {controles.map(control => (
+              {controles.activo.map(control => (
                 <div 
                   key={control[0]} 
                   className={`riesgo-item ${selectedControl === control[0] ? 'selected' : ''}`} 

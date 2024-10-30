@@ -171,20 +171,20 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
-          <label className='riesgos_div '>
+          <label className="riesgos_div">
             <p>Riesgos Asociados</p>
-            <div className='control_disabled flex flex-col justify-around relative'>
+            <div className="control_disabled flex flex-col justify-around relative">
+              <div className="overlay_control"></div> {/* Overlay para cubrir todo el área */}
+              
               {controlSelectedRiesgos.map((control, index) => (
-                <div key={index} className='mx-4 flex justify-center'>
-                  <div className='bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap'>
-                    <strong >R{control[1]}</strong>
-                    <span className='ml-2'>{descriptionRiesgos[index]}</span>
+                <div key={index} className="mx-4 flex justify-center mb-4">
+                  <div className="bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <strong>R{control[1]}</strong>
+                    <span className="ml-2">{descriptionRiesgos[index]}</span>
                   </div>
                 </div>
               ))}
-              <div className='overlay_control'></div>
             </div>
-
           </label>
           <Input
               label="Evidencias"

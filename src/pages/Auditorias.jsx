@@ -105,8 +105,8 @@ const Auditorias = () => {
     if (loading) {
         return <div className='card_option'>
                     <div className='total_add'>
-                        <div className='upper_box'>
-                            <div className='text'>Total de&nbsp;<strong>auditorías</strong>:</div>
+                        <div className='upper_box text-xs'>
+                            <div className='text'>Total de&nbsp;<strong>auditorías</strong>&nbsp;y&nbsp;<strong>seguimientos</strong></div>
                             <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
                         </div>
                         <div onClick={handleOpenPopup}>
@@ -180,7 +180,6 @@ const Auditorias = () => {
                     </svg>
                 </div>
                 <h3>{selectedAuditoriaName}</h3>
-                    {console.log('AUDITORIA_DATA: ',AuditoriaData)}
                     {AuditoriaData && !loading ? (
                         <div>
                             {popupFormType === 'control' && (
@@ -347,8 +346,8 @@ const Auditorias = () => {
                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} />
                 )}
             <div className='total_add'>
-                <div className='upper_box'>
-                    <div className='text'>Total de&nbsp;<strong>auditorías</strong>:</div>
+                <div className='upper_box text-xs'>
+                    <div className='text'>Total de&nbsp;<strong>auditorías</strong>&nbsp;y&nbsp;<strong>seguimientos</strong></div>
                     <div className='number'>{data.length}</div>
                 </div>
                 <div onClick={() => handleOpenPopup('auditoria')}>
@@ -381,7 +380,7 @@ const Auditorias = () => {
                             {data.map((auditoria, index) => (
                                 <tr key={index} className="table-row">
                                 <td>{auditoria[1]}</td>
-                                <td>{Math.floor(auditoria[3] / auditoria[2] * 100)}%</td>
+                                <td>{Math.floor(auditoria[3] / auditoria[2] * 100) ? Math.floor(auditoria[3] / auditoria[2] * 100) : '0'}%</td>
                                 <td>{auditoria[4]}</td>
                                 <td >
                                     <svg
