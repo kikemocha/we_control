@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import S3Image from '../components/S3Image';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
-const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria, state, fetchData, control_name, message_admin}) => {
+const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria, state, fetchData, control_name, message_admin, order}) => {
   const [uploadError, setUploadError] = useState('');
   const {role, token, awsCredentials, fetchAwsCredentials} = useAuth(); // Credenciales AWS desde el contexto
   const [message, setMessage] = useState('');
@@ -53,6 +53,7 @@ const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria,
     const requestBody = {
       id_control: id_control,
       id_auditoria: id_auditoria,
+      order : order
     };
 
     try {
@@ -171,10 +172,17 @@ const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria,
     
   };
 
+  const requestBody2 = {
+    id_control: id_control,
+    id_auditoria: id_auditoria,
+    order : order
+  };
+
   if (!show) return null;
 
   return (
     <div className="popup-overlay">
+      {console.log('REQUESTED: ',requestBody2)}
       <div className="popup_img">
       {loading && (
           <div className="absolute rounded-3xl top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">

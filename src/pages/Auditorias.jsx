@@ -72,7 +72,7 @@ const Auditorias = () => {
                         'Authorization' : `Bearer ${token}`
                     }}
                 );
-                setAuditoriaData(response.data);
+                setAuditoriaData(response.data.activo);
             } catch (error) {
                 setError(error);
             } finally {

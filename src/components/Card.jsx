@@ -16,7 +16,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                 const response = await axios.get(apiURL+selectedEmpresa, {headers: {'Authorization': `Bearer ${token}`,}});
                 let data_clean = [];
                 if (name === 'Gestores'){
-                    data_clean = response.data.map(item => [item[2], item[4]])
+                    data_clean = response.data.activo.map(item => [item.name, item.email])
                 }
                 else if (name === 'Controles'){
                     data_clean = response.data.activo.map(item => [item[1], item[2], item[3], item[5], item[8]])

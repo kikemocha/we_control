@@ -68,13 +68,24 @@ const Riesgos = () => {
     if (loading) {
         return <div className='card_option'>
                     <div className='total_add'>
-                        <div className='upper_box'>
-                            <div className='text'>Total de&nbsp;<strong>riesgos</strong>:</div>
-                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
-                        </div>
-                        <div onClick={handleOpenPopup} style={{height : '40px', width : '40px'}}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        <div className='flex'>
+                            <div className={riesgosState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
+                                    <div className='text'>Total de&nbsp;<strong>riesgos</strong> {riesgosState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
+                                    <div className='number'>{riesgosState === 'activo' ? data.activo.length : data.eliminado.length}</div>
+                                </div>
+                            </div>
+                        <div onClick={handleOpenPopup}>
+                            <svg
+                                viewBox="0 0 1024 1024"
+                                fill="currentColor"
+                                height="2em"
+                                width="2em"
+                                >
+                                <defs>
+                                    <style />
+                                </defs>
+                                <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
                             </svg>
                         </div>
                     </div>

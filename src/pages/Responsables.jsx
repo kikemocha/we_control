@@ -133,7 +133,7 @@ const Responsables = () => {
                                         <td>{responsable[5]}</td>
                                         <td>{responsable[4]}</td>
                                         <td>{responsable[11]}</td>
-                                        <td>
+                                        <td className='flex align-middle justify-center'>
                                             <svg
                                                 viewBox="0 0 24 24"
                                                 fill="currentColor"
