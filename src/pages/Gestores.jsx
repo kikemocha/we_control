@@ -139,7 +139,6 @@ const Gestores = () => {
     }
 
     return <div className='card_option'>
-        {console.log(data)}
             <GestoresForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualGestores={data.activo}/>
             <div className='total_add'>
                         <div className='flex'>

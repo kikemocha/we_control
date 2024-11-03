@@ -65,22 +65,25 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
 
       const result = await response.json();
 
-      if (response.ok) {
-        fetchData();
-        setSuccessMessage(result.message);
-        setErrorMessage('');
-        onClose();
-        
-      } else {
-        setErrorMessage(result.message);
-        setSuccessMessage('');
-      }
+        console.log("API Response Result:", result); // Debug log
+        console.log("API Response Status:", response.status); // Debug log
+
+        if (response.ok) {
+            fetchData();
+            setSuccessMessage(result.message || 'Operación exitosa');
+            setErrorMessage('');
+            onClose();
+        } else {
+            setErrorMessage(result.message || 'Error en la API');
+            setSuccessMessage('');
+        }
     } catch (error) {
-      setErrorMessage('Error al enviar los datos al servidor');
-      setSuccessMessage('');
-    } finally{
-      setLoading(false);
-    };
+        setErrorMessage('Error al enviar los datos al servidor');
+        setSuccessMessage('');
+        console.error("Error:", error); // Debug log
+    } finally {
+        setLoading(false);
+    }
   };
   if (!show) return null;
 
