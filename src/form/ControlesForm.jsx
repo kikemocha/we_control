@@ -62,7 +62,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
             'Authorization': `Bearer ${token}`
           }
         });
-        setRiesgos(response.data);
+        setRiesgos(response.data.activo);
       } catch (error) {
         console.error('Error fetching riesgos:', error);
       }
