@@ -7,10 +7,20 @@ import './Layout.css';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-    const {role, selectedEmpresa, signOut, checkTokenValidity} = useAuth();
+    const {role, selectedEmpresa, signOut, expirationTime} = useAuth();
     const location = useLocation();
   
   
+  useEffect(() => {
+    const currentTime = new Date().getTime(); // Obtén el tiempo actual en milisegundos
+    if (expirationTime < currentTime) {
+      alert('La sesión ha expirado');
+      signOut(); // Llama a la función SignOut cuando el usuario acepte el alert
+    }else{
+      console.log('expirationTime < currentTime: ',expirationTime < currentTime)
+    }
+  }, [expirationTime, location]);
+
 
   useEffect(() => {
     // Verifica que signOut está definido
@@ -27,6 +37,7 @@ const Sidebar = () => {
   }, [role, signOut]);
     return (
         <div className="sidebar">
+          {console.log(expirationTime)}
           <Link to="/home">
             <img className="logo_sidebar mx-auto" src={logo} alt="" />
           </Link>

@@ -165,6 +165,9 @@ export const AuthProvider = ({ children }) => {
       setToken(newIdToken);
       setRefreshToken(newRefreshToken);
   
+      const newExpirationTime = new Date(exp * 1000); // `exp` está en segundos, convertir a milisegundos
+      setExpirationTime(newExpirationTime);
+
       console.log('Tokens renovados con éxito');
     } catch (error) {
       console.error('Error al renovar el token:', error);
@@ -204,7 +207,6 @@ export const AuthProvider = ({ children }) => {
   
   
   
-  
 
   const value = {
     token,
@@ -231,6 +233,7 @@ export const AuthProvider = ({ children }) => {
     userData,
     fetchAwsCredentials,
     refreshAccessToken,
+    expirationTime,
     setExpirationTime
   };
 

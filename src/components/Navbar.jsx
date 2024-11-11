@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { type } from '@testing-library/user-event/dist/type';
 
 const Navbar = () => {
-    const { name, role, surname, profileImg } = useAuth();
+    const { name, role, surname, profileImg, expirationTime, signOut } = useAuth();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [categorySelected, setcategorySelected ] = useState('Todas las Categorías')
@@ -25,6 +25,7 @@ const Navbar = () => {
             setcategorySelected('Controles')    
         }
     }, [categorySelected])
+    
     useEffect(() => {
         const handleClickOutside = (event) => {
           // Si el clic ocurre fuera del dropdownRef, cierra el dropdown
