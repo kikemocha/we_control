@@ -98,10 +98,12 @@ const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria,
     const requestBody = {
       id_control: id_control,
       id_auditoria: id_auditoria,
-      state: 1
+      state: 1,
+      order: order
     };
 
     try {
+      console.log('body: ',requestBody)
       const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoriaState', {
         method: 'PUT',
         headers: {
@@ -140,6 +142,7 @@ const ShowFile = ({ show, onClose, imgkey, bucketName, id_control, id_auditoria,
       id_control: id_control,
       id_auditoria: id_auditoria,
       state: 2 ,
+      order: order,
       message : message,
       control_name : control_name,
     };
