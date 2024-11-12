@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.clear();
   
       // Redirigir al usuario a la página de inicio de sesión
-      window.location.href = '/login'; // Forzar redirección a la página de inicio
+      window.location.href = '/'; // Forzar redirección a la página de inicio
     } catch (error) {
       console.error('Error al limpiar sesión:', error);
     }

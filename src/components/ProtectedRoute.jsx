@@ -8,7 +8,7 @@ const ProtectedRoute = ({ element: Component, allowedRoles }) => {
   if (!token) {
     // Si no hay token, redirigir a la página de inicio de sesión
     console.log('No tienes token');
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   if (!allowedRoles.includes(role)) {
