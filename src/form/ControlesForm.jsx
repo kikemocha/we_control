@@ -32,7 +32,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
   const checkControlName = (newNumberName) => {
     // Obtenemos todos los primeros elementos de actualRiesgos
-    const primerosElementos = actualControles.map(subarray => subarray[1]);
+    const primerosElementos = actualControles.activo.map(subarray => subarray[1]);
 
     // Comprobamos si el valor existe en el array
     if (primerosElementos.includes('C' + newNumberName)) {

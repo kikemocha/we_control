@@ -86,8 +86,8 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
             />
           </svg>
         </button>
-        <form className="form_controles"onSubmit={handleSubmit}>
-          <h4>NUEVA EMRESA</h4>
+        <form className="form_controles px-40"onSubmit={handleSubmit}>
+          <h4>NUEVA EMPRESA</h4>
           <Input
               label="Nombre Empresa"
               type="text"

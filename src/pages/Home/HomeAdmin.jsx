@@ -24,7 +24,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
     const handleCloseEditPopup = () => setshowEditPopup(false);
     
     return <div className='admin_home'>
-    {selectedEmpresa ?(
+    {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
       <div>
         <div>
           <svg fill="none" viewBox="0 0 15 15" height="3em" width="3em" onClick={() => setSelectedEmpresa(null)} className='close-icon text-red-500'>
