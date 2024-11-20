@@ -175,7 +175,7 @@ const Riesgos = () => {
     
 
     return <div className='card_option'>
-            <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp} actualRiesgos={data}/>
+            <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp} actualRiesgos={data.activo}/>
             <div className='total_add'>
                 <div className='flex'>
                 <div className={riesgosState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>

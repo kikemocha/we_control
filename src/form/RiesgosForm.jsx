@@ -37,7 +37,7 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) =
 
   const checkRiesgo = (newNumberName) => {
     // Obtenemos todos los primeros elementos de actualRiesgos
-    const primerosElementos = actualRiesgos.activo.map(subarray => subarray[1]);
+    const primerosElementos = actualRiesgos.map(subarray => subarray[1]);
 
     // Comprobamos si el valor existe en el array
     if (primerosElementos.includes('R' + newNumberName)) {
