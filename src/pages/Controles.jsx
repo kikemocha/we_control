@@ -230,12 +230,18 @@ const Controles = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data[controlesState].map((control, index) => (
+                                    {data[controlesState]
+                                        .slice() // Hacer una copia para evitar mutar el estado original
+                                        .sort((a, b) => {
+                                            if (a[1] < b[1]) return -1; // Orden ascendente
+                                            if (a[1] > b[1]) return 1;
+                                            return 0;
+                                        }).map((control, index) => (
                                             <tr key={index}>
                                                 <td className="text-center font-bold border-t border-black h-16 text-sm py-2 px-5">{control[1]}</td>
                                                 
                                                 <td className="w-1/5 min-w-[200px] max-w-[200px] overflow-hidden whitespace-nowrap border-t border-black h-16 text-sm py-2 px-5 text-left">
-                                                    <div className="flex justify-around items-center space-x-2 overflow-x-auto max-w-full align-middle">
+                                                    <div className="flex justify-start items-center space-x-2 overflow-x-auto max-w-full align-middle">
                                                         {control[8].split(',').map((riesgo, index) => (
                                                             <div
                                                                 key={index}
@@ -246,7 +252,6 @@ const Controles = () => {
                                                         ))}
                                                     </div>
                                                 </td>
-
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[2]}</td>
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[3]}</td>
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[4]}</td>

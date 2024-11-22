@@ -66,7 +66,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
           </div>
           <div className={'small_card'}>
             <Card
-              name='Auditorías'
+              name='Seguimientos y Auditorías'
               singularName='auditoría'
               href='auditorias'
               index={['Nombre', 'Progreso']}

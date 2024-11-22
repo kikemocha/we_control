@@ -214,7 +214,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             {loading ? 'Cargando...' : 'Guardar Cambios'}
           </Button>
 
-          <Button
+          {/* <Button
             onClick={handleDelete}
             className={`delete text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
@@ -222,7 +222,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             disabled={loading}
           >
             {loading ? 'Cargando...' : 'Eliminar Empresa'}
-          </Button>
+          </Button> */}
           </div>
 
         </form>

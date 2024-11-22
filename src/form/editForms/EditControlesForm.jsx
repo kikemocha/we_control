@@ -73,7 +73,7 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
         setErrorMessage('Error al enviar los datos al servidor');
         setSuccessMessage('');
       } finally{
-        resetValues();
+        handleClose();
         setLoading(false);
       }
   };

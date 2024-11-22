@@ -30,6 +30,28 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
     checkControlName(newValue);
   };
 
+  useEffect(() => {
+    if (show && valueControl === 'Transversal' && riesgos.length > 0) {
+      setSelectedRiesgos(riesgos.map(riesgo => riesgo[0]));
+    }
+  }, [show, valueControl, riesgos]);
+
+  useEffect(() => {
+    if (selectedRiesgos.length > 0) {
+      setErrorMessage('');
+    }
+  }, [selectedRiesgos]);
+
+  useEffect(() => {
+    if (valueControl === 'Transversal') {
+      // Selecciona todos los riesgos si es Transversal
+      setSelectedRiesgos(riesgos.map(riesgo => riesgo[0]));
+    } else if (valueControl === 'Específico') {
+      // Deselecciona todos los riesgos si es Específico
+      setSelectedRiesgos([]);
+    }
+  }, [valueControl, riesgos]);
+
   const checkControlName = (newNumberName) => {
     // Obtenemos todos los primeros elementos de actualRiesgos
     const primerosElementos = actualControles.map(subarray => subarray[1]);
@@ -78,6 +100,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
     if (selectedRiesgos.length === 0) {
       setErrorMessage('Debes seleccionar al menos un riesgo');
+      setLoading(false);
       return;
     }
 
