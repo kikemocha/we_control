@@ -147,7 +147,7 @@
   
 .bussiness_boxes {
     cursor: pointer;
-    height: 260px;
+    height: 180px; /* Altura base para pantallas pequeñas */
     width: 80%;
     padding: 10px;
     margin: 20px;
@@ -155,14 +155,33 @@
     border: 1px solid #ccc;
     border-radius: 30px;
     text-align: center;
-    box-shadow: 2px solid black;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.bussiness_boxes h3{
+
+.bussiness_boxes h3 {
+    font-size: 0.8rem; /* Tamaño base de la fuente */
     margin-top: 10px;
 }
-.bussiness_boxes:hover{
+
+.bussiness_boxes:hover {
     background-color: rgba(184, 184, 184, 0.26);
+}
+
+.bussiness_boxes div{
+    font-size: 0.9em;
+}
+/* Estilos para pantallas >= 2xl */
+@media (min-width: 1536px) {
+    .bussiness_boxes {
+        height: 260px; /* Altura aumentada para pantallas grandes */
+    }
+
+    .bussiness_boxes h3 {
+        font-size: 1.25rem; /* Tamaño de fuente más grande */
+    }
+    .bussiness_boxes div{
+        font-size: 1.0em;
+    }
 }
 
 .main_action{

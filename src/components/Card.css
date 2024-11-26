@@ -81,3 +81,10 @@
     white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
     box-sizing: border-box; /* Incluir padding y borde en el tamaño total del elemento */
 }
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+.no-scrollbar {
+    scrollbar-width: none; /* Firefox */
+}

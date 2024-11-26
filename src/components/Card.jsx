@@ -103,18 +103,18 @@ const Card = ({name, singularName, href, index, apiURL}) => {
     }
 
     return (
-        <div className="relative h-full w-full p-3">
+        <div className="relative h-full w-full xl:p-0 2xl:p-3">
             <span>
-                <h3 className="text-lg font-semibold">{name}</h3>
+                <h3 className="md:text-xs xl:text-xs 2xl:text-lg font-semibold">{name}</h3>
             </span>
             <div className="relative bg-gray-100 h-full w-11/12 mx-auto border border-black py-3" style={{borderRadius:'40px'}}>
-                <p className="mt-2 ml-5 text-sm">{data.length} {name} activos</p>
-                <div className="relative h-5/6 overflow-y-auto rounded-xl overflow-x-auto">
-                    <table className="w-full text-center">
+                <p className="mt-2 ml-5 md:text-xxs xl:text-xs 2xl:text-sm">{data.length} {name} activos</p>
+                <div className="relative h-5/6 overflow-y-auto no-scrollbar rounded-xl overflow-x-auto">
+                    <table className="w-full text-center no-scrollbar">
                         <thead>
                             <tr className="border-b border-black">
                                 {index.map((header, idx) => (
-                                    <th className="py-2 px-4 text-sm font-medium" key={idx}>{header}</th>
+                                    <th className="py-2 px-4 md:text-xxs xl:text-xs 2xl:text-sm font-medium" key={idx}>{header}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -124,7 +124,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                         {row.map((cell, cellIdx) => (
                             <td
                                 key={cellIdx}
-                                className={`py-2 px-4 h-16 text-sm text-center ${
+                                className={`py-2 px-4 h-16 md:text-xxs lg:text-xxs xl:text-xs 2xl:text-sm text-center ${
                                     name === 'Controles' && cellIdx === 4
                                         ? 'w-1/5 min-w-[200px] max-w-[200px] overflow-hidden whitespace-nowrap text-left'
                                         : ''
@@ -148,7 +148,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex justify-center items-center h-1/5">
                     <Link 
                         to={`/${href}`} 
-                        className="bg-primary text-black font-bold rounded-full px-6 py-4 no-underline text-center"
+                        className="text-black bg-primary font-bold rounded-full no-underline text-center md:text-xs xl:text-xs 2xl:text-sm md:px-4 md:py-3 2xl:px-6 2xl:py-4"
                     >
                         + Nuevo {singularName}
                     </Link>

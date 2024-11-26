@@ -78,7 +78,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
       
     ) : (
           <div className='bussines_box'>
-            <h3>Hola {name}</h3>
+            <h3 className="md:text-xs lg:text-sm xl:text-md 2xl:text-lg ">Hola {name}</h3>
             <EmpresasForm show={showPopup} onClose={() => {setShowPopup(false)}} fetchData={getUserData}/>
             <div className='total_add'>
               <div className='upper_box'>
@@ -107,7 +107,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             </div>
             <div className='bussines_div overflow-auto h-full'>
               {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
-                <div className='admin_boxes overflow-y-auto h-full' >
+                <div className='admin_boxes overflow-y-auto h-full no-scrollbar' >
                   {UserInfo.data.empresas.map((empresas, index) => (
                     <div className='bussiness_boxes flex flex-col relative' >
                       <h3 className='font-bold'>{empresas[1]}</h3>

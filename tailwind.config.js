@@ -23,6 +23,9 @@ module.exports = {
           'alpha-1': '#e5f301FF', // Color con 100% de opacidad (sin transparencia)
         },
       },
+      fontSize: {
+        'xxs': '0.625rem', // 10px
+      },
     },
   },
   plugins: [],

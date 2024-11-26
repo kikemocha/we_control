@@ -45,7 +45,7 @@ const Sidebar = () => {
             <>
               {role === 'admin' && (
                 <ul>
-                  <li className={location.pathname === '/riesgos' ? 'link_activate' : ''}>
+                  <li className={`${location.pathname === '/riesgos' ? 'link_activate' : ''}`}>
                     <Link to="/riesgos">Riesgos</Link>
                   </li>
                   <li className={location.pathname === '/controles' ? 'link_activate' : ''}>

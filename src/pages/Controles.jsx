@@ -233,10 +233,11 @@ const Controles = () => {
                                     {data[controlesState]
                                         .slice() // Hacer una copia para evitar mutar el estado original
                                         .sort((a, b) => {
-                                            if (a[1] < b[1]) return -1; // Orden ascendente
-                                            if (a[1] > b[1]) return 1;
-                                            return 0;
-                                        }).map((control, index) => (
+                                            const numA = parseInt(a[1], 10); // Convertir a número
+                                            const numB = parseInt(b[1], 10); // Convertir a número
+                                            return numA - numB; // Orden ascendente
+                                        })
+                                        .map((control, index) => (
                                             <tr key={index}>
                                                 <td className="text-center font-bold border-t border-black h-16 text-sm py-2 px-5">{control[1]}</td>
                                                 
