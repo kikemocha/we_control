@@ -229,7 +229,14 @@ const Riesgos = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {data[riesgosState].map((riesgos, index) => (
+                                        {data[riesgosState]
+                                        .slice() // Hacer una copia para evitar mutar el estado original
+                                        .sort((a, b) => {
+                                            const numA = parseInt(a[1].match(/\d+/), 10); // Convertir a número
+                                            const numB = parseInt(b[1].match(/\d+/), 10); // Convertir a número
+                                            return numA - numB; // Orden ascendente
+                                        })
+                                        .map((riesgos, index) => (
                                             <tr key={index} className="table-row">
                                                 <td className='riesgos_controles'><div className='bg-primary'>{riesgos[1]}</div></td>
                                                 <td><p className='text-center'>{riesgos[2]}</p></td>

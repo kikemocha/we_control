@@ -119,7 +119,22 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                             </tr>
                         </thead>
                         <tbody>
-                        {data.map((row, idx) => (
+                        {data
+                        .slice() // Hacemos una copia para no mutar el estado original
+                        .sort((a, b) => {
+                            // Extraer la parte de texto (primera columna)
+                            const letraA = a[0][0];
+                            const letraB = b[0][0];
+                
+                            const numeroA = parseInt(a[0].slice(1), 10);
+                            const numeroB = parseInt(b[0].slice(1), 10);
+                
+                            // Comparar por letra y luego por número
+                            if (letraA < letraB) return -1;
+                            if (letraA > letraB) return 1;
+                            return numeroA - numeroB;
+                        })
+                        .map((row, idx) => (
                         <tr key={idx} className="border-t border-black">
                         {row.map((cell, cellIdx) => (
                             <td

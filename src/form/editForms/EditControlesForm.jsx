@@ -219,6 +219,7 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
           </div>
           <div className='flex justify-around w-full'>
           <Button
+            onClick={handleSubmit}
             type='submit'
             className={`text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
