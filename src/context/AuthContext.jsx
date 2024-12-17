@@ -66,6 +66,10 @@ export const AuthProvider = ({ children }) => {
   }, [selectedEmpresa]);
 
   useEffect(() => {
+    sessionStorage.setItem('awsCredentials', awsCredentials);
+  }, [awsCredentials]);
+
+  useEffect(() => {
     sessionStorage.setItem('expirationTime', expirationTime?.toString() || '');
   }, [expirationTime]);
   

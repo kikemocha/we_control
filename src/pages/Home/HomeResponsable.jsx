@@ -7,7 +7,7 @@ import FileUploadPopup from "../../form/UploadFile";
 import ShowFile from "../../form/ShowFile";
 
 const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
-    const {role, cognitoId, token, configureAwsCredentials} = useAuth();
+    const {cognitoId, token, awsCredentials, fetchAwsCredentials} = useAuth();
     const [loading, setLoading] = useState(false);
 
     const [showUploadPopup, setShowUploadPopup] = useState(false);
@@ -20,6 +20,20 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
         // Aquí va tu lógica de carga de archivos usando S3
     };
     
+    useEffect(() => {
+        const getAwsCredentials = async () => {
+          if (!awsCredentials || Object.keys(awsCredentials).length === 0) {
+            setLoading(true); // Activa el loading
+            await fetchAwsCredentials(token); // Llama a fetchAwsCredentials
+            setLoading(false); // Desactiva el loading
+          } else {
+            console.log("AWS Credentials disponibles");
+          }
+        };
+    
+        getAwsCredentials();
+      }, [awsCredentials, fetchAwsCredentials, token]);
+
     const [imgkey, setImgKey] = useState(null);
     const [bucketName, setBucketName] = useState(null);
     const [controlName, setControlName] = useState(null);
@@ -62,11 +76,11 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     return (
         <div className='responsable_home'>
             { UserInfo ? (
-                <div className='w-full max-w-[90%]'>
+                <div className='w-full max-w-[90%] h-full'>
                     <div className='mb-6'>
                     Controles Asociados: {UserInfo.data.riesgos.length}
                     </div>
-                    <div className='card_option'>
+                    <div className='card_option h-full'>
                     <div className="table-container overflow-y-auto max-h-[70vh] p-">
                         {UserInfo && UserInfo.data && UserInfo.data.riesgos ? (
                             <div>

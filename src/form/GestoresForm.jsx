@@ -36,6 +36,19 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
     }
   };
 
+  const handleClose = () =>{
+    onClose();
+    setErrorMessage('');
+    setSuccessMessage('');
+    setLoading(false);
+    setName('');
+    setSurname('');
+    setTitulo('');
+    setPhone('');
+    setEmail('');
+    fetchData();
+  }
+
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -62,7 +75,7 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
         },
         body: JSON.stringify(requestBody),
       });
-
+      
       const result = await response.json();
 
         console.log("API Response Result:", result); // Debug log
@@ -72,15 +85,18 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
             fetchData();
             setSuccessMessage(result.message || 'Operación exitosa');
             setErrorMessage('');
-            onClose();
+            handleClose();
         } else {
-            setErrorMessage(result.message || 'Error en la API');
-            setSuccessMessage('');
-        }
-    } catch (error) {
-        setErrorMessage('Error al enviar los datos al servidor');
-        setSuccessMessage('');
-        console.error("Error:", error); // Debug log
+          // Manejar errores en la respuesta de la API
+          setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
+          setSuccessMessage('');
+          console.error("API Error Response:", result); // Debug log
+      }
+  } catch (error) {
+      // Manejar errores en la solicitud/fetch
+      setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
+      setSuccessMessage('');
+      console.error("Request Error:", error); // Debug log
     } finally {
         setLoading(false);
     }
@@ -91,7 +107,7 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
     <div className="popup-overlay">
       <div className="popup relative">
         {/* Botón para cerrar */}
-        <button className="popup-close" onClick={onClose}>
+        <button className="popup-close" onClick={handleClose}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>

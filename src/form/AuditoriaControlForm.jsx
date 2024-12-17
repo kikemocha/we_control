@@ -363,7 +363,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           <label className='w-full'>
             <p>Controles Disponibles</p>
             <div className='control_riesgos w-full'>
-              {controles.activo.map(control => (
+              {controles.map(control => (
                 <div 
                   key={control[0]} 
                   className={`riesgo-item ${selectedControl === control[0] ? 'selected' : ''}`} 
