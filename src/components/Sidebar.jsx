@@ -54,6 +54,9 @@ const Sidebar = () => {
                   <li className={location.pathname === '/gestores' ? 'link_activate' : ''}>
                     <Link to="/gestores">Gestores</Link>
                   </li>
+                  <li className={location.pathname === '/responsables' ? 'link_activate' : ''}>
+                    <Link to="/responsables">Responsables</Link>
+                  </li>
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
                     <Link to="/auditorias">Seguimientos y<br /> Auditorías</Link>
                   </li>

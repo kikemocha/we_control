@@ -124,7 +124,7 @@ const Responsables = () => {
                                     <th>Título</th>
                                     <th>E-mail</th>
                                     <th>Controles Asignados</th>
-                                    <th>Ajustes</th>
+                                    {/* <th>Ajustes</th> */}
                                 </tr>
                                 {data.map((responsable, index) => (
                                     <tr key={index} className="table-row">
@@ -133,7 +133,7 @@ const Responsables = () => {
                                         <td>{responsable[5]}</td>
                                         <td>{responsable[4]}</td>
                                         <td>{responsable[11]}</td>
-                                        <td className='flex align-middle justify-center'>
+                                        {/* <td className='flex align-middle justify-center'>
                                             <svg
                                                 viewBox="0 0 24 24"
                                                 fill="currentColor"
@@ -142,7 +142,7 @@ const Responsables = () => {
                                                 >
                                                 <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                                             </svg>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))}
                             </table>

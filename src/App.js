@@ -26,7 +26,7 @@ const App = () => {
           <Route path="controles" element={<ProtectedRoute element={Controles} allowedRoles={['admin', 'gestor']}  />} />
           <Route path="gestores" element={<ProtectedRoute element={Gestores} allowedRoles={['admin']} />} />
           <Route path="auditorias" element={<ProtectedRoute element={Auditorias} allowedRoles={['admin', 'gestor']} />} />
-          <Route path="responsables" element={<ProtectedRoute element={Responsables} allowedRoles={['gestor']} />} />
+          <Route path="responsables" element={<ProtectedRoute element={Responsables} allowedRoles={['admin', 'gestor']} />} />
         </Route>
       </Routes>
     </Router>
