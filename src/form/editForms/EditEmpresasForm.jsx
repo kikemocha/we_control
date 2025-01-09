@@ -153,7 +153,6 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               name="email"
               value={EmpresaEmail == 'None' ? '' : EmpresaEmail}
               onChange={(e) => setEmpresaEmail(e.target.value)}
-              required={true}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
             <Input
@@ -162,7 +161,6 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               name="web"
               value={EmpresaWeb == 'None' ? '' : EmpresaWeb}
               onChange={(e) => setEmpresaWeb(e.target.value)}
-              required={true}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
             <Input
@@ -171,7 +169,6 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               name="phone"
               value={EmpresaPhone == 'None' ? '' : EmpresaPhone}
               onChange={(e) => setEmpresaPhone(e.target.value)}
-              required
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
