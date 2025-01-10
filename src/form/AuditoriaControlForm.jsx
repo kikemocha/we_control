@@ -24,6 +24,30 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
   const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
   const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
 
+  const [searchTermControles, setSearchTermControles] = useState('');
+
+  const filteredControles = controles.filter((riesgo) =>
+    riesgo[2].toLowerCase().includes(searchTermControles.toLowerCase())
+  );
+
+
+  const handleSearchControlChange = (e) => {
+    setSearchTermControles(e.target.value);
+  };
+
+  const [searchTermResponsables, setSearchTermResponsables] = useState('');
+
+  const filteredResponsables = responsables.filter((riesgo) =>
+    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
+  );
+
+
+  const handleSearchResponsablesChange = (e) => {
+    setSearchTermResponsables(e.target.value);
+  };
+
+
+
   const [limitDate, setLimitDate] = useState(new Date()); // Estado para la fecha límite seleccionada
   const [limitDate2, setLimitDate2] = useState(new Date());
   const [limitDate3, setLimitDate3] = useState(new Date());
@@ -358,12 +382,22 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
             />
           </svg>
         </button>
-        <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
+        <form className="w-full mx-auto" onSubmit={handleSubmit}>
           <h4 className="text-lg font-semibold mb-5">NUEVO CONTROL</h4>
+          <div className='w-full grid grid-cols-2'>
           <label className='w-full'>
             <p>Controles Disponibles</p>
+              <div className="[width:82%] mb-4 mx-auto">
+                <input
+                  type="text"
+                  placeholder="Buscar controles..."
+                  value={searchTermControles}
+                  onChange={handleSearchControlChange}
+                  className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
+                />
+              </div>
             <div className='control_riesgos w-full'>
-              {controles.map(control => (
+              {filteredControles.map(control => (
                 <div 
                   key={control[0]} 
                   className={`riesgo-item ${selectedControl === control[0] ? 'selected' : ''}`} 
@@ -375,11 +409,19 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               ))}
             </div>
           </label>
-          <br />
           <label className='riesgos_div'>
             <p>Responsables Disponibles</p>
+            <div className="[width:82%] mb-4 mx-auto">
+                <input
+                  type="text"
+                  placeholder="Buscar responsables..."
+                  value={searchTermResponsables}
+                  onChange={handleSearchResponsablesChange}
+                  className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
+                />
+              </div>
             <div className='control_riesgos'>
-              {responsables.map(responsable => (
+              {filteredResponsables.map(responsable => (
                 <div 
                   key={responsable[0]} 
                   className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
@@ -391,6 +433,8 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               ))}
             </div>
           </label>
+          </div>
+          
           <br />
           <label>
             <p>Fecha Límite - ({periocity})</p>

@@ -24,6 +24,18 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const [riesgos, setRiesgos] = useState([]); // Estado para almacenar los riesgos disponibles
   const [selectedRiesgos, setSelectedRiesgos] = useState([]); // Estado para almacenar los riesgos seleccionados
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredRiesgos = riesgos.filter((riesgo) =>
+    riesgo[2].toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+
   const handleNumberNameChange = (e) => {
     const newValue = e.target.value;
     setNumberName(newValue);
@@ -170,80 +182,94 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   return (
     <div className="popup-overlay">
       <div className="popup form_control">
-      <button className="popup-close" onClick={handleClose}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <button className="popup-close" onClick={handleClose}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-        <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
-          <h4 className="text-lg font-semibold mb-5">NUEVO CONTROL</h4>
-          <div className="grid md:grid-cols-2 md:gap-6">
-            <Input
-                label="Número de control"
-                type="number"
-                name="number_name"
-                value={numberName}
-                onChange={handleNumberNameChange}
-                required
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer "
-              />
-            <Input
-              label="Nombre"
-              type="text"
-              name="name"
-              value={controlName}
-              onChange={(e) => setControlName(e.target.value)}
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer"
-            />
-          </div>
-          <label className='riesgos_div'>
-            <p>Riesgos Asociados</p>
-            <div className='control_riesgos'>
-              {riesgos.map(riesgo => (
-                <div 
-                  key={riesgo[0]} 
-                  className={`riesgo-item ${selectedRiesgos.includes(riesgo[0]) ? 'selected' : ''}`} 
-                  onClick={() => handleRiesgoClick(riesgo[0])}
-                >
-                  <strong>{riesgo[1]}</strong>
-                  <p>{riesgo[2]}</p>
+          <form className="w-full mx-auto " onSubmit={handleSubmit}>
+            <h4 className="text-lg font-semibold mb-5">NUEVO CONTROL</h4>
+            <div className='grid grid-cols-2 h-full w-full '>
+              <div className="w-full p-4 px-8 flex flex-col justify-around">
+                <Input
+                  label="Número de control"
+                  type="number"
+                  name="number_name"
+                  value={numberName}
+                  onChange={handleNumberNameChange}
+                  required
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+                />
+                <Input
+                  label="Nombre"
+                  type="text"
+                  name="name"
+                  value={controlName}
+                  onChange={(e) => setControlName(e.target.value)}
+                  required
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+                />
+                <Input
+                  label="Evidencias"
+                  type="text"
+                  name="evidences"
+                  value={evidences}
+                  onChange={(e) => setEvidences(e.target.value)}
+                  required
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                />
+                <div className="grid md:grid-cols-2 md:gap-6">
+                  <SelectInput
+                    label="Periodicidad"
+                    type="text"
+                    name="periocity"
+                    value={periocity}
+                    onChange={(e) => setPeriocity(e.target.value)}
+                    required
+                    className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+                    options={periocity_options}
+                  />
+                  <SelectInput
+                    label="Valor de Control"
+                    type="text"
+                    name="valueControl"
+                    value={valueControl}
+                    onChange={(e) => setValueControl(e.target.value)}
+                    required
+                    className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+                    options={value_control_options}
+                  />
                 </div>
-              ))}
-            </div>
-          </label>
-          <Input
-              label="Evidencias"
-              type="text"
-              name="evidences"
-              value={evidences}
-              onChange={(e) => setEvidences(e.target.value)}
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            />
-          <div className="grid md:grid-cols-2 md:gap-6">
-            <SelectInput
-                label="Periodicidad"
-                type="text"
-                name="periocity"
-                value={periocity}
-                onChange={(e) => setPeriocity(e.target.value)}
-                required
-                className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer"
-                options={periocity_options}
-              />
-            <SelectInput
-                label="Valor de Control"
-                type="text"
-                name="valueControl"
-                value={valueControl}
-                onChange={(e) => setValueControl(e.target.value)}
-                required
-                className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
-                options={value_control_options}
-              />
+              </div>
+            <label className='riesgos_div'>
+              <div className='m-auto w-full'>
+                <p>Riesgos Asociados</p>
+                <div className="[width:82%] mb-4 mx-auto">
+                  <input
+                    type="text"
+                    placeholder="Buscar riesgos..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
+                  />
+                </div>
+                <div className='control_riesgos'>
+                  {filteredRiesgos.map(riesgo => (
+                    <div 
+                      key={riesgo[0]} 
+                      className={`riesgo-item ${selectedRiesgos.includes(riesgo[0]) ? 'selected' : ''}`} 
+                      onClick={() => handleRiesgoClick(riesgo[0])}
+                    >
+                      <strong>{riesgo[1]}</strong>
+                      <p>{riesgo[2]}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </label>
           </div>
+          
           <Button
               type="submit"
               className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
