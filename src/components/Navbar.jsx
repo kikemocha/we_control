@@ -46,9 +46,8 @@ const Navbar = () => {
         <div className="navbar">
             <div className='w-1/2'>
                 <form className="w-full mx-auto relative">
-                    <div className="flex md:h-3 lg:h-6 xl:h-8 h-full">
-
-                        <div className="relative w-full ">
+                    <div className="flex md:h-3 lg:h-6 xl:h-8 h-full hidden">
+                        <div className="relative w-full">
                             <input
                             type="search"
                             id="search-dropdown"

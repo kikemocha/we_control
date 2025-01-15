@@ -116,6 +116,29 @@
 .riesgos_div{
     width: 100%;
 }
+
+@media screen and (max-height: 750px) {
+    .riesgos_div{
+        width: 100%;
+        height: 70%;
+    }
+    .div_pather{
+        height: 50%;
+        font-size: 0.8em;
+    }
+    .periodicity_label{
+        font-size: 0.7em;
+    }
+    .button_control_submit{
+        font-size: 0.9em !important;
+        height: 50px !important;
+        width: 200px !important;
+    }
+    .h4_control_form {
+        font-size: 0.8em;
+    }
+}
+
 .control_riesgos {
     margin: 0px auto;
     border: 1px solid gray;

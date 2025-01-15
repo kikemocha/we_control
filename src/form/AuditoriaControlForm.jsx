@@ -116,11 +116,13 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
   }, [selectedEmpresa]);
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
+    
 
     if (!selectedControl || !selectedResponsable) {
       setErrorMessage('Debes seleccionar un control y un responsable');
+      setLoading(false);
       return;
     }
     if (periocity === 'Anual'){
@@ -361,10 +363,16 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     setPeriocity(Periocity);
     setSelectedControl(controlId); // Selecciona solo un control
     setSelectedControlName(controlName);
+    if (selectedResponsable & selectedControl) {
+      setErrorMessage('');
+    }
   };
 
   const handleResponsableClick = (responsableId) => {
     setSelectedResponsable(responsableId); // Selecciona solo un responsable
+    if (selectedResponsable & selectedControl) {
+      setErrorMessage('');
+    }
   };
 
   if (!show) return null;
@@ -383,9 +391,9 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           </svg>
         </button>
         <form className="w-full mx-auto" onSubmit={handleSubmit}>
-          <h4 className="text-lg font-semibold mb-5">NUEVO CONTROL</h4>
-          <div className='w-full grid grid-cols-2'>
-          <label className='w-full'>
+          <h4 className="h4_control_form text-lg font-semibold mb-5">NUEVO CONTROL</h4>
+          <div className='div_pather w-full grid grid-cols-2'>
+          <label className='riesgos_div'>
             <p>Controles Disponibles</p>
               <div className="[width:82%] mb-4 mx-auto">
                 <input
@@ -436,7 +444,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           </div>
           
           <br />
-          <label>
+          <label className='periodicity_label'>
             <p>Fecha Límite - ({periocity})</p>
             {periocity === 'Anual' ? (
               <div>
@@ -563,10 +571,10 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
           <Button
             type="submit"
-            className={`text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+            className={`button_control_submit text-black font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            disabled={loading}
+            disabled={loading || !!errorMessage}
           >
             {loading ? 'Cargando...' : 'Nuevo Control'}
           </Button>

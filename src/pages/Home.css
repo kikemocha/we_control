@@ -170,6 +170,15 @@
 .bussiness_boxes div{
     font-size: 0.9em;
 }
+
+@media screen and (max-height: 800px) {
+    .total_add{
+
+    }
+    .total_add div{
+
+    } 
+}
 /* Estilos para pantallas >= 2xl */
 @media (min-width: 1536px) {
     .bussiness_boxes {
@@ -232,6 +241,7 @@
         font-size: 1.5em;
         font-weight: bold;
     }
+    
 }
 
 @media (min-width: 1281px) {
@@ -239,8 +249,8 @@
         border: 1px solid black;
         display: flex;
         flex-direction: row;
-        width: 400px;
-        height: 100px;
+        width: 350px;
+        height: 80px;
         padding: 0px;
         border-radius: 30px;
         margin: 20px 0px;
@@ -251,15 +261,22 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5em;
+        font-size: 1.2em;
     }
     .upper_box .number{
         width: 20%;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 2em;
+        font-size: 1.6em;
         font-weight: bold;
+    }
+    .paperbin svg{
+        height: 3em !important;
+        width: 3em !important;
+    }
+    .sidebar li{
+        font-size: 0.8em;
     }
 }
 .total_add{
