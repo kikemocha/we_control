@@ -15,22 +15,23 @@ export const AuthProvider = ({ children }) => {
   const [refreshTimeout, setRefreshTimeout] = useState(null);
   
   const [role, setRole] = useState(() => sessionStorage.getItem('role') || null);
-  const [name, setName] = useState(() => sessionStorage.getItem('name') || null);
-  const [surname, setSurname] = useState(() => sessionStorage.getItem('surname') || null);
   
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
-  const [profileImg, setProfileImg] = useState(() => sessionStorage.getItem('profileImg') || null);
 
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
 
-  const [userData, setUserData] = useState(null); // Para almacenar la información del usuario
+  const [userData, setUserData] = useState(() => sessionStorage.getItem('userData') || null);
 
 
   useEffect(() => {
     sessionStorage.setItem('accessToken', accessToken);
   }, [accessToken]);
+
+  useEffect(() => {
+    sessionStorage.setItem('userData', userData);
+  }, [userData]);
 
   useEffect(() => {
     sessionStorage.setItem('refreshToken', refreshToken);
@@ -39,23 +40,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     sessionStorage.setItem('token', token);
   }, [token]);
-  
 
   useEffect(() => {
     sessionStorage.setItem('role', role);
   }, [role]);
-
-  useEffect(() => {
-    sessionStorage.setItem('name', name);
-  }, [name]);
-
-  useEffect(() => {
-    sessionStorage.setItem('profileImg', profileImg);
-  }, [profileImg]);
-
-  useEffect(() => {
-    sessionStorage.setItem('surname', surname);
-  }, [surname]);
 
   useEffect(() => {
     sessionStorage.setItem('cognitoId', cognitoId);
@@ -84,9 +72,6 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(null);
       setRefreshToken(null);
       setRole(null);
-      setName(null);
-      setSurname(null);
-      setProfileImg(null);
       setCognitoId(null);
       setSelectedEmpresa(null);
       setAwsCredentials(null);
@@ -144,9 +129,6 @@ export const AuthProvider = ({ children }) => {
         setSelectedEmpresa(data.belongs_to);
         setRole('responsable');
       }
-      setName(data.name);
-      setSurname(data.surname);
-      setProfileImg(data.img);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -221,12 +203,7 @@ export const AuthProvider = ({ children }) => {
     setRefreshToken,
     role,
     setRole,
-    name,
-    setName,
-    surname,
-    setSurname,
-    profileImg,
-    setProfileImg,
+
     cognitoId,
     setCognitoId,
     signOut,

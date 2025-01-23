@@ -3,7 +3,7 @@ import React from 'react';
 const Button = ({ children, onClick, className = '', disabled = false }) => (
   <button
     className={`
-      bg-yellow-300 
+      bg-primary 
       ${
       disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-orange-400 cursor-pointer'
     } text-black p-2 rounded-full text-md ${className}`}

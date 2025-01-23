@@ -170,15 +170,6 @@
 .bussiness_boxes div{
     font-size: 0.9em;
 }
-
-@media screen and (max-height: 800px) {
-    .total_add{
-
-    }
-    .total_add div{
-
-    } 
-}
 /* Estilos para pantallas >= 2xl */
 @media (min-width: 1536px) {
     .bussiness_boxes {
@@ -241,7 +232,77 @@
         font-size: 1.5em;
         font-weight: bold;
     }
-    
+    .upper_box{
+        height: 60px;
+    }
+    .close-icon{
+        height: 40px;
+        width: auto;
+    }
+    .big_card{
+        padding-top: 10px;
+    }
+    .small_card{
+        padding-top: 10px;
+    }
+    .big_card h3{
+        font-size: 0.8em;
+    }
+    .big_card th{
+        font-size: 0.6em;
+
+    }
+    .big_card td{
+        font-size: 0.6em; 
+    }
+
+    .small_card th{
+        font-size: 0.6em;
+
+    }
+    .small_card td{
+        font-size: 0.6em; 
+    }
+
+    .small_card h3{
+        font-size: 0.8em;
+    }
+
+    .bussiness_boxes {
+        height: 150px;
+        font-size: 0.8em;
+    }
+    .admin_boxes {
+        gap: 0px;
+    }
+    .sidebar li{
+        font-size: 0.7em;
+    }
+    .navbar{
+        height: 50px;
+    }
+    .close-icon {
+        z-index: 9989;
+        position: absolute;
+        top: 7%;
+        right: 10%;
+        cursor: pointer;
+    }
+    .user-info{
+        height: 35px;
+    }
+    .user-info div{
+        height: 35px;
+        width: 35px;
+    }
+    .card_table{
+        font-size: 0.7em;
+    }
+    .content-padding{
+        padding-top: 0px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 }
 
 @media (min-width: 1281px) {
@@ -278,6 +339,7 @@
     .sidebar li{
         font-size: 0.8em;
     }
+
 }
 .total_add{
     display: flex;
