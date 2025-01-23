@@ -25,6 +25,7 @@ const Responsables = () => {
             );
             let data_clean = [];
             data_clean = response.data
+            console.log('getResponsablesData: ',data_clean)
             setData(data_clean);
         } catch (error) {
             setError(error);

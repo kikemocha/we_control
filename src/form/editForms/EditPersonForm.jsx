@@ -6,8 +6,9 @@ import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import DeleteForm from '../DeleteForm';
+import axios from 'axios';
 
-const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_name, cargo, email, phone, messagePopUp }) => {
+const EditPersonForm = ({ show, onClose, fetchData, id_cognito, id_person,first_name, last_name, cargo, email, phone, messagePopUp }) => {
   const {token} = useAuth();
 
   const [idPerson, setIdPerson] = useState(id_person);
@@ -24,6 +25,8 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
   const [newPassword, setNewPassword] = useState('');
   const [reNewPassword, setReNewPassword] = useState('');
   
+  const [messageError, setMessageError] = useState('');
+  const [messageSucess, setSuccesMessage] = useState('');
 
   useEffect(() => {
     setIdPerson(id_person || '');
@@ -92,13 +95,65 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
     }
   }
 
-  const changePassword = async () =>{
-    if (newPassword === reNewPassword) {
-      console.log(token);
-    } else{
-      console.log('No es la misma');
+  const changePassword = async () => {
+    setLoading(true);
+    setMessageError('');
+    // Validar que ambas contraseñas coinciden
+    if (newPassword !== reNewPassword) {
+        console.log('Las contraseñas no coinciden');
+        setMessageError('Las contraseñas no coinciden');
+        setLoading(false);
+        return;
     }
-  };
+
+    try {
+        // Definir el cuerpo de la solicitud con las contraseñas
+        const requestBody = {
+            id_cognito: id_cognito,  // La contraseña actual proporcionada por el usuario
+            newpassword: newPassword,        // Nueva contraseña ingresada por el usuario
+        };
+
+        // Configurar los headers con el token de autorización
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Asegúrate de que el token esté disponible en tu estado
+            }
+        };
+
+        // Enviar la solicitud POST a la API Gateway
+        const response = await axios.post(
+            'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/changeUserPasswd',
+            requestBody,
+            config
+        );
+        const data = await response.data;
+
+        // Manejar la respuesta de la API
+        if (response.status === 200) {
+            setSuccesMessage("Contraseña actualizada correctamente");
+        } else {
+            throw new Error(data.body || 'Error desconocido al cambiar la contraseña');
+        }
+
+    } catch (error) {
+        if (error.response && error.response.data) {
+            // Verifica si la respuesta contiene el mensaje de error esperado
+            if (error.response.data.includes("Password must have symbol characters")) {
+                setMessageError("La contraseña debe contener caracteres especiales.");
+            } else if (error.response.data.includes("Invalid current password")) {
+                setMessageError("La contraseña actual no es correcta.");
+            } else {
+                setMessageError(error.response.data);
+            }
+        } else {
+            // Manejo de errores genéricos
+            setMessageError("Error desconocido. Por favor, intenta nuevamente.");
+        }
+    } finally {
+        setLoading(false);
+    }
+};
 
   const confirmDelete = async () => {
     setLoading(true);
@@ -306,6 +361,19 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
             >
               {loading ? 'Cargando...' : <p>Cambiar <br />Contraseña</p>}
             </button>
+            {messageSucess ? (
+                                <p className="mt-2 text-xs text-green-500 font-semibold text-center">
+                                    {messageSucess}
+                                </p>
+                            ) : messageError ? (
+                                <p className="mt-2 text-xs text-red-500 font-semibold text-center">
+                                    {messageError}
+                                </p>
+                            ): (
+                                <p className="mt-2">
+                                    
+                                </p>
+                            )}
           </form>
         </div>
       )}

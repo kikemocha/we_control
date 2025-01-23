@@ -228,6 +228,7 @@ const Gestores = () => {
                         show={showEditPopup}
                         onClose={handleCloseEditPopup}
                         fetchData={fetchData}
+                        id_cognito={selectedGestor.id_cognito}
                         id_person={selectedGestor.id_user} 
                         first_name={selectedGestor.name} 
                         last_name={selectedGestor.surname} 
