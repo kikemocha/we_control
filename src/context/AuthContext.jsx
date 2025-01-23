@@ -22,12 +22,16 @@ export const AuthProvider = ({ children }) => {
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
 
-  const [userData, setUserData] = useState(null); // Para almacenar la información del usuario
+  const [userData, setUserData] = useState(() => sessionStorage.getItem('userData') || null);
 
 
   useEffect(() => {
     sessionStorage.setItem('accessToken', accessToken);
   }, [accessToken]);
+
+  useEffect(() => {
+    sessionStorage.setItem('userData', userData);
+  }, [userData]);
 
   useEffect(() => {
     sessionStorage.setItem('refreshToken', refreshToken);

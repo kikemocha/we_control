@@ -7,11 +7,21 @@ import Button from './common/Button';
 import axios from 'axios';
 
 const Navbar = () => {
+    const {role, userData, token } = useAuth();
+
     const [loading, setLoading] = useState(false)
     const [messageError, setMessageError] = useState('');
     const [messageSucess, setSuccesMessage] = useState('');
+    const [message, messagePopUp] = useState('');
 
-    const {role, userData, token } = useAuth();
+    const [idPerson, setIdPerson] = useState(userData.id);
+    const [firstName, setFirstName] = useState(userData.name);
+    const [lastName, setLastName] = useState(userData.surname);
+    const [cargoPerson, setCargoPerson] = useState(userData.role);
+    const [emailPerson, setEmail] = useState(userData.email);
+    const [phonePerson, setPhonePerson] = useState(userData.phone);
+
+
     const [profilePopUp, setProfilePopUp] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [categorySelected, setcategorySelected ] = useState('Todas las Categorías')
@@ -23,6 +33,11 @@ const Navbar = () => {
     const [showActualPassword, setShowActualPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
 
+    const onClose = () =>{
+        setLoading(false);
+        setProfilePopUp(false);
+        onClosePasswd();
+    }
     const onClosePasswd = () => {
         setMessageError('');
         setShowChangePassword(false);
@@ -32,6 +47,47 @@ const Navbar = () => {
         setShowActualPassword(false);
         setShowNewPassword(false);
         setSuccesMessage('');
+    }
+
+    const handleEdit = async (e) => {
+        setLoading(true);
+        e.preventDefault();
+    
+        const requestBody = {
+          firstName: firstName,
+          lastName: lastName,
+          cargoPerson: cargoPerson,
+          id_person: idPerson,
+          phone: phonePerson
+        };
+    
+        try {
+          const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/updateUser', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(requestBody),
+          });
+    
+          if (response.ok) {
+            onClose();
+            setLoading(false);
+            messagePopUp('Gestor editado correctamente', 'success');
+            userData.name = firstName;
+            userData.surname = lastName;
+            userData.phone = phonePerson;
+          } else{
+            messagePopUp('Error editando el riesgo', 'error')
+          }
+        } catch (error) {
+          console.log(error);
+        } finally{
+          setLoading(false);
+
+          onClosePasswd();
+        }
     }
 
     const changePassword = async () => {
@@ -130,10 +186,11 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
+            {console.log('UserData: ', userData)}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
-                onClick={() => setProfilePopUp(false)}  // Cierra el popup al hacer clic fuera
+                onClick={() => onClose()}  // Cierra el popup al hacer clic fuera
               >
                 <div 
                   className="w-1/2 h-4/5 bg-white rounded-3xl shadow-xl p-8 relative"
@@ -174,8 +231,8 @@ const Navbar = () => {
                                     label="Nombre"
                                     type="text"
                                     name="name"
-                                    value={userData.name}
-                                    onChange={(e) => {e.preventDefault();}}
+                                    value={firstName}
+                                    onChange={(e) => {setFirstName(e.target.value)}}
                                     required
                                     className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     />
@@ -183,8 +240,8 @@ const Navbar = () => {
                                         label="Apellido"
                                         type="text"
                                         name="surname"
-                                        value={userData.surname}
-                                        onChange={(e) => {e.preventDefault();}}
+                                        value={lastName}
+                                        onChange={(e) => {setLastName(e.target.value)}}
                                         required
                                         className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     />
@@ -194,8 +251,8 @@ const Navbar = () => {
                                 label="Teléfono"
                                 type="text"
                                 name="phone"
-                                value={userData.phone}
-                                onChange={(e) => {e.preventDefault();}}
+                                value={phonePerson}
+                                onChange={(e) => {setPhonePerson(e.target.value)}}
                                 required
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                             />
@@ -203,7 +260,7 @@ const Navbar = () => {
                                 label="email"
                                 type="email"
                                 name="email"
-                                value={userData.email}
+                                value={emailPerson}
                                 onChange={(e) => {e.preventDefault();}}
                                 disabled={true}
                                 required
@@ -223,7 +280,7 @@ const Navbar = () => {
                             </div>
                             <div className='h-full w-full flex justify-around items-center align-middle'>
                             <Button
-                                onClick={(e)=>{e.preventDefault(); setShowChangePassword(true)}}
+                                onClick={(e)=>{handleEdit(e)}}
                                 className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
                                 loading ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
@@ -264,7 +321,7 @@ const Navbar = () => {
                                     value={actualPassword}
                                     onChange={(e) => setActualPassword(e.target.value)}
                                     required
-                                    labelSize='text-sm'
+                                    labelsize='text-sm'
                                     className="text-sm block mb-8 py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
                                     />
                                     <div 
@@ -296,7 +353,7 @@ const Navbar = () => {
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     required
-                                    labelSize='text-sm'
+                                    labelsize='text-sm'
                                     className="text-sm block mb-8 py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
                                     />
                                     <div 
@@ -327,7 +384,7 @@ const Navbar = () => {
                                     value={reNewPassword}
                                     onChange={(e) => setReNewPassword(e.target.value)}
                                     required
-                                    labelSize='text-sm'
+                                    labelsize='text-sm'
                                     className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
                                 />
                             </div>
