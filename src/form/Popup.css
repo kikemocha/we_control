@@ -114,6 +114,7 @@
 }
 .riesgos_div{
     width: 100%;
+    position: relative;
 }
 
 @media screen and (max-height: 750px) {
@@ -161,7 +162,6 @@
 .control_disabled::-webkit-scrollbar {
     display: none; /* Oculta el scrollbar en Chrome, Safari y Edge */
 }
-
 .overlay_control {
     position: sticky; /* Permite que el overlay se quede en su lugar */
     top: 0;

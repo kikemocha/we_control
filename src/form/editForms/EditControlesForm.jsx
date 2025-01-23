@@ -174,12 +174,12 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
           <label className="riesgos_div">
             <p>Riesgos Asociados</p>
             <div className="control_disabled flex flex-col justify-around relative">
-              <div className="overlay_control"></div> {/* Overlay para cubrir todo el área */}
+              <div className="overlay_control"></div>
               
               {controlSelectedRiesgos.map((control, index) => (
                 <div key={index} className="mx-4 flex justify-center mb-4">
                   <div className="bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap">
-                    <strong>R{control[1]}</strong>
+                    <strong>{control}</strong>
                     <span className="ml-2">{descriptionRiesgos[index]}</span>
                   </div>
                 </div>
