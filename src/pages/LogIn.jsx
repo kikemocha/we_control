@@ -22,7 +22,7 @@ const LogIn = () => {
   const [showPassword, setShowPassword ] = useState(null);
   const [showNewPassword, setShowNewPassword ] = useState(null);
   const [showNewConfirmPassword, setShowNewConfirmPassword ] = useState(null);
-
+  
   useEffect(() => {
     // Comprueba si alguno de los tokens o el role está presente en sessionStorage
     const isAuthenticated = sessionStorage.getItem('token')| sessionStorage.getItem('accessToken')  || sessionStorage.getItem('refreshToken') ;

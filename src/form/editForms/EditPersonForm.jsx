@@ -8,7 +8,7 @@ import Input from '../../components/common/Input';
 import DeleteForm from '../DeleteForm';
 
 const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_name, cargo, email, phone, messagePopUp }) => {
-  const { token} = useAuth();
+  const {token} = useAuth();
 
   const [idPerson, setIdPerson] = useState(id_person);
   const [firstName, setFirstName] = useState(first_name);
@@ -20,6 +20,10 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [reNewPassword, setReNewPassword] = useState('');
+  
 
   useEffect(() => {
     setIdPerson(id_person || '');
@@ -30,7 +34,7 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
     setPhonePerson(phone || '');
   }, [id_person, first_name, last_name, cargo, email, phone]);
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
 
 
@@ -44,6 +48,9 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
     setErrorMessage('');
     setSuccessMessage('');
     onClose();
+    setShowChangePassword(false);
+    setReNewPassword(''); 
+    setNewPassword('');
   };
 
   const handleEdit = async (e) => {
@@ -84,6 +91,14 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
       onClose();
     }
   }
+
+  const changePassword = async () =>{
+    if (newPassword === reNewPassword) {
+      console.log(token);
+    } else{
+      console.log('No es la misma');
+    }
+  };
 
   const confirmDelete = async () => {
     setLoading(true);
@@ -141,10 +156,10 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
         </button>
 
         {/* Contenido del formulario */}
-        <form className="max-w-md mx-auto">
+        <form className="max-w-xl mx-auto w-full">
           <h4 className="text-lg font-semibold mb-5">Editar GESTOR</h4>
 
-          <div className="grid md:grid-cols-2 md:gap-6">
+          <div className="grid md:grid-cols-2 md:gap-6 w-full">
             <Input
               label="Nombre"
               type="text"
@@ -177,7 +192,7 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
             className="block py-2.5 px-0 w-full text-sm border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
           />
 
-          <div className="grid md:grid-cols-2 md:gap-6">
+          <div className="grid md:grid-cols-2 md:gap-6 w-full">
             <Input
               label="Cargo"
               placeholder="CTO, RRHH"
@@ -218,6 +233,15 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
           >
             {loading ? 'Cargando...' : 'Eliminar Gestor'}
           </Button>
+          <Button
+            onClick={(e)=>{e.preventDefault(); setShowChangePassword(true)}}
+            className={`text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Cambiar Contraseña'}
+          </Button>
           </div>
         </form>
         {
@@ -246,6 +270,45 @@ const EditPersonForm = ({ show, onClose, fetchData, id_person,first_name, last_n
           </div>
         )}
       </div>
+      {showChangePassword &&(
+        <div className='relative ml-12 w-1/4 h-1/2 bg-white rounded-xl'>
+          <button className="popup-close" onClick={()=>{setShowChangePassword(false); setReNewPassword(''); setNewPassword('')}}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+          <form className="max-w-xl mx-auto w-full flex flex-col justify-around h-full ">
+            <h4 className="text-lg font-semibold mt-5 mb-5 text-center">Cambiar Contraseña</h4>
+            <div className='w-8/12 mx-auto'>
+              <Input
+                label="Nueva Contraseña"
+                type="password"
+                name="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                className="block mb-4 py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              />
+              <Input
+                label="Repita la contraseña"
+                type="password"
+                name="repassword"
+                value={reNewPassword}
+                onChange={(e) => setReNewPassword(e.target.value)}
+                required
+                className="block mt-16 py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              />
+            </div>
+            <button
+              onClick={(e)=>{e.preventDefault(); changePassword()}}
+              className='text-black bg-primary font-bold h-16 w-44 px-2 rounded-full mx-auto'
+              disabled={loading}
+            >
+              {loading ? 'Cargando...' : <p>Cambiar <br />Contraseña</p>}
+            </button>
+          </form>
+        </div>
+      )}
       {showDeletePopup && (
         <DeleteForm
           show={showDeletePopup}

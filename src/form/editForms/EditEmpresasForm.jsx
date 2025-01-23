@@ -123,7 +123,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
 
   return (
     <div className="popup-overlay" style={{ backgroundColor:'rgba(0, 0, 0, 0.1)'}}>
-      <div className="popup form_control">
+      <div className="popup form_control px-48 pt-8">
         <button className="popup-close" onClick={handleClose}>
           <svg fill="none" viewBox="0 0 15 15" height="1em" width="1em">
             <path

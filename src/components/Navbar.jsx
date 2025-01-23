@@ -2,12 +2,98 @@
 import React, {useState, useRef, useEffect } from 'react';
 import './Layout.css';
 import { useAuth } from '../context/AuthContext';
+import Input from './common/Input';
+import Button from './common/Button';
+import axios from 'axios';
 
 const Navbar = () => {
-    const { name, role, surname, profileImg, expirationTime, signOut } = useAuth();
+    const [loading, setLoading] = useState(false)
+    const [messageError, setMessageError] = useState('');
+    const [messageSucess, setSuccesMessage] = useState('');
 
+    const {role, userData, token } = useAuth();
+    const [profilePopUp, setProfilePopUp] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [categorySelected, setcategorySelected ] = useState('Todas las Categorías')
+
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [actualPassword, setActualPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [reNewPassword, setReNewPassword] = useState('');
+    const [showActualPassword, setShowActualPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+
+    const onClosePasswd = () => {
+        setMessageError('');
+        setShowChangePassword(false);
+        setActualPassword('');
+        setNewPassword('');
+        setReNewPassword('');
+        setShowActualPassword(false);
+        setShowNewPassword(false);
+        setSuccesMessage('');
+    }
+
+    const changePassword = async () => {
+        setLoading(true);
+        setMessageError('');
+        // Validar que ambas contraseñas coinciden
+        if (newPassword !== reNewPassword) {
+            console.log('Las contraseñas no coinciden');
+            setMessageError('Las contraseñas no coinciden');
+            setLoading(false);
+            return;
+        }
+    
+        try {
+            // Definir el cuerpo de la solicitud con las contraseñas
+            const requestBody = {
+                currentpassword: actualPassword,  // La contraseña actual proporcionada por el usuario
+                newpassword: newPassword,        // Nueva contraseña ingresada por el usuario
+            };
+    
+            // Configurar los headers con el token de autorización
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Asegúrate de que el token esté disponible en tu estado
+                }
+            };
+    
+            // Enviar la solicitud POST a la API Gateway
+            const response = await axios.post(
+                'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/changeUserPasswd',
+                requestBody,
+                config
+            );
+            const data = await response.data;
+
+            // Manejar la respuesta de la API
+            if (response.status === 200) {
+                setSuccesMessage("Contraseña actualizada correctamente");
+            } else {
+                throw new Error(data.body || 'Error desconocido al cambiar la contraseña');
+            }
+    
+        } catch (error) {
+            if (error.response && error.response.data) {
+                // Verifica si la respuesta contiene el mensaje de error esperado
+                if (error.response.data.includes("Password must have symbol characters")) {
+                    setMessageError("La contraseña debe contener caracteres especiales.");
+                } else if (error.response.data.includes("Invalid current password")) {
+                    setMessageError("La contraseña actual no es correcta.");
+                } else {
+                    setMessageError(error.response.data);
+                }
+            } else {
+                // Manejo de errores genéricos
+                setMessageError("Error desconocido. Por favor, intenta nuevamente.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
     const dropdownRef = useRef(null);
 
@@ -44,9 +130,236 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
+            {profilePopUp && (
+                <div 
+                className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+                onClick={() => setProfilePopUp(false)}  // Cierra el popup al hacer clic fuera
+              >
+                <div 
+                  className="w-1/2 h-4/5 bg-white rounded-3xl shadow-xl p-8 relative"
+                  onClick={(e) => e.stopPropagation()}  // Evita el cierre al hacer clic dentro
+                >
+                    <button className="popup-close" onClick={() => setProfilePopUp(false)}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">Perfil</h2>
+                    <div className='w-full h-full'>
+                        <div>
+                            <div className='flex flex-col items-center justify-center h-full pt-12'>
+                                { userData.img && userData.img !== 'null'? (
+                                    <div> {userData.img} </div>
+                                ): (
+                                    <div className="relative inline-flex items-center justify-center w-36 h-36 overflow-hidden rounded-full bg-gray-600">
+                                        <span className="text-4xl font-medium text-white">
+                                            {userData.name && userData.surname ? userData.name[0].toUpperCase() + userData.surname[0].toUpperCase() : ''}
+                                        </span>
+                                    </div>
+                                )}
+                                <p className='text-gray-500 mt-2 text-sm'>
+                                    {userData.is_gestor ? (
+                                        <p>gestor</p>
+                                    ) : userData.is_responsable ? (
+                                        <p>responsable</p>
+                                    ) : (
+                                        <p>admin</p>
+                                    )}
+                                </p>
+                            </div>
+                            <div className='pt-12 px-12 flex flex-col gap-4'>
+                                <div className='grid grid-cols-2 gap-8'>
+                                    <Input
+                                    label="Nombre"
+                                    type="text"
+                                    name="name"
+                                    value={userData.name}
+                                    onChange={(e) => {e.preventDefault();}}
+                                    required
+                                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                    />
+                                    <Input
+                                        label="Apellido"
+                                        type="text"
+                                        name="surname"
+                                        value={userData.surname}
+                                        onChange={(e) => {e.preventDefault();}}
+                                        required
+                                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                    />
+                                </div>
+                            
+                            <Input
+                                label="Teléfono"
+                                type="text"
+                                name="phone"
+                                value={userData.phone}
+                                onChange={(e) => {e.preventDefault();}}
+                                required
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                            />
+                            <Input
+                                label="email"
+                                type="email"
+                                name="email"
+                                value={userData.email}
+                                onChange={(e) => {e.preventDefault();}}
+                                disabled={true}
+                                required
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                            />
+                            <Input
+                                label="role"
+                                type="text"
+                                name="role"
+                                value={userData.role}
+                                onChange={(e) => {e.preventDefault();}}
+                                disabled={true}
+                                required
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                            />
+
+                            </div>
+                            <div className='h-full w-full flex justify-around items-center align-middle'>
+                            <Button
+                                onClick={(e)=>{e.preventDefault(); setShowChangePassword(true)}}
+                                className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={loading}
+                            >
+                                {loading ? 'Cargando...' : 'Editar'}
+                            </Button>
+                            <Button
+                                onClick={(e)=>{e.preventDefault(); setShowChangePassword(true)}}
+                                className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={loading}
+                            >
+                                {loading ? 'Cargando...' : 'Cambiar Contraseña'}
+                            </Button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                    {showChangePassword &&(
+                        <div className='relative ml-12 w-1/4 h-1/2 bg-white rounded-xl' onClick={(e) => e.stopPropagation()}>
+                        <button className="popup-close" onClick={(e)=>{ e.preventDefault(); onClosePasswd(false);}}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        <form className="max-w-xl mx-auto w-full flex flex-col justify-around h-full ">
+                            <h4 className="text-md font-semibold mt-5 mb-5 text-center">Cambiar Contraseña</h4>
+                            <div className='w-8/12 mx-auto relative'>
+                                {/* Contraseña Actual */}
+                                <div className="relative">
+                                    <Input
+                                    label="Contraseña Actual"
+                                    type={showActualPassword ? 'text' : 'password'}
+                                    name="actualPassword"
+                                    value={actualPassword}
+                                    onChange={(e) => setActualPassword(e.target.value)}
+                                    required
+                                    labelSize='text-sm'
+                                    className="text-sm block mb-8 py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
+                                    />
+                                    <div 
+                                    className="absolute right-4 top-1/3 text-black cursor-pointer"
+                                    >
+                                    {showActualPassword ? (
+                                        <svg 
+                                        onClick={() => {setShowActualPassword(false)}} 
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer z-99 absolute right-4 top-1/4 text-black">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                      </svg>
+                                    ) : (
+                                        <svg
+                                            onClick={() => {setShowActualPassword(true)}} 
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer z-99 absolute right-4 top-1/4 text-black">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                    )}
+                                    </div>
+                                </div>
+
+                                {/* Nueva Contraseña */}
+                                <div className="relative">
+                                    <Input
+                                    label="Nueva Contraseña"
+                                    type={showNewPassword ? 'text' : 'password'}
+                                    name="newPassword"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                    labelSize='text-sm'
+                                    className="text-sm block mb-8 py-2.5 px-0 w-full text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
+                                    />
+                                    <div 
+                                    className="absolute right-4 top-1/3 text-black cursor-pointer"
+                                    >
+                                    {showNewPassword ? (
+                                        <svg 
+                                        onClick={() => {setShowNewPassword(false)}} 
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer z-99 absolute right-4 top-1/4 text-black">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                      </svg>
+                                    ) : (
+                                        <svg
+                                            onClick={() => {setShowNewPassword(true)}} 
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer z-99 absolute right-4 top-1/4 text-black">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                    )}
+                                    </div>
+                                </div>
+
+                                {/* Repite la contraseña */}
+                                <Input
+                                    label="Repita la contraseña"
+                                    type="password"
+                                    name="reNewPassword"
+                                    value={reNewPassword}
+                                    onChange={(e) => setReNewPassword(e.target.value)}
+                                    required
+                                    labelSize='text-sm'
+                                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300"
+                                />
+                            </div>
+                            <button
+                                onClick={(e)=>{e.preventDefault(); changePassword()}}
+                                className='text-black bg-primary text-sm font-bold w-40 h-14 px-2 rounded-full mx-auto'
+                                disabled={loading}
+                            >
+                            {loading ? 'Cargando...' : <p>Cambiar <br />Contraseña</p>}
+                            </button>
+                            {messageSucess ? (
+                                <p className="mt-2 text-xs text-green-500 font-semibold text-center">
+                                    {messageSucess}
+                                </p>
+                            ) : messageError ? (
+                                <p className="mt-2 text-xs text-red-500 font-semibold text-center">
+                                    {messageError}
+                                </p>
+                            ): (
+                                <p className="mt-2">
+                                    
+                                </p>
+                            )}
+                        </form>
+                        </div>
+                    )}
+              </div>
+
+            )}
             <div className='w-1/2'>
-                <form className="w-full mx-auto relative">
-                    <div className="flex md:h-3 lg:h-6 xl:h-8 h-full hidden">
+                <form className="w-full mx-auto relative hidden">
+                    <div className="flex md:h-3 lg:h-6 xl:h-8 h-full">
                         <div className="relative w-full">
                             <input
                             type="search"
@@ -145,18 +458,18 @@ const Navbar = () => {
                 </form>
             </div>
 
-            <div className="user-info">
-                { profileImg && profileImg !== 'null'? (
-                    <div> {profileImg} </div>
+            <div className="user-info cursor-pointer" onClick={()=>{setProfilePopUp(true)}}>
+                { userData.img && userData.img !== 'null'? (
+                    <div> {userData.img} </div>
                 ): (
                     <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full bg-gray-600">
                         <span className="text-sm font-medium text-white">
-                                {name && surname ? name[0].toUpperCase() + surname[0].toUpperCase() : ''}
+                                {userData.name && userData.surname ? userData.name[0].toUpperCase() + userData.surname[0].toUpperCase() : ''}
                             </span>
                     </div>
                 )}
                 
-                <div>{name}</div>
+                <div>{userData.name}</div>
             </div>
         </div>
     );
