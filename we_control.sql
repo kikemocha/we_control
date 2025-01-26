@@ -23,15 +23,16 @@ CREATE TABLE users(
     FOREIGN KEY (belongs_to) REFERENCES empresas(id_empresa)
 );
 
-
 CREATE TABLE controles(
     id_control  INT AUTO_INCREMENT PRIMARY KEY,
+    id_responsable INT,
     number_name  VARCHAR(64) NOT NULL,
     name    VARCHAR(255) NOT NULL,
     evidences   VARCHAR(255),
     periodicity VARCHAR(255),
     control_values  VARCHAR(255),
     belongs_to  INT,
+    FOREIGN KEY (id_responsable) REFERENCES users(id_user)
     FOREIGN KEY (belongs_to) REFERENCES empresas(id_empresa)
     -- A la empresa no a al despacho
 );

@@ -7,7 +7,7 @@ import Button from './common/Button';
 import axios from 'axios';
 
 const Navbar = () => {
-    const {role, userData, token } = useAuth();
+    const {role, userData, token, fetchUserData, cognitoId } = useAuth();
 
     const [loading, setLoading] = useState(false)
     const [messageError, setMessageError] = useState('');
@@ -32,6 +32,14 @@ const Navbar = () => {
     const [reNewPassword, setReNewPassword] = useState('');
     const [showActualPassword, setShowActualPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+
+    useEffect(() => {
+        // Si userData es null, intenta obtener los datos del usuario
+        if (!userData) {
+            console.log('UserData is null, fetching user data...');
+            fetchUserData(cognitoId, token);
+        }
+    }, [userData, fetchUserData, cognitoId, token]);
 
     const onClose = () =>{
         setLoading(false);
@@ -186,7 +194,6 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            {console.log('UserData: ', userData)}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"

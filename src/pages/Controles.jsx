@@ -226,6 +226,7 @@ const Controles = () => {
                                             <th>Evidencias</th>
                                             <th>Periodicidad</th>
                                             <th>Tipo de Control</th>
+                                            <th>Responsable</th>
                                             <th>Ajustes</th>
                                         </tr>
                                     </thead>
@@ -243,7 +244,7 @@ const Controles = () => {
                                                 
                                                 <td className="w-1/5 min-w-[200px] max-w-[200px] overflow-hidden whitespace-nowrap border-t border-black h-16 text-sm py-2 px-5 text-left">
                                                     <div className="flex justify-start items-center space-x-2 overflow-x-auto max-w-full align-middle">
-                                                        {control[8].split(',').map((riesgo, index) => (
+                                                        {control[9].split(',').map((riesgo, index) => (
                                                             <div
                                                                 key={index}
                                                                 className="bg-primary px-3 py-2 rounded-full flex-shrink-0"
@@ -257,6 +258,7 @@ const Controles = () => {
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[3]}</td>
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[4]}</td>
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">{control[5]}</td>
+                                                <td className="text-center border-t border-black h-16 text-sm py-2 px-5"><p className='td-truncate '>{control?.[11] ?? '-'}</p></td>
                                                 <td className="text-center border-t border-black h-16 text-sm py-2 px-5">
                                                         <svg 
                                                             xmlns="http://www.w3.org/2000/svg" 
@@ -288,8 +290,8 @@ const Controles = () => {
                         id_control={selectedControl[0]}
                         name={selectedControl[2]}
                         numberName={selectedControl[1]}
-                        riesgosAsociados={selectedControl[8]}
-                        descriptionsAsociadas={selectedControl[9]}
+                        riesgosAsociados={selectedControl[9]}
+                        descriptionsAsociadas={selectedControl[10]}
                         evidences={selectedControl[3]}
                         periocity={selectedControl[4]}
                         value={selectedControl[5]}

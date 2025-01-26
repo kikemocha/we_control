@@ -30,8 +30,13 @@ export const AuthProvider = ({ children }) => {
   }, [accessToken]);
 
   useEffect(() => {
-    sessionStorage.setItem('userData', userData);
+    sessionStorage.setItem('userData', JSON.stringify(userData));
   }, [userData]);
+  useEffect(() => {
+    if (userData && typeof userData === 'string') {
+        setUserData(JSON.parse(userData)); // Convertirlo al objeto cuando se extrae
+    }
+}, []);
 
   useEffect(() => {
     sessionStorage.setItem('refreshToken', refreshToken);
@@ -190,8 +195,6 @@ export const AuthProvider = ({ children }) => {
       scheduleTokenRefresh(expirationTime);
     }
   }, [expirationTime]);
-  
-  
   
 
   const value = {

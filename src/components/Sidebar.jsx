@@ -16,8 +16,6 @@ const Sidebar = () => {
     if (expirationTime < currentTime) {
       alert('La sesión ha expirado');
       signOut(); // Llama a la función SignOut cuando el usuario acepte el alert
-    }else{
-      console.log('expirationTime < currentTime: ',expirationTime < currentTime)
     }
   }, [expirationTime, location]);
 
