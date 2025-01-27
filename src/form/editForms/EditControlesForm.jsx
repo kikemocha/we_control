@@ -1,16 +1,16 @@
 // RiesgosForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Popup.css'; // Asegúrate de tener los estilos
 import { useAuth } from '../../context/AuthContext';
-
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import SelectInput from '../../components/common/SelectInput';
 
 import DeleteForm from '../DeleteForm';
+import axios from 'axios';
 
 const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, name, riesgosAsociados, descriptionsAsociadas, evidences, periocity, value, data}) => {
-  const {token} = useAuth();
+  const {token, selectedEmpresa} = useAuth();
 
   const [ControlNumberName, setControlNumberName] = useState(numberName);
   const [controlName, setControlName] = useState(name);
@@ -22,11 +22,48 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
   const [controlPeriocity, setControlPeriocity] = useState(periocity);
   const [controlValue, setControlValue] = useState(value);
 
+  const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
+  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
+  const [searchTermResponsables, setSearchTermResponsables] = useState('');
+
+  const filteredResponsables = responsables.filter((riesgo) =>
+    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
+  );
+  const handleSearchResponsablesChange = (e) => {
+    setSearchTermResponsables(e.target.value);
+  };
+
+  const handleResponsableClick = (responsableId) => {
+    setSelectedResponsable(responsableId); // Selecciona solo un responsable
+    if (selectedResponsable) {
+      setErrorMessage('');
+    }
+  };
+
+  useEffect(() => {
+      fetchResponsables();
+    }, [selectedEmpresa]);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+
+  const fetchResponsables = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setResponsables(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching responsables:', error);
+    }
+  };
+
 
   const resetValues = () =>{
     setControlName('');
@@ -92,6 +129,7 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
       evidences: controlEvidences,
       periodicity: controlPeriocity,
       valueControl: controlValue,
+      id_responsable: selectedResponsable,
     };
 
     try {
@@ -147,76 +185,108 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-
-        <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
+        <form className="mx-auto" onSubmit={handleSubmit}>
           <h4 className="text-lg font-semibold mb-5">EDITAR CONTROL</h4>
           <div className="grid md:grid-cols-2 md:gap-6">
-            <Input
-                label="Número de control"
-                type="text"
-                name="number_name"
-                value={ControlNumberName}
-                onChange={null}
-                disabled={true}
-                required
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-gray-300 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              />
-            <Input
-              label="Nombre"
-              type="text"
-              name="name"
-              value={controlName}
-              onChange={(e) => setControlName(e.target.value)}
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            />
-          </div>
-          <label className="riesgos_div">
-            <p>Riesgos Asociados</p>
-            <div className="control_disabled flex flex-col justify-around relative">
-              <div className="overlay_control"></div>
-              
-              {controlSelectedRiesgos.map((control, index) => (
-                <div key={index} className="mx-4 flex justify-center mb-4">
-                  <div className="bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap">
-                    <strong>{control}</strong>
-                    <span className="ml-2">{descriptionRiesgos[index]}</span>
+            <div className='ml-10'>
+              <div className="grid md:grid-cols-2 md:gap-6">
+                <Input
+                    label="Número de control"
+                    type="text"
+                    name="number_name"
+                    value={ControlNumberName}
+                    onChange={null}
+                    disabled={true}
+                    required
+                    className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-gray-300 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  />
+                <Input
+                  label="Nombre"
+                  type="text"
+                  name="name"
+                  value={controlName}
+                  onChange={(e) => setControlName(e.target.value)}
+                  required
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                />
+              </div>
+              <label className="riesgos_div">
+                <p>Riesgos Asociados</p>
+                <div className="control_disabled flex flex-col justify-around relativ mb-10">
+                  <div className="overlay_control"></div>
+                  
+                  {controlSelectedRiesgos.map((control, index) => (
+                    <div key={index} className="mx-4 flex justify-center mb-4">
+                      <div className="bg-primary rounded-full my-auto p-4 w-4/5 h-14 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <strong>{control}</strong>
+                        <span className="ml-2">{descriptionRiesgos[index]}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </label>
+              <Input
+                  label="Evidencias"
+                  type="text"
+                  name="evidences"
+                  value={controlEvidences}
+                  onChange={(e) => setControlEvidences(e.target.value)}
+                  required
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                />
+              <div className="grid md:grid-cols-2 md:gap-6">
+                <SelectInput
+                    label="Periodicidad"
+                    type="text"
+                    name="periocity"
+                    value={controlPeriocity}
+                    onChange={(e) => setControlPeriocity(e.target.value)}
+                    required
+                    className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer"
+                    options={periocity_options}
+                  />
+                <SelectInput
+                    label="Valor de Control"
+                    type="text"
+                    name="controlValue"
+                    value={controlValue}
+                    onChange={(e) => setControlValue(e.target.value)}
+                    required
+                    className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
+                    options={value_control_options}
+                  />
+              </div>
+            </div>
+            <div>
+              <label className='riesgos_div'>
+                <div className='m-auto w-full'>
+                  <p>Responsables</p>
+                  <div className="[width:82%] mb-4 mx-auto">
+                    <input
+                      type="text"
+                      placeholder="Buscar responsables..."
+                      value={searchTermResponsables}
+                      onChange={handleSearchResponsablesChange}
+                      className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
+                    />
+                  </div>
+                  <div className='control_riesgos'>
+                      {filteredResponsables.map(responsable => (
+                      <div 
+                        key={responsable[0]} 
+                        className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
+                        onClick={() => handleResponsableClick(responsable[0])}
+                      >
+                        <strong>{responsable[2]}</strong>
+                        <p>{responsable[4]}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </label>
             </div>
-          </label>
-          <Input
-              label="Evidencias"
-              type="text"
-              name="evidences"
-              value={controlEvidences}
-              onChange={(e) => setControlEvidences(e.target.value)}
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            />
-          <div className="grid md:grid-cols-2 md:gap-6">
-            <SelectInput
-                label="Periodicidad"
-                type="text"
-                name="periocity"
-                value={controlPeriocity}
-                onChange={(e) => setControlPeriocity(e.target.value)}
-                required
-                className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0  peer"
-                options={periocity_options}
-              />
-            <SelectInput
-                label="Valor de Control"
-                type="text"
-                name="controlValue"
-                value={controlValue}
-                onChange={(e) => setControlValue(e.target.value)}
-                required
-                className="block py-2.5 px-0 w-full text-md text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 peer"
-                options={value_control_options}
-              />
           </div>
+          
           <div className='flex justify-around w-full'>
           <Button
             onClick={handleSubmit}

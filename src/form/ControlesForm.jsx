@@ -24,17 +24,25 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const [riesgos, setRiesgos] = useState([]); // Estado para almacenar los riesgos disponibles
   const [selectedRiesgos, setSelectedRiesgos] = useState([]); // Estado para almacenar los riesgos seleccionados
 
+  const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
+  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
+  const [searchTermResponsables, setSearchTermResponsables] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredRiesgos = riesgos.filter((riesgo) =>
     riesgo[2].toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const filteredResponsables = responsables.filter((riesgo) =>
+    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
+  );
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
-
+  const handleSearchResponsablesChange = (e) => {
+    setSearchTermResponsables(e.target.value);
+  };
 
   const handleNumberNameChange = (e) => {
     const newValue = e.target.value;
@@ -88,20 +96,35 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
     resetValues();
     onClose();
   }
-  useEffect(() => {
-    const fetchRiesgos = async () => {
-      try {
-        const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setRiesgos(response.data.activo);
-      } catch (error) {
-        console.error('Error fetching riesgos:', error);
-      }
-    };
+  const fetchResponsables = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setResponsables(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching responsables:', error);
+    }
+  };
 
+  const fetchRiesgos = async () => {
+    try {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setRiesgos(response.data.activo);
+    } catch (error) {
+      console.error('Error fetching riesgos:', error);
+    }
+  };
+  useEffect(() => {
+    fetchResponsables();
     fetchRiesgos();
   }, [selectedEmpresa]);
 
@@ -124,6 +147,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
       valueControl: valueControl,
       riesgos: selectedRiesgos, // Incluir los IDs de los riesgos seleccionados
       belongs_to: selectedEmpresa,
+      id_responsable: selectedResponsable
     };
 
     try {
@@ -165,6 +189,14 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
     );
   };
 
+  const handleResponsableClick = (responsableId) => {
+    setSelectedResponsable(responsableId); // Selecciona solo un responsable
+    if (selectedResponsable & filteredRiesgos) {
+      setErrorMessage('');
+    }
+  };
+
+
   const periocity_options = [
     { value: 'Anual', label: 'Anual' },
     { value: 'Semestral', label: 'Semestral' },
@@ -181,7 +213,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
   return (
     <div className="popup-overlay">
-      <div className="popup form_control">
+      <div className="popup form_control" style={{ width: '100%', maxWidth: '1500px' }}>
         <button className="popup-close" onClick={handleClose}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -190,7 +222,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
           <form className="w-full mx-auto " onSubmit={handleSubmit}>
             <h4 className="text-lg font-semibold mb-5">NUEVO CONTROL</h4>
-            <div className='grid grid-cols-2 h-full w-full '>
+            <div className='grid grid-cols-3 h-full w-full '>
               <div className="w-full p-4 px-8 flex flex-col justify-around">
                 <Input
                   label="Número de control"
@@ -263,6 +295,32 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
                     >
                       <strong>{riesgo[1]}</strong>
                       <p>{riesgo[2]}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </label>
+            <label className='riesgos_div'>
+              <div className='m-auto w-full'>
+                <p>Responsables</p>
+                <div className="[width:82%] mb-4 mx-auto">
+                  <input
+                    type="text"
+                    placeholder="Buscar responsables..."
+                    value={searchTermResponsables}
+                    onChange={handleSearchResponsablesChange}
+                    className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
+                  />
+                </div>
+                <div className='control_riesgos'>
+                    {filteredResponsables.map(responsable => (
+                    <div 
+                      key={responsable[0]} 
+                      className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
+                      onClick={() => handleResponsableClick(responsable[0])}
+                    >
+                      <strong>{responsable[2]}</strong>
+                      <p>{responsable[4]}</p>
                     </div>
                   ))}
                 </div>

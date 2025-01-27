@@ -421,3 +421,10 @@
     width: 100%; /* Ajusta esto para simular el ancho de una línea de texto */
     height: 16px; /* Ajusta la altura según el tamaño del texto */
   }
+
+.td-truncate{
+    width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+} 

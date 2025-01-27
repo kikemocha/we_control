@@ -21,9 +21,6 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
   const [selectedControl, setSelectedControl] = useState(null); // Estado para almacenar el control seleccionado
   const [selectedControlName, setSelectedControlName] = useState(null);
 
-  const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
-  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
-
   const [searchTermControles, setSearchTermControles] = useState('');
 
   const filteredControles = controles.filter((riesgo) =>
@@ -35,19 +32,6 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     setSearchTermControles(e.target.value);
   };
 
-  const [searchTermResponsables, setSearchTermResponsables] = useState('');
-
-  const filteredResponsables = responsables.filter((riesgo) =>
-    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
-  );
-
-
-  const handleSearchResponsablesChange = (e) => {
-    setSearchTermResponsables(e.target.value);
-  };
-
-
-
   const [limitDate, setLimitDate] = useState(new Date()); // Estado para la fecha límite seleccionada
   const [limitDate2, setLimitDate2] = useState(new Date());
   const [limitDate3, setLimitDate3] = useState(new Date());
@@ -57,7 +41,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     const today = new Date();
     switch (periocity) {
       case 'Anual':
-        setLimitDate(today);
+        setLimitDate(new Date(today.getFullYear(), 11, 31));
         break;
       case 'Semestral':
         setLimitDate(new Date(today.getFullYear(), 5, 30));
@@ -79,40 +63,24 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     }
   }, [periocity]);
 
+  const fetchControles = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa=${selectedEmpresa}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setControles(response.data.activo);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching controles:', error);
+    }
+  };
+
 
   useEffect(() => {
-    const fetchControles = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa=${selectedEmpresa}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setControles(response.data.activo);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching controles:', error);
-      }
-    };
-
-    const fetchResponsables = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setResponsables(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching responsables:', error);
-      }
-    };
-
     fetchControles();
-    fetchResponsables();
   }, [selectedEmpresa]);
 
   const handleSubmit = async (e) => {
@@ -120,242 +88,57 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     setLoading(true);
     
 
-    if (!selectedControl || !selectedResponsable) {
+    if (!selectedControl ) {
       setErrorMessage('Debes seleccionar un control y un responsable');
       setLoading(false);
       return;
     }
-    if (periocity === 'Anual'){
-      const requestBody = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate.toISOString().split('T')[0],
-        order : 1,
-      };
+    const limitDatesArray = [];
+    limitDatesArray.push(limitDate.toISOString().split('T')[0]);
+
+    if (periocity === 'Semestral' || periocity === 'Cuatrimestral' || periocity === 'Trimestral') {
+      limitDatesArray.push(limitDate2.toISOString().split('T')[0]);
+    }
+    if (periocity === 'Cuatrimestral' || periocity === 'Trimestral') {
+      limitDatesArray.push(limitDate3.toISOString().split('T')[0]);
+    }
+    if (periocity === 'Trimestral') {
+      limitDatesArray.push(limitDate4.toISOString().split('T')[0]);
+    }
+
+    const requestBody = {
+      id_auditoria: selectedAuditoria,
+      id_control: selectedControl,  // Aquí puedes enviar más ids si los seleccionas
+      limit_dates: limitDatesArray
+    };
+
+    try {
+      console.log('requestBody: ',requestBody);
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
+        },
+        body: JSON.stringify(requestBody),
+      });
   
-      try {
-        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody),
-        });
+      const result = await response.json();
   
-        const result = await response.json();
-  
-        if (response.ok) {
-          setSuccessMessage(result.message);
-          setErrorMessage('');
-          fetchData(); // Recargar la lista de controles
-          onClose();
-        } else {
-          setErrorMessage(result.message);
-          setSuccessMessage('');
-        }
-      } catch (error) {
-        setErrorMessage('Error al enviar los datos al servidor');
+      if (response.ok) {
+        setSuccessMessage(result.message);
+        setErrorMessage('');
+        fetchData(); // Recargar la lista de controles
+        onClose();
+      } else {
+        setErrorMessage(result.message);
         setSuccessMessage('');
-      } finally{
-        setLoading(false);
       }
-    } else if (periocity === 'Semestral'){
-      const requestBody = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate.toISOString().split('T')[0],
-        order: 1
-      };
-      const requestBody2 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate2.toISOString().split('T')[0],
-        order: 2
-      };
-      try {
-        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody),
-        });
-        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody2),
-        });
-  
-        const result = await response.json();
-  
-        if (response.ok) {
-          setSuccessMessage(result.message);
-          setErrorMessage('');
-          fetchData(); // Recargar la lista de controles
-          onClose();
-        } else {
-          setErrorMessage(result.message);
-          setSuccessMessage('');
-        }
-      } catch (error) {
-        setErrorMessage('Error al enviar los datos al servidor');
-        setSuccessMessage('');
-      } finally{
-        setLoading(false);
-      }
-    } else if (periocity === 'Cuatrimestral'){
-      const requestBody = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate.toISOString().split('T')[0],
-        order: 1,
-      };
-      const requestBody2 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate2.toISOString().split('T')[0],
-        order: 2,
-      };
-      const requestBody3 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate3.toISOString().split('T')[0],
-        order: 3
-      };
-      try {
-        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody),
-        });
-        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody2),
-        });
-        const response3 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody3),
-        });
-  
-        const result = await response.json();
-  
-        if (response.ok) {
-          setSuccessMessage(result.message);
-          setErrorMessage('');
-          fetchData(); // Recargar la lista de controles
-          onClose();
-        } else {
-          setErrorMessage(result.message);
-          setSuccessMessage('');
-        }
-      } catch (error) {
-        setErrorMessage('Error al enviar los datos al servidor');
-        setSuccessMessage('');
-      } finally{
-        setLoading(false);
-      }
-    } else if (periocity === 'Trimestral'){
-      const requestBody = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate.toISOString().split('T')[0],
-        order: 1,
-      };
-      const requestBody2 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate2.toISOString().split('T')[0],
-        order: 2,
-      };
-      const requestBody3 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate3.toISOString().split('T')[0],
-        order: 3,
-      };
-      const requestBody4 = {
-        id_auditoria: selectedAuditoria,
-        id_control: selectedControl,
-        id_responsable: selectedResponsable,
-        limit_date: limitDate3.toISOString().split('T')[0],
-        order: 4
-      };
-      try {
-        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody),
-        });
-        const response2 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody2),
-        });
-        const response3 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody3),
-        });
-        const response4 = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/insertControlAuditoria', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Incluye el token de autorización si es necesario
-          },
-          body: JSON.stringify(requestBody4),
-        });
-  
-        const result = await response.json();
-  
-        if (response.ok) {
-          setSuccessMessage(result.message);
-          setErrorMessage('');
-          fetchData(); // Recargar la lista de controles
-          onClose();
-        } else {
-          setErrorMessage(result.message);
-          setSuccessMessage('');
-        }
-      } catch (error) {
-        setErrorMessage('Error al enviar los datos al servidor');
-        setSuccessMessage('');
-      } finally{
-        setLoading(false);
-      }
+    } catch (error) {
+      setErrorMessage('Error al enviar los datos al servidor');
+      setSuccessMessage('');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -363,17 +146,11 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
     setPeriocity(Periocity);
     setSelectedControl(controlId); // Selecciona solo un control
     setSelectedControlName(controlName);
-    if (selectedResponsable & selectedControl) {
+    if (selectedControl) {
       setErrorMessage('');
     }
   };
 
-  const handleResponsableClick = (responsableId) => {
-    setSelectedResponsable(responsableId); // Selecciona solo un responsable
-    if (selectedResponsable & selectedControl) {
-      setErrorMessage('');
-    }
-  };
 
   if (!show) return null;
 
@@ -417,33 +194,6 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               ))}
             </div>
           </label>
-          <label className='riesgos_div'>
-            <p>Responsables Disponibles</p>
-            <div className="[width:82%] mb-4 mx-auto">
-                <input
-                  type="text"
-                  placeholder="Buscar responsables..."
-                  value={searchTermResponsables}
-                  onChange={handleSearchResponsablesChange}
-                  className="block w-full py-2 px-4 border border-gray-500 rounded-xl "
-                />
-              </div>
-            <div className='control_riesgos'>
-              {filteredResponsables.map(responsable => (
-                <div 
-                  key={responsable[0]} 
-                  className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
-                  onClick={() => handleResponsableClick(responsable[0])}
-                >
-                  <strong>{responsable[2]}</strong>
-                  <p>{responsable[4]}</p>
-                </div>
-              ))}
-            </div>
-          </label>
-          </div>
-          
-          <br />
           <label className='periodicity_label'>
             <p>Fecha Límite - ({periocity})</p>
             {periocity === 'Anual' ? (
@@ -566,7 +316,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
             }
             
           </label>
-          <br />
+          </div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
           <Button
