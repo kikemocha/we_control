@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [awsCredentials, setAwsCredentials] = useState({});
 
   const [userData, setUserData] = useState(() => sessionStorage.getItem('userData') || null);
-
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     sessionStorage.setItem('accessToken', accessToken);
@@ -206,7 +206,8 @@ export const AuthProvider = ({ children }) => {
     setRefreshToken,
     role,
     setRole,
-
+    searchQuery,
+    setSearchQuery,
     cognitoId,
     setCognitoId,
     signOut,

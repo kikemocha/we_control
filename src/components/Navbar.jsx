@@ -5,9 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import Input from './common/Input';
 import Button from './common/Button';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+
 
 const Navbar = () => {
-    const {role, userData, token, fetchUserData, cognitoId } = useAuth();
+    const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, searchQuery, setSearchQuery} = useAuth();
+
+    const location = useLocation();
 
     const [loading, setLoading] = useState(false)
     const [messageError, setMessageError] = useState('');
@@ -32,6 +36,40 @@ const Navbar = () => {
     const [reNewPassword, setReNewPassword] = useState('');
     const [showActualPassword, setShowActualPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+
+    useEffect(() => {
+        let newCategory = 'Todas las Categorías';
+    
+        if (location.pathname.includes('riesgos')) {
+            newCategory = 'Riesgos';
+        } else if (location.pathname.includes('controles')) {
+            newCategory = 'Controles';
+        } else if (location.pathname.includes('gestores')) {
+            newCategory = 'Gestores';
+        } else if (location.pathname.includes('responsables')) {
+            newCategory = 'Responsables';
+        } else if (
+            location.pathname.includes('auditorias') ||
+            location.pathname.includes('seguimientos')
+        ) {
+            newCategory = 'Auditorías y Seguimientos';
+        } else {
+            newCategory = 'Todas las Categorías';
+        }
+        setSearchQuery('');
+        // Si la categoría es "Todas las Categorías", manejar dependiendo de la empresa seleccionada
+        if (newCategory === 'Todas las Categorías') {
+            if (!selectedEmpresa) {
+                newCategory = 'Empresas'; // No hay empresa seleccionada
+            } else {
+                newCategory = 'Home'; // Hay empresa seleccionada
+            }
+        }
+    
+        setcategorySelected(newCategory);
+    }, [location.pathname, role, selectedEmpresa]);
+    
+    
 
     useEffect(() => {
         // Si userData es null, intenta obtener los datos del usuario
@@ -157,17 +195,7 @@ const Navbar = () => {
             setLoading(false);
         }
     };
-    
 
-    const dropdownRef = useRef(null);
-
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    }
-    const closeDropdown = (category) => {
-        setcategorySelected(category);
-        setIsDropdownOpen(false);
-      };
 
     useEffect(() =>{
         if (role === 'responsable'){
@@ -175,25 +203,11 @@ const Navbar = () => {
         }
     }, [categorySelected])
     
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-          // Si el clic ocurre fuera del dropdownRef, cierra el dropdown
-          if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-            setIsDropdownOpen(false);
-          }
-        };  
-        // Agregar el evento click al document
-        document.addEventListener('mousedown', handleClickOutside);
-
-        // Limpiar el evento cuando el componente se desmonta
-        return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [dropdownRef]);
 
 
     return (
         <div className="navbar">
+            {console.log('categorySelected: ',categorySelected)}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
@@ -422,104 +436,31 @@ const Navbar = () => {
 
             )}
             <div className='w-1/2'>
-                <form className="w-full mx-auto relative hidden">
+                {categorySelected !== 'Home' & categorySelected !== 'Auditorías y Seguimientos' ? (
+                    <form className="w-full mx-auto relative">
                     <div className="flex md:h-3 lg:h-6 xl:h-8 h-full">
                         <div className="relative w-full">
                             <input
                             type="search"
                             id="search-dropdown"
-                            className="block md:h-3 lg:h-6 xl:h-8 2xl:h-12 py-2.5 px-6  w-full z-20 lg:text-xxs lg:text-xs xl:text-sm 2xl:text-md  text-gray-900 bg-gray-50 rounded-s-full focus:border-none focus:ring-none"
-                            placeholder={categorySelected === 'Todas las Categorías' ? ("Busca Riesgos, Controles, Gestores, Auditorías...") : (`Buscar ${categorySelected}`)}
-                            required
+                            className="block md:h-3 lg:h-6 xl:h-8 2xl:h-12 py-2.5 px-6  w-full z-20 lg:text-xxs lg:text-xs xl:text-sm 2xl:text-md  text-black bg-gray-200 focus:bg-gray-300 rounded-full focus:outline-none focus:ring-0 focus:border-none"
+                            placeholder={`Buscar ${categorySelected}`}
+                            value={searchQuery} // Enlazar el valor del input con el contexto
+                            onChange={(e) => setSearchQuery(e.target.value)} // Actualizar el estado global
                             />
-                        </div>
-                        <button
-                            id="dropdown-button"
-                            // Si el role no es "responsable", habilitamos el evento onClick
-                            onClick={role !== 'responsable' ? toggleDropdown : null}
-                            className={`xl:h-8 2xl:h-12 flex-shrink-0 z-10 w-56 inline-flex items-center py-2.5 px-4 lg:text-xs xl:text-sm 2xl:text-md font-medium text-center text-gray-900 bg-yellow-100 rounded-e-full ${
-                                role !== 'responsable' ? 'hover:bg-orange-400 focus:ring-2 focus:outline-none focus:ring-orange-300 cursor-pointer' : 'cursor-default'
-                            }`}
-                            type="button"
-                            style={{
-                                cursor: role === 'responsable' ? 'default' : 'pointer'  // Cambia el cursor dependiendo del rol
-                            }}
-                        >
-                            <p className='w-full'>{categorySelected}</p>
-                            {role !== 'responsable' && (
-                                <svg
-                                    className="w-2.5 h-2.5 ms-2.5"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 10 6"
-                                >
-                                    <path
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="m1 1 4 4 4-4"
-                                    />
-                                </svg>
-                            )}
-                        </button>
-                        {role !== 'responsable' ? (
-                            <div
-                            ref={dropdownRef}
-                            id="dropdown"
-                            className={` z-10 top-12 right-0 ${isDropdownOpen ? 'absolute' : 'hidden'} bg-white divide-y divide-gray-100 rounded-lg shadow w-48`}
-                        >
                             
-                            <ul className="py-2 text-sm text-black" aria-labelledby="dropdown-button">
-                            <li>
-                                <button 
-                                    type="button" 
-                                    className={`inline-flex w-full px-4 py-2 mr-1 mb-2 rounded ${categorySelected === 'Todas las Categorías' ? 'bg-gray-400 text-white' : 'hover:bg-gray-700 hover:text-white'}`} 
-                                    onClick={() => closeDropdown('Todas las Categorías')} >
-                                    <p className='text-center w-full'>Todas las Categorías</p>
-                                </button>
-                            </li>
-                            <li>
-                                <button 
-                                    type="button" 
-                                    className={`inline-flex w-full px-4 py-2 mr-1 mb-2 rounded ${categorySelected === 'Riesgos' ? 'bg-gray-400 text-white' : 'hover:bg-gray-700 hover:text-white'}`} 
-                                    onClick={() => closeDropdown('Riesgos')}>
-                                    <p className='text-center w-full'>Riesgos</p>
-                                </button>
-                            </li>
-                            <li>
-                                <button 
-                                    type="button" 
-                                    className={`inline-flex w-full px-4 py-2 mr-1 mb-2 rounded ${categorySelected === 'Controles' ? 'bg-gray-400 text-white' : 'hover:bg-gray-700 hover:text-white'}`} 
-                                    onClick={() => closeDropdown('Controles')}>
-                                    <p className='text-center w-full'>Controles</p>
-                                </button>
-                            </li>
-                            <li>
-                                <button 
-                                    type="button" 
-                                    className={`inline-flex w-full px-4 py-2 mr-1 mb-2 rounded ${categorySelected === 'Gestores' ? 'bg-gray-400 text-white' : 'hover:bg-gray-700 hover:text-white'}`} 
-                                    onClick={() => closeDropdown('Gestores')}>
-                                    <p className='text-center w-full'>Gestores</p>
-                                </button>
-                            </li>
-                            <li>
-                                <button 
-                                    type="button" 
-                                    className={`inline-flex w-full px-4 py-2 mr-1 rounded ${categorySelected === 'Auditorías y Seguimientos' ? 'bg-gray-400 text-white' : 'hover:bg-gray-700 hover:text-white'}`} 
-                                    onClick={() => closeDropdown('Auditorías y Seguimientos')}>
-                                <p className='text-center w-full'>Auditorías y Seguimientos</p>
-                                </button>
-                            </li>
-                            </ul>
+                            <div className="absolute top-2 right-3 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
+                                    className="size-8 text-black cursor-pointer">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 15.75-2.489-2.489m0 0a3.375 3.375 0 1 0-4.773-4.773 3.375 3.375 0 0 0 4.774 4.774ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
+
                         </div>
-                        ): (
-                            <div></div>
-                        )}
                         
                     </div>
                 </form>
+                ): (<p></p>)}
             </div>
 
             <div className="user-info cursor-pointer" onClick={()=>{setProfilePopUp(true)}}>

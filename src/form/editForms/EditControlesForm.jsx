@@ -26,8 +26,9 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
   const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
   const [searchTermResponsables, setSearchTermResponsables] = useState('');
 
-  const filteredResponsables = responsables.filter((riesgo) =>
-    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
+  const filteredResponsables = responsables.filter((responsable) =>
+    responsable.name.toLowerCase().includes(searchTermResponsables.toLowerCase()) |
+    responsable.email.toLowerCase().includes(searchTermResponsables.toLowerCase()) 
   );
   const handleSearchResponsablesChange = (e) => {
     setSearchTermResponsables(e.target.value);
@@ -273,12 +274,12 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
                   <div className='control_riesgos'>
                       {filteredResponsables.map(responsable => (
                       <div 
-                        key={responsable[0]} 
-                        className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
-                        onClick={() => handleResponsableClick(responsable[0])}
+                        key={responsable.id_user} 
+                        className={`riesgo-item ${selectedResponsable === responsable.id_user ? 'selected' : ''}`} 
+                        onClick={() => handleResponsableClick(responsable.id_user)}
                       >
-                        <strong>{responsable[2]}</strong>
-                        <p>{responsable[4]}</p>
+                        <strong>{responsable.name}</strong>
+                        <p>{responsable.email}</p>
                       </div>
                     ))}
                   </div>

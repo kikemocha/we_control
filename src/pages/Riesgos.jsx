@@ -6,7 +6,7 @@ import RiesgosForm from '../form/RiesgosForm';
 import EditRiesgosForm from '../form/editForms/EditRiesgosForm';
 
 const Riesgos = () => {
-    const {selectedEmpresa, token} = useAuth();
+    const {selectedEmpresa, token, searchQuery} = useAuth();
     const [data, setData] = useState({ activo: [], eliminado: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -65,6 +65,11 @@ const Riesgos = () => {
         fetchData();
     }, [selectedEmpresa]);
 
+    const filteredRiesgos = data[riesgosState].filter((riesgo) =>
+        riesgo[1].toLowerCase().includes(searchQuery.toLowerCase()) || // Filtra por número de riesgo
+        riesgo[2].toLowerCase().includes(searchQuery.toLowerCase())    // Filtra por descripción
+    );
+      
     if (loading) {
         return <div className='card_option'>
                     <div className='total_add'>
@@ -229,7 +234,7 @@ const Riesgos = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {data[riesgosState]
+                                        {filteredRiesgos
                                         .slice() // Hacer una copia para evitar mutar el estado original
                                         .sort((a, b) => {
                                             const numA = parseInt(a[1].match(/\d+/), 10); // Convertir a número
