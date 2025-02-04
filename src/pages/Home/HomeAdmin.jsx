@@ -5,11 +5,10 @@ import { useAuth } from '../../context/AuthContext';
 
 import EmpresasForm from "../../form/EmpresasForm";
 import EditEmpresasForm from "../../form/editForms/EditEmpresasForm";
-import CircularProgress from "../../components/CircularProgress";
 import Card from "../../components/Card";
 
 const HomeAdmin = ({getUserData, UserInfo}) => {
-    const { userData, setSelectedEmpresa, selectedEmpresa} = useAuth();
+    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery} = useAuth();
     
     const [showPopup, setShowPopup] = useState(false);
 
@@ -23,6 +22,11 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
         };
     const handleCloseEditPopup = () => setshowEditPopup(false);
     
+    const filteredEmpresas = UserInfo?.data?.empresas?.filter((empresa) =>
+      empresa[1].toLowerCase().includes(searchQuery.toLowerCase()) // Filtra por nombre de empresa
+    );
+
+  
     return <div className='admin_home'>
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
       <div>
@@ -107,58 +111,58 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             </div>
             <div className='bussines_div overflow-auto h-full'>
               {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
-                <div className='admin_boxes overflow-y-auto h-full no-scrollbar' >
-                  {UserInfo.data.empresas.map((empresas, index) => (
-                    <div className='bussiness_boxes flex flex-col relative' >
-                      <h3 className='font-bold'>{empresas[1]}</h3>
-                      <div className='grow flex' onClick={() => setSelectedEmpresa(empresas[0])}>
-                        <div className='w-3/4 mx-auto h-full flex-col flex'>
-                          <h4 className='border-b-2 border-black w-3/4 mx-auto'>
-                            <span className='px-3'>Contacto</span>
-                          </h4>
-                          <div className='flex flex-col justify-around grow h-full'>
-                            <div>{empresas[8] === 'None' ? '------' : empresas[8]}</div>
-                            <div>{empresas[10] === 'None' ? '------' : empresas[10]}</div>
-                            <div>
-                              <a 
-                                className='z-40 text-blue-800 hover:text-purple-800' 
-                                href={
-                                  empresas[9] === 'None' 
-                                    ? ' ' 
-                                    : empresas[9].startsWith('http') 
-                                      ? empresas[9] 
-                                      : `https://${empresas[9]}`
-                                } 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                              >
-                                {empresas[9] === 'None' ? '------' : empresas[9]}
-                              </a>
+                <div className='admin_boxes overflow-y-auto h-full no-scrollbar'>
+                  {filteredEmpresas.length > 0 ? (
+                    filteredEmpresas.map((empresa, index) => (
+                      <div className='bussiness_boxes flex flex-col relative' key={index}>
+                        <h3 className='font-bold'>{empresa[1]}</h3>
+                        <div className='grow flex' onClick={() => setSelectedEmpresa(empresa[0])}>
+                          <div className='w-3/4 mx-auto h-full flex-col flex'>
+                            <h4 className='border-b-2 border-black w-3/4 mx-auto'>
+                              <span className='px-3'>Contacto</span>
+                            </h4>
+                            <div className='flex flex-col justify-around grow h-full'>
+                              <div>{empresa[8] === 'None' ? '------' : empresa[8]}</div>
+                              <div>{empresa[10] === 'None' ? '------' : empresa[10]}</div>
+                              <div>
+                                <a 
+                                  className='z-40 text-blue-800 hover:text-purple-800' 
+                                  href={
+                                    empresa[9] === 'None' 
+                                      ? ' ' 
+                                      : empresa[9].startsWith('http') 
+                                        ? empresa[9] 
+                                        : `https://${empresa[9]}`
+                                  } 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                >
+                                  {empresa[9] === 'None' ? '------' : empresa[9]}
+                                </a>
+                              </div>
                             </div>
-  
                           </div>
                         </div>
+                        <div className='absolute right-3' style={{zIndex:'49'}} onClick={(e) => handleOpenEditPopup(empresa)}>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 bg-gray-300 p-1 rounded-full hover:bg-gray-500 hover:border-2 hover:border-black">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                          </svg>
+                        </div>
                       </div>
-                      {/*
-                      <div>Img <span>{empresas[11]}</span></div>
-                      */}
-                      <div className='absolute right-3' style={{zIndex:'49'}} onClick={(e) => handleOpenEditPopup(empresas)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 bg-gray-300 p-1 rounded-full hover:bg-gray-500 hover:border-2 hover:border-black">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                        </svg>
-                      </div>
-                    </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center w-full mt-4">No se encontraron empresas con ese nombre.</p>
+                  )}
+                </div>
+              ) : (
+                <div className='admin_boxes'>
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className='bussiness_boxes skeleton'></div>
                   ))}
                 </div>
-                
-              ) : (
-                    <div className='admin_boxes'>
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <div className='bussiness_boxes skeleton'></div>
-                      ))}
-                    </div>
               )}
             </div>
+
             {showEditPopup && selectedEditEmpresa && (
               <EditEmpresasForm
                   show={showEditPopup}

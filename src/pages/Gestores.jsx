@@ -7,7 +7,7 @@ import GestoresForm from '../form/GestoresForm';
 import EditPersonForm from '../form/editForms/EditPersonForm';
 
 const Gestores = () => {
-    const {selectedEmpresa, token} = useAuth();
+    const {selectedEmpresa, token, searchQuery} = useAuth();
     const [data, setData] = useState({ activo: [], eliminado: [] });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -73,6 +73,15 @@ const Gestores = () => {
         fetchData();
     }, [selectedEmpresa]);
 
+    const filteredGestores = data[gestoresState].filter((gestor) =>
+        gestor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||  // Nombre
+        gestor.surname.toLowerCase().includes(searchQuery.toLowerCase()) || // Apellido
+        gestor.role.toLowerCase().includes(searchQuery.toLowerCase()) || // Cargo
+        gestor.email.toLowerCase().includes(searchQuery.toLowerCase()) || // Email
+        gestor.phone.toLowerCase().includes(searchQuery.toLowerCase())  // Teléfono
+    );
+
+    
     if (loading | !data.activo) {
         return <div className='card_option'>
                     <div className='total_add'>
@@ -191,7 +200,7 @@ const Gestores = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {data[gestoresState].map((gestor, index) => (
+                                {filteredGestores.map((gestor, index) => (
                                     <tr key={index} className="table-row">
                                         <td><p className='text-center'>{gestor.name}</p></td>
                                         <td><p className='text-center'>{gestor.surname}</p></td>

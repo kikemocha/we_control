@@ -25,7 +25,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const [selectedRiesgos, setSelectedRiesgos] = useState([]); // Estado para almacenar los riesgos seleccionados
 
   const [responsables, setResponsables] = useState([]); // Estado para almacenar los responsables disponibles
-  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para almacenar el responsable seleccionado
+  const [selectedResponsable, setSelectedResponsable] = useState([]); // Estado para almacenar el responsable seleccionado
   const [searchTermResponsables, setSearchTermResponsables] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,8 +33,9 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const filteredRiesgos = riesgos.filter((riesgo) =>
     riesgo[2].toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const filteredResponsables = responsables.filter((riesgo) =>
-    riesgo[2].toLowerCase().includes(searchTermResponsables.toLowerCase())
+  const filteredResponsables = responsables.filter((responsable) =>
+    responsable.name.toLowerCase().includes(searchTermResponsables.toLowerCase()) |
+    responsable.email.toLowerCase().includes(searchTermResponsables.toLowerCase()) 
   );
 
   const handleSearchChange = (e) => {
@@ -99,17 +100,30 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
   const fetchResponsables = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+        const response = await axios.get(
+            `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa=${selectedEmpresa}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+
+        // Verifica que la API devuelve un array antes de setearlo en el estado
+        if (Array.isArray(response.data)) {
+            setResponsables(response.data);
+        } else {
+            console.warn("API no devolvió un array de responsables:", response.data);
+            setResponsables([]); // Evita que el estado tenga un valor incorrecto
         }
-      });
-      setResponsables(response.data);
-      setLoading(false);
     } catch (error) {
-      console.error('Error fetching responsables:', error);
+        console.error('Error fetching responsables:', error);
+        setResponsables([]); // Evita que sea null si hay error
+    } finally {
+        setLoading(false);
     }
-  };
+};
+
 
   const fetchRiesgos = async () => {
     try {
@@ -315,12 +329,12 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
                 <div className='control_riesgos'>
                     {filteredResponsables.map(responsable => (
                     <div 
-                      key={responsable[0]} 
-                      className={`riesgo-item ${selectedResponsable === responsable[0] ? 'selected' : ''}`} 
-                      onClick={() => handleResponsableClick(responsable[0])}
+                      key={responsable.id_user} 
+                      className={`riesgo-item ${selectedResponsable === responsable.id_user ? 'selected' : ''}`} 
+                      onClick={() => handleResponsableClick(responsable.id_user)}
                     >
-                      <strong>{responsable[2]}</strong>
-                      <p>{responsable[4]}</p>
+                      <strong>{responsable.name}</strong>
+                      <p>{responsable.email}</p>
                     </div>
                   ))}
                 </div>

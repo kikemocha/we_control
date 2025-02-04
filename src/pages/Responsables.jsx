@@ -6,7 +6,7 @@ import ResponsablesForm from '../form/ResponsablesForm';
 
 
 const Responsables = () => {
-    const {selectedEmpresa, token} = useAuth();
+    const {selectedEmpresa, token, searchQuery} = useAuth();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -38,6 +38,14 @@ const Responsables = () => {
     }, [selectedEmpresa]);
     
 
+    const filteredResponsables = data.filter((responsable) =>
+        responsable.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        responsable.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        responsable.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        responsable.role.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    
     if (loading) {
         return <div className='card_option'>
                     <div className='total_add'>
@@ -127,13 +135,13 @@ const Responsables = () => {
                                     <th>Controles Asignados</th>
                                     {/* <th>Ajustes</th> */}
                                 </tr>
-                                {data.map((responsable, index) => (
+                                {filteredResponsables.map((responsable, index) => (
                                     <tr key={index} className="table-row">
-                                        <td>{responsable[2]}</td>
-                                        <td>{responsable[3]}</td>
-                                        <td>{responsable[5]}</td>
-                                        <td>{responsable[4]}</td>
-                                        <td>{responsable[11]}</td>
+                                        <td>{responsable.name}</td>
+                                        <td>{responsable.phone}</td>
+                                        <td>{responsable.role}</td>
+                                        <td>{responsable.email}</td>
+                                        <td>{responsable.cuenta}</td>
                                         {/* <td className='flex align-middle justify-center'>
                                             <svg
                                                 viewBox="0 0 24 24"

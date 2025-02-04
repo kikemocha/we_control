@@ -6,7 +6,7 @@ import ControlesForm from '../form/ControlesForm';
 import EditControlesForm from '../form/editForms/EditControlesForm';
 
 const Controles = () => {
-    const {selectedEmpresa, token, refreshAccessToken} = useAuth();
+    const {selectedEmpresa, token, searchQuery} = useAuth();
     const [data, setData] = useState({ activo: [], eliminado: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -47,6 +47,13 @@ const Controles = () => {
         fetchData();    
     }, [selectedEmpresa]);
 
+    const filteredControles = data[controlesState].filter((control) =>
+        control[1]?.toLowerCase().includes(searchQuery.toLowerCase()) || // Número
+        control[2]?.toLowerCase().includes(searchQuery.toLowerCase()) || // Nombre
+        control[9]?.toLowerCase().includes(searchQuery.toLowerCase()) || // Riesgos Asociados
+        control[11]?.toLowerCase().includes(searchQuery.toLowerCase())   // Responsable Asociado
+    );
+    
 
     if (loading) {
         return <div className='card_option'>
@@ -231,7 +238,7 @@ const Controles = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {data[controlesState]
+                                    {filteredControles
                                         .slice() // Hacer una copia para evitar mutar el estado original
                                         .sort((a, b) => {
                                             const numA = parseInt(a[1].match(/\d+/), 10); // Convertir a número
