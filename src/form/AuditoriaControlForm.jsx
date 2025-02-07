@@ -194,48 +194,26 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               ))}
             </div>
           </label>
-          <label className='periodicity_label'>
-            <p>Fecha Límite - ({periocity})</p>
+          <div className='flex flex-col align-middle items-center'>
+            <p className='mb-6'>Fecha Límite - ({periocity})</p>
             {periocity === 'Anual' ? (
               <div>
-                <DatePicker
+                <div>
+                  <DatePicker
                   selected={limitDate}
                   onChange={(date) => setLimitDate(date)}
                   dateFormat="yyyy-MM-dd"
                   className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
                   required
                 />
+                </div>
               </div>
               ) : periocity === 'Semestral' ? 
               (
                 <div>
-                  <div className='flex items-center justify-between w-full'>
-                  <p className='font-bold mr-5'>{selectedControlName} - S1</p>
-                    <DatePicker
-                      selected={limitDate}
-                      onChange={(date) => setLimitDate(date)}
-                      dateFormat="yyyy-MM-dd"
-                      className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
-                      required
-                    />
-                  </div>
-                  <div className='flex items-center justify-between w-full'>
-                      <p className='font-bold mr-5'>{selectedControlName} - S2</p>
-                      <DatePicker
-                        selected={limitDate2}
-                        onChange={(date) => setLimitDate2(date)}
-                        dateFormat="yyyy-MM-dd"
-                        className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
-                        required
-                      />
-                  </div>
-                </div>
-              ) : periocity === 'Cuatrimestral' ? 
-              (
-                <div>
-                  <div>
-                  <div className='flex items-center justify-between w-full'>
-                    <p className='font-bold mr-5'>{selectedControlName} - 1_Cuatr</p>
+                  <div className='flex flex-col gap-4'>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - S1</p>
                       <DatePicker
                         selected={limitDate}
                         onChange={(date) => setLimitDate(date)}
@@ -243,6 +221,33 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
                         className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
                         required
                       />
+                    </div>
+                    <div className='flex items-center justify-between w-full'>
+                        <p className='font-bold mr-5'>{selectedControlName} - S2</p>
+                        <DatePicker
+                          selected={limitDate2}
+                          onChange={(date) => setLimitDate2(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
+                    </div>
+                  </div>
+                </div>
+
+              ) : periocity === 'Cuatrimestral' ? 
+              (
+                <div>
+                  <div className='flex flex-col gap-4'>
+                    <div className='flex items-center justify-between w-full'>
+                      <p className='font-bold mr-5'>{selectedControlName} - 1_Cuatr</p>
+                        <DatePicker
+                          selected={limitDate}
+                          onChange={(date) => setLimitDate(date)}
+                          dateFormat="yyyy-MM-dd"
+                          className="date-picker bg-gray-300 p-2 rounded-lg text-center cursor-pointer"
+                          required
+                        />
                     </div>
                     <div className='flex items-center justify-between w-full'>
                       <p className='font-bold mr-5'>{selectedControlName} - 2_Cuatr</p>
@@ -269,7 +274,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               ) : periocity === 'Trimestral' &&
               (
                 <div>
-                  <div>
+                  <div className='flex flex-col gap-4'>
                     <div className='flex items-center justify-between w-full'>
                       <p className='font-bold mr-5'>{selectedControlName} - T1</p>
                       <DatePicker
@@ -315,7 +320,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
               )
             }
             
-          </label>
+          </div>
           </div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
