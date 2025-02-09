@@ -77,7 +77,7 @@ const LogIn = () => {
         setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
-  
+        await fetchAwsCredentials(idToken);
         await fetchUserData(cognitoId, idToken);
         navigate('/home');
 

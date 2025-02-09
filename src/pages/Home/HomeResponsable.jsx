@@ -22,10 +22,16 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     
     useEffect(() => {
         const getAwsCredentials = async () => {
-          if (!awsCredentials || Object.keys(awsCredentials).length === 0) {
-            setLoading(true); // Activa el loading
-            await fetchAwsCredentials(token); // Llama a fetchAwsCredentials
-            setLoading(false); // Desactiva el loading
+          if (!awsCredentials || Object.keys(awsCredentials).length === 0) {setLoading(true);
+            try {
+              await fetchAwsCredentials(token);
+            } catch (error) {
+              // Muestra error y redirige a login o vuelve a iniciar sesión
+              console.error("Error al obtener AWS credentials:", error);
+              // Aquí podrías forzar el logout o mostrar un mensaje específico
+            } finally {
+              setLoading(false);
+            }
           } else {
             console.log("AWS Credentials disponibles");
           }
@@ -73,6 +79,49 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
         fetchUserAuditoriaData();
     },[])
 
+    if (loading || !awsCredentials) {
+        return <div className='responsable_main'>
+        <div className='length-responsable'>
+            <div>Controles Asociados: 
+                <p className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></p>
+            </div>
+        </div>
+        <div className='card_option'>
+            <div className="table-container skeleton">
+                <div>
+                <table className="card_table">
+                    <thead>
+                        <tr className="table-row">
+                        <th>Número de Control</th>
+                        <th>Nombre</th>
+                        <th>Evidencias</th>
+                        <th>Responsable</th>
+                        <th>Fecha límite</th>
+                        <th>Fecha de evidencias</th>
+                        <th>Archivos subidos</th>
+                        <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from({ length: 8 }).map((_, index) => (
+                        <tr key={index} className="table-row">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        ))}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
     return (
         <div className='responsable_home'>
             { UserInfo ? (
