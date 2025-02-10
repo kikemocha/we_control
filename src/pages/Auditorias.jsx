@@ -238,7 +238,7 @@ const Auditorias = () => {
                                 <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} selectedAuditoria={selectedAuditoria}/>
                             )}
                             {popupFormType === 'auditoria' && (
-                                <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                                <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} selectedYear={selectedYear}/>
                             )}
                             <div className='total_add'>
                                 <div className='upper_box'>
@@ -385,7 +385,7 @@ const Auditorias = () => {
                                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
                                 )}
                                 {popupFormType === 'auditoria' && (
-                                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} selectedYear={selectedYear}/>
                                 )}
                         </div>
                     )}
@@ -393,7 +393,7 @@ const Auditorias = () => {
         ):(
         <div>
                 {popupFormType === 'auditoria' && (
-                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} />
+                    <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} selectedYear={selectedYear}/>
                 )}
                 {popupFormType === 'control' && (
                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} />
