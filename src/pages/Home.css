@@ -316,6 +316,10 @@
         border-radius: 30px;
         margin: 20px 0px;
     }
+
+    .upper_box.auditoria{
+        width: 500px;
+    }
     
     .upper_box .text{
         width: 80%;

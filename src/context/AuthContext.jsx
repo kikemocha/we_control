@@ -22,7 +22,11 @@ export const AuthProvider = ({ children }) => {
   // AWS Credentials
   const [awsCredentials, setAwsCredentials] = useState({});
 
-  const [userData, setUserData] = useState(() => sessionStorage.getItem('userData') || null);
+  const [userData, setUserData] = useState(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    return storedUserData ? JSON.parse(storedUserData) : null;
+});
+
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -30,8 +34,11 @@ export const AuthProvider = ({ children }) => {
   }, [accessToken]);
 
   useEffect(() => {
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-  }, [userData]);
+    if (userData) {
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+    }
+}, [userData]);
+
   useEffect(() => {
     if (userData && typeof userData === 'string') {
         setUserData(JSON.parse(userData)); // Convertirlo al objeto cuando se extrae

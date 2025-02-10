@@ -13,6 +13,10 @@ const Controles = () => {
 
     const [controlesState, setControlesState] = useState('activo');
 
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [years, setYears] = useState([]);
+        
+
     const [showPopup, setShowPopup] = useState(false);
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
@@ -25,7 +29,30 @@ const Controles = () => {
         setshowEditPopup(true);
     };
 
+    const fetchYear = async () => {
+        try {
+            setLoading(true);
+            const response_years = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+            setYears(response_years.data);
+    
+            // Solo cambiar el selectedYear si aún no tiene valor
+            if (response_years.data.length > 0 && selectedYear === null) {
+                setSelectedYear(response_years.data[response_years.data.length - 1].id_year);
+            }
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchData = async () => {
+        if (!selectedYear) return
         try {
             const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa="+selectedEmpresa,
                 {headers: {
@@ -44,8 +71,15 @@ const Controles = () => {
     };
 
     useEffect(() => {
-        fetchData();    
-    }, [selectedEmpresa]);
+            const fetchAllData = async () => {
+                await fetchYear();
+                if (selectedYear) {
+                    await fetchData();
+                }
+            };
+        
+            fetchAllData();
+        }, [selectedEmpresa, selectedYear]); 
 
     const filteredControles = data[controlesState].filter((control) =>
         control[1]?.toLowerCase().includes(searchQuery.toLowerCase()) || // Número
@@ -63,6 +97,17 @@ const Controles = () => {
                             <div className='text'>Total de&nbsp;<strong>controles</strong>:</div>
                             <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
                         </div>
+                        <div className='flex flex-row justify-center w-full'>
+                        <div>
+                            <select 
+                                id="year" 
+                                className="w-36 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-400 focus:border-orange-400 block p-2.5"
+                            >
+                                <option>----</option>
+                            </select>
+            
+                            </div>
+                        </div>
                         <div onClick={handleOpenPopup}>
                             <svg
                                 viewBox="0 0 1024 1024"
@@ -77,6 +122,7 @@ const Controles = () => {
                                 <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
                             </svg>
                         </div>
+
                     </div>
                     <div className='responsable_home'>
                         <div className='responsable_main'>
@@ -202,6 +248,25 @@ const Controles = () => {
                             className={controlesState === 'activo' ? '' : 'selected'}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                         </svg>
+                    </div>
+                </div>
+                <div className='flex flex-row justify-center w-full'>
+                    <div>
+                    <select 
+                        id="year" 
+                        className="w-36 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-400 focus:border-orange-400 block p-2.5"
+                        value={selectedYear} 
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                    >
+                        {years.length === 0 ? (
+                            <option>Cargando...</option>
+                        ) : (
+                            years.map((year, index) => (
+                                <option key={index} value={year.id_year}>{year.value}</option>
+                            ))
+                        )}
+                    </select>
+    
                     </div>
                 </div>
                 <div onClick={handleOpenPopup}>

@@ -15,6 +15,9 @@ const Auditorias = () => {
     const [selectedAuditoria, setSelectedAuditoria] = useState(null);
     const [selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
     const [AuditoriaData, setAuditoriaData] = useState(null);
+
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [years, setYears] = useState([]);
     
     const [showPopup, setShowPopup] = useState(false);
     const [popupFormType, setPopupFormType] = useState(''); // Nuevo estado para controlar qué formulario mostrar
@@ -66,42 +69,89 @@ const Auditorias = () => {
       }
 
     
-    const fetchAuditoriaData = async () => {
-        if (selectedAuditoria) {
-            try {
-                const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditoriaData?id_auditoria=${selectedAuditoria}`,
-                    {headers : {
-                        'Authorization' : `Bearer ${token}`
-                    }}
-                );
-                setAuditoriaData(response.data.activo);
-            } catch (error) {
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-    const fetchData = async () => {
+      const fetchAuditoriaData = async () => {
+        if (!selectedAuditoria) return; // Evita ejecutar la solicitud si no hay auditoría seleccionada
+    
         try {
-            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa="+selectedEmpresa,
-                {headers : {
-                    'Authorization' : `Bearer ${token}`
-                }}
+            const response = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditoriaData?id_auditoria=${selectedAuditoria}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
             );
-            let data_clean = [];
-            data_clean = response.data
-            setData(data_clean);
+            setAuditoriaData(response.data.activo);
         } catch (error) {
             setError(error);
         } finally {
             setLoading(false);
         }
     };
-    useEffect(() => {  
-        fetchAuditoriaData();
-        fetchData();
-    }, [selectedAuditoria]);
+    
+    const fetchYear = async () => {
+        try {
+            setLoading(true);
+            const response_years = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+            setYears(response_years.data);
+    
+            // Solo cambiar el selectedYear si aún no tiene valor
+            if (response_years.data.length > 0 && selectedYear === null) {
+                setSelectedYear(response_years.data[response_years.data.length - 1].id_year);
+            }
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const fetchData = async () => {
+        if (!selectedYear) return; // Previene la ejecución si selectedYear es null
+        try {
+            setLoading(true);
+            const response = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa=${selectedEmpresa}&id_year=${selectedYear}`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+    
+            // Convertir la respuesta en un array de objetos
+            const formattedData = response.data.map(auditoria => ({
+                id: auditoria[0], 
+                name: auditoria[1], 
+                totalControles: auditoria[2], 
+                controlesVerificados: auditoria[3], 
+                createDate: auditoria[4]
+            }));
+    
+            setData(formattedData);
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    
+    useEffect(() => {
+        const fetchAllData = async () => {
+            await fetchYear();
+            if (selectedYear) {
+                await fetchData();
+            }
+            if (selectedAuditoria) {
+                await fetchAuditoriaData();
+            }
+        };
+    
+        fetchAllData();
+    }, [selectedAuditoria, selectedYear]); 
+    
 
     
     if (loading) {
@@ -109,7 +159,7 @@ const Auditorias = () => {
                     <div className='total_add'>
                         <div className='upper_box text-xs'>
                             <div className='text'>Total de&nbsp;<strong>auditorías</strong>&nbsp;y&nbsp;<strong>seguimientos</strong></div>
-                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
+                            {/* <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div> */}
                         </div>
                         <div onClick={handleOpenPopup}>
                             <svg
@@ -215,59 +265,58 @@ const Auditorias = () => {
                                     <div className="table-container">
                                         <div>
                                             <table className="card_table">
-                                            <thead className='no_main'>
-                                                <tr className="table-row">
-                                                <th>Número de Control</th>
-                                                <th>Nombre</th>
-                                                <th>Responsable</th>
-                                                <th>Fecha límite</th>
-                                                <th>Fecha de evidencia</th>
-                                                <th>Archivos subidos</th>
-                                                <th>Estado</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {AuditoriaData.map((control, index) => (
-                                                <tr key={index} className="table-row">
-                                                    <td>
-                                                        {
-                                                        control[11] === 'Anual' ? (
-                                                            control[0]
-                                                        ) : control[11] === 'Semestral' ? (
-                                                            `${control[0]} - S${control[10]}`
-                                                        ): control[11] === 'Cuatrimestral' ? (
-                                                            `${control[0]} - ${control[10]}_Cuatr`
-                                                        ): control[11] === 'Trimestral' && (
-                                                            `${control[0]} - T${control[10]}`
-                                                        )
-                                                        }
-                                                    </td>
-                                                    <td>{control[1]}</td>
-                                                    <td>{control[2]}</td>
-                                                    <td>{control[3]}</td>
-                                                    <td>{control[4] == 'None' ? '---' : control[4]}</td>
-                                                    <td className="archive_responsable">
-                                                        {console.log(control)}
-                                                    <div className={control[5] === 'None' ? '' : 'archive'}>
-                                                        {control[5] === 'None' ? (
-                                                            <p>None</p>
-                                                        ) : (
-                                                            <p
-                                                            onClick={control[5] !== 'None' ? () => handleShowFile(control[5], `empresa-${control[7]}`,control[8],control[9],control[6], control[12], control[0]) : null}
-                                                            style={{ cursor: control[5] !== 'None' ? 'pointer' : 'default' }} // Cambiar el cursor para indicar si es clicable
-                                                            >
-                                                                {control[5].split('/').slice(1).join('')}
-                                                            </p>
-                                                            
+                                                <thead className='no_main'>
+                                                    <tr className="table-row">
+                                                    <th>Número de Control</th>
+                                                    <th>Nombre</th>
+                                                    <th>Responsable</th>
+                                                    <th>Fecha límite</th>
+                                                    <th>Fecha de evidencia</th>
+                                                    <th>Archivos subidos</th>
+                                                    <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {AuditoriaData.map((control, index) => (
+                                                    <tr key={index} className="table-row">
+                                                        <td>
+                                                            {
+                                                            control[11] === 'Anual' ? (
+                                                                control[0]
+                                                            ) : control[11] === 'Semestral' ? (
+                                                                `${control[0]} - S${control[10]}`
+                                                            ): control[11] === 'Cuatrimestral' ? (
+                                                                `${control[0]} - ${control[10]}_Cuatr`
+                                                            ): control[11] === 'Trimestral' && (
+                                                                `${control[0]} - T${control[10]}`
+                                                            )
+                                                            }
+                                                        </td>
+                                                        <td>{control[1]}</td>
+                                                        <td>{control[2]}</td>
+                                                        <td>{control[3]}</td>
+                                                        <td>{control[4] == 'None' ? '---' : control[4]}</td>
+                                                        <td className="archive_responsable">
+                                                        <div className={control[5] === 'None' ? '' : 'archive'}>
+                                                            {control[5] === 'None' ? (
+                                                                <p>None</p>
+                                                            ) : (
+                                                                <p
+                                                                onClick={control[5] !== 'None' ? () => handleShowFile(control[5], `empresa-${control[7]}`,control[8],control[9],control[6], control[12], control[0]) : null}
+                                                                style={{ cursor: control[5] !== 'None' ? 'pointer' : 'default' }} // Cambiar el cursor para indicar si es clicable
+                                                                >
+                                                                    {control[5].split('/').slice(1).join('')}
+                                                                </p>
+                                                                
 
-                                                        )}
-                                                        
-                                                    </div>
-                                                    </td>
-                                                    <td className={control[6] === 'Denegado' ? 'text-red-500' : control[6] === 'Verificado' ? 'text-green-600' : ''}>{control[6] === 'Denegado' ? 'No Validado' : control[6]}</td>
-                                                </tr>
-                                                ))}
-                                            </tbody>
+                                                            )}
+                                                            
+                                                        </div>
+                                                        </td>
+                                                        <td className={control[6] === 'Denegado' ? 'text-red-500' : control[6] === 'Verificado' ? 'text-green-600' : ''}>{control[6] === 'Denegado' ? 'No Validado' : control[6]}</td>
+                                                    </tr>
+                                                    ))}
+                                                </tbody>
                                             </table>
                                         </div>
                                         {showIMGPopup && (
@@ -293,7 +342,7 @@ const Auditorias = () => {
                     ):(
                         <div>
                             <div>
-                                <div className='upper_box'>
+                                <div className='upper_box auditoria'>
                                     <div className='text'>Total de controles:</div>
                                     <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
                                 </div>
@@ -350,9 +399,28 @@ const Auditorias = () => {
                     <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} />
                 )}
             <div className='total_add'>
-                <div className='upper_box text-xs'>
+                <div className='upper_box auditoria text-xs'>
                     <div className='text'>Total de&nbsp;<strong>auditorías</strong>&nbsp;y&nbsp;<strong>seguimientos</strong></div>
                     <div className='number'>{data.length}</div>
+                </div>
+                <div className='flex flex-row justify-center w-full'>
+                    <div>
+                    <select 
+                        id="year" 
+                        className="w-36 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-400 focus:border-orange-400 block p-2.5"
+                        value={selectedYear} 
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                    >
+                        {years.length === 0 ? (
+                            <option>Cargando...</option>
+                        ) : (
+                            years.map((year, index) => (
+                                <option key={index} value={year.id_year}>{year.value}</option>
+                            ))
+                        )}
+                    </select>
+    
+                    </div>
                 </div>
                 <div onClick={() => handleOpenPopup('auditoria')}>
                     <svg
@@ -387,21 +455,21 @@ const Auditorias = () => {
 
                             {data.map((auditoria, index) => (
                                 <tr key={index} className="table-row">
-                                <td>{auditoria[1]}</td>
-                                <td>{Math.floor(auditoria[3] / auditoria[2] * 100) ? Math.floor(auditoria[3] / auditoria[2] * 100) : '0'}%</td>
-                                <td>{auditoria[4]}</td>
-                                <td >
-                                    <svg
-                                        onClick={() => handleAuditoria(auditoria[0], auditoria[1])}
-                                        viewBox="0 0 1024 1024"
-                                        fill="currentColor"
-                                        height="2em"
-                                        width="2em"
-                                        className='mx-auto'
+                                    <td>{auditoria.name}</td>
+                                    <td>{Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%</td>
+                                    <td>{auditoria.createDate}</td>
+                                    <td>
+                                        <svg
+                                            onClick={() => handleAuditoria(auditoria.id, auditoria.name)}
+                                            viewBox="0 0 1024 1024"
+                                            fill="currentColor"
+                                            height="2em"
+                                            width="2em"
+                                            className='mx-auto'
                                         >
-                                        <path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z" />
-                                    </svg>
-                                </td>
+                                            <path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z" />
+                                        </svg>
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>

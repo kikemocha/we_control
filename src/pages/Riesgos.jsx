@@ -8,8 +8,14 @@ import EditRiesgosForm from '../form/editForms/EditRiesgosForm';
 const Riesgos = () => {
     const {selectedEmpresa, token, searchQuery} = useAuth();
     const [data, setData] = useState({ activo: [], eliminado: [] });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [years, setYears] = useState([]);
+
+    const [selectedAuditoria, setSelectedAuditoria] = useState(null);
+    const [auditorias, setAuditorias] = useState([]);
 
     const [riesgosState, setRiesgosState] = useState('activo');
     const [messagePopUp, setMessagePopUp] = useState('');
@@ -48,12 +54,21 @@ const Riesgos = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}`, {
+            const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}&id_year=${selectedYear}&id_auditoria=${selectedAuditoria}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
             setData(response.data);
+            const response_years = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setYears(response_years.data);
+            if (response_years.data.length > 0) {
+                setSelectedYear(response_years.data[response_years.data.length - 1].id_year);
+            }
         } catch (error) {
             setError(error);
         } finally {
@@ -61,9 +76,75 @@ const Riesgos = () => {
         }
     };
 
+    const fetchYear = async () => {
+        try {
+            setLoading(true);
+            const response_years = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/`,
+                {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }
+            );
+            setYears(response_years.data);
+    
+            // Solo cambiar el selectedYear si aún no tiene valor
+            if (response_years.data.length > 0 && selectedYear === null) {
+                setSelectedYear(response_years.data[response_years.data.length - 1].id_year);
+            }
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchAuditorias = async () => {
+        if (!selectedYear) return;
+        try {
+            setLoading(true);
+            const response_auditoria = await axios.get(
+                `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa=${selectedEmpresa}&id_year=${selectedYear}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            let data_clean = response_auditoria.data;
+            setAuditorias(data_clean);
+    
+            // Solo resetear auditoría si el usuario ha cambiado de año (no si solo cambia de auditoría)
+            if (data_clean.length > 0 && selectedAuditoria === null) {
+                setSelectedAuditoria(data_clean[0][0]); // Primera auditoría de la lista
+            }
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+
     useEffect(() => {
-        fetchData();
-    }, [selectedEmpresa]);
+        const fetchAllData = async () => {
+            await fetchYear(); // Obtener los años disponibles
+    
+            if (selectedYear) {
+                await fetchAuditorias(); // Obtener las auditorías para el año seleccionado
+            }
+        };
+    
+        fetchAllData();
+    }, [selectedYear]);
+
+    useEffect(() => {
+        if (selectedAuditoria) {
+            fetchData();
+        }
+    }, [selectedAuditoria]); // Solo recarga los riesgos cuando cambias la auditoría
+    
+
+
 
     const filteredRiesgos = data[riesgosState].filter((riesgo) =>
         riesgo[1].toLowerCase().includes(searchQuery.toLowerCase()) || // Filtra por número de riesgo
@@ -183,7 +264,7 @@ const Riesgos = () => {
             <RiesgosForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} messagePopUp={handleCloseMessagePopUp} actualRiesgos={data.activo}/>
             <div className='total_add'>
                 <div className='flex'>
-                <div className={riesgosState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
+                    <div className={riesgosState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
                         <div className='text'>Total de&nbsp;<strong>riesgos</strong> {riesgosState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
                         <div className='number'>{riesgosState === 'activo' ? data.activo.length : data.eliminado.length}</div>
                     </div>
@@ -198,6 +279,40 @@ const Riesgos = () => {
                             className={riesgosState === 'activo' ? '' : 'selected'}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                         </svg>
+                    </div>
+                </div>
+                <div className='flex flex-row justify-between w-full mr-12'>
+                    <div>
+                        <select 
+                            id="year" 
+                            className="w-36 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-400 focus:border-orange-400 block p-2.5"
+                            value={selectedYear} 
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                        >
+                            <option disabled value="">Año</option>
+                            {years.length === 0 ? (
+                                <option>Cargando...</option>
+                            ) : (
+                                years.map((year, index) => (
+                                    <option key={index} value={year.id_year}>{year.value}</option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+                    <div>
+                        <select 
+                            id="auditorias"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-400 focus:border-orange-400 block w-full p-2.5"
+                            value={selectedAuditoria} 
+                            onChange={(e) => setSelectedAuditoria(e.target.value)}
+                        >
+                            <option disabled value="">Auditoría/Seguimiento</option>
+                            {auditorias.map((auditoria) => (
+                                <option key={auditoria[0]} value={auditoria[0]}>
+                                    {auditoria[1]}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
                 
