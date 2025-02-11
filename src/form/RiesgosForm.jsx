@@ -7,7 +7,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
 
-const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) => {
+const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos, selectedYear}) => {
   const {selectedEmpresa, token} = useAuth();
   const [numberName, setNumberName] = useState('');
   const [description, setDescription] = useState('');
@@ -55,6 +55,7 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) =
       description: description,
       value: riesgoValue,
       belongs_to: selectedEmpresa,
+      year: selectedYear,
     };
 
     try {
@@ -92,6 +93,7 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos}) =
   return (
     <div className="popup-overlay">
       <div className="popup">
+        {console.log('selectedYear: ',selectedYear)}
         <button className="popup-close" onClick={handleClose}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

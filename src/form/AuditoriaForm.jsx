@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 
-const AuditoriaForm = ({ show, onClose, fetchData }) => {
+const AuditoriaForm = ({ show, onClose, fetchData, selectedYear}) => {
   const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
 
@@ -22,6 +22,7 @@ const AuditoriaForm = ({ show, onClose, fetchData }) => {
     const requestBody = {
       name: name,
       belongs_to: selectedEmpresa,
+      year: selectedYear,
     };
 
     try {
