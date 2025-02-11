@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import '../Home.css';
 
 import { useAuth } from '../../context/AuthContext';
@@ -9,7 +9,6 @@ import Card from "../../components/Card";
 
 const HomeAdmin = ({getUserData, UserInfo}) => {
     const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery} = useAuth();
-    
     const [showPopup, setShowPopup] = useState(false);
 
       // Admin -> Empresas Edit Form
@@ -26,6 +25,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
       empresa[1].toLowerCase().includes(searchQuery.toLowerCase()) // Filtra por nombre de empresa
     );
 
+    
   
     return <div className='admin_home'>
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(

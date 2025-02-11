@@ -9,11 +9,41 @@ const Card = ({name, singularName, href, index, apiURL}) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const [selectedYear, setSelectedYear] = useState(null);
+
     useEffect(() => {
+        if (selectedEmpresa) {
+          axios
+            .get(
+              "https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/",
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((response) => {
+              // La API devuelve: [{"id_year": 1, "value": "2023"}, {"id_year": 2, "value": "2024"}, {"id_year": 3, "value": "2025"}]
+              const yearsArray = response.data;
+              if (Array.isArray(yearsArray) && yearsArray.length > 0) {
+                const maxYearObj = yearsArray.reduce((prev, curr) =>
+                  parseInt(prev.value, 10) > parseInt(curr.value, 10) ? prev : curr
+                );
+                setSelectedYear(maxYearObj.id_year);
+              }
+            })
+            .catch((err) => console.error("Error fetching years:", err));
+        }
+      }, [selectedEmpresa, token]);
+      
+
+    useEffect(() => {
+        if (!selectedEmpresa || !selectedYear) return;
+        setLoading(true);
         const fetchData = async () => {
             
             try {
-                const response = await axios.get(apiURL+selectedEmpresa, {headers: {'Authorization': `Bearer ${token}`,}});
+                const response = await axios.get(
+                    `${apiURL}${selectedEmpresa}&id_year=${selectedYear}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
                 let data_clean = [];
                 if (name === 'Gestores'){
                     data_clean = response.data.activo.map(item => [item.name, item.email])
@@ -41,7 +71,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
             }
         };
         fetchData();
-    }, [apiURL]);
+    }, [apiURL, selectedEmpresa, selectedYear, name, token]);
 
     if (loading) {
         return (
@@ -159,7 +189,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                                 {/* Renderizamos un div con scroll horizontal para la columna de riesgos */}
                                 {name === 'Controles' && cellIdx === 4 ? (
                                     <div className="flex justify-start items-center space-x-2 overflow-x-auto max-w-full align-middle">
-                                        {cell}
+                                        <p className="text-center mx-auto">{cell}</p>
                                     </div>
                                 ) : (
                                     cell
