@@ -60,6 +60,17 @@ const EditControlesForm = ({ show, onClose, fetchData, id_control, numberName, n
       });
       setResponsables(response.data);
       setLoading(false);
+      if (Array.isArray(response.data)) {
+        setResponsables(response.data);
+        // Comprobamos si alguno tiene el email que viene en data
+        const found = response.data.find(responsable => responsable.email === data);
+        if (found) {
+          setSelectedResponsable(found.id_user);
+        }
+      } else {
+        console.warn("API no devolvió un array de responsables:", response.data);
+        setResponsables([]);
+      }
     } catch (error) {
       console.error('Error fetching responsables:', error);
     }

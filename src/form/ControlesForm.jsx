@@ -8,13 +8,13 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import SelectInput from '../components/common/SelectInput';
 
-const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
+const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear }) => {
   const {selectedEmpresa, token} = useAuth();
   const [controlName, setControlName] = useState('');
   const [numberName, setNumberName] = useState('');
   const [evidences, setEvidences] = useState('');
   const [periocity, setPeriocity] = useState('Anual');
-  const [valueControl, setValueControl] = useState('Transversal');
+  const [valueControl, setValueControl] = useState('Específico');
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -30,6 +30,17 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
+  useEffect(() => {
+    if (show) {
+      if (actualControles.length > 0) {
+        const maxNumber = Math.max(...actualControles.map(control => parseInt(control[1].replace('C', ''), 10) || 0));
+        setNumberName((maxNumber + 1).toString());
+      } else {
+        setNumberName('1');
+      }
+    }
+  }, [show, actualControles]);
+  
   const filteredRiesgos = riesgos.filter((riesgo) =>
     riesgo[2].toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -87,11 +98,13 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
   const resetValues = () =>{
     setControlName('');
-    setNumberName('');
     setEvidences('');
     setPeriocity('Anual');
-    setValueControl('Transversal');
+    setValueControl('Específico');
     setSelectedRiesgos([]);
+    setSelectedResponsable([]);
+    setSearchTerm('');
+    setSearchTermResponsables('');
   }
   const handleClose = () =>{
     resetValues();
@@ -127,7 +140,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles }) => {
 
   const fetchRiesgos = async () => {
     try {
-      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}`, {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}&id_year=${selectedYear}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -30,7 +30,7 @@ return (
                 name='Responsables'
                 singularName='responsable'
                 href='responsables'
-                index={['Nombre', 'Título', 'email']}
+                index={['Nombre','Apellido', 'Título', 'email']}
                 apiURL={'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getResponsablesData?id_empresa='}
               />
             </div>

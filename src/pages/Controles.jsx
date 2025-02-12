@@ -263,7 +263,7 @@ const Controles = () => {
 
 
     return <div className='card_option'>
-            <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data.activo}/>
+            <ControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} actualControles={data.activo} selectedYear={selectedYear}/>
             {/* <button onClick={()=>{refreshAccessToken()}} >BUTTON</button> */}
             <div className='total_add'>
                 <div className='flex'>
@@ -402,7 +402,7 @@ const Controles = () => {
                         periocity={selectedControl[4]}
                         value={selectedControl[5]}
 
-                        data={data}
+                        data={selectedControl?.[11]}
                     />
 
                 )}
