@@ -129,6 +129,7 @@ const Responsables = () => {
                                 <table className="card_table">
                                 <tr className="table-row">
                                     <th>Nombre</th>
+                                    <th>Apellido</th>
                                     <th>Teléfono</th>
                                     <th>Título</th>
                                     <th>E-mail</th>
@@ -138,6 +139,7 @@ const Responsables = () => {
                                 {filteredResponsables.map((responsable, index) => (
                                     <tr key={index} className="table-row">
                                         <td>{responsable.name}</td>
+                                        <td>{responsable.surname}</td>
                                         <td>{responsable.phone}</td>
                                         <td>{responsable.role}</td>
                                         <td>{responsable.email}</td>

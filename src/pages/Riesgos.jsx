@@ -53,12 +53,23 @@ const Riesgos = () => {
 
     const fetchData = async () => {
         setLoading(true);
+        
         try {
-            const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}&id_year=${selectedYear}&id_auditoria=${selectedAuditoria}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            let response;
+            if (selectedAuditoria){
+                response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}&id_year=${selectedYear}&id_auditoria=${selectedAuditoria}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } else{
+                response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa=${selectedEmpresa}&id_year=${selectedYear}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            }
+            
             setData(response.data);
             const response_years = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getYears/`, {
                 headers: {
@@ -138,9 +149,8 @@ const Riesgos = () => {
     }, [selectedYear]);
 
     useEffect(() => {
-        if (selectedAuditoria) {
-            fetchData();
-        }
+        fetchData();
+        
     }, [selectedAuditoria, selectedYear]); // Solo recarga los riesgos cuando cambias la auditoría
     
 
