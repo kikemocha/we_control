@@ -18,7 +18,7 @@ return (
             </div>
             <div className={'small_card'}>
               <Card
-                name='Auditorías'
+                name='Seguimientos / Auditorías'
                 singularName='auditoría'
                 href='auditorias'
                 index={['Nombre', 'Progreso']}
