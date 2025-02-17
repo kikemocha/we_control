@@ -142,16 +142,12 @@ const Riesgos = () => {
     
             if (selectedYear) {
                 await fetchAuditorias(); // Obtener las auditorías para el año seleccionado
+                fetchData();
             }
         };
     
         fetchAllData();
     }, [selectedYear]);
-
-    useEffect(() => {
-        fetchData();
-        
-    }, [selectedAuditoria, selectedYear]); // Solo recarga los riesgos cuando cambias la auditoría
     
 
 

@@ -268,6 +268,7 @@ const Auditorias = () => {
                                                 <thead className='no_main'>
                                                     <tr className="table-row">
                                                     <th>Número de Control</th>
+                                                    <th>Periodicidad</th>
                                                     <th>Nombre</th>
                                                     <th>Responsable</th>
                                                     <th>Fecha límite</th>
@@ -292,6 +293,7 @@ const Auditorias = () => {
                                                             )
                                                             }
                                                         </td>
+                                                        <td>{control[11]}</td>
                                                         <td>{control[1]}</td>
                                                         <td>{control[2]}</td>
                                                         <td>{control[3]}</td>

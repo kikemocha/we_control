@@ -137,6 +137,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                 <thead>
                                 <tr className="table-row">
                                     <th>Número de Control</th>
+                                    <th>Periodicidad</th>
                                     <th>Nombre</th>
                                     <th>Evidencias</th>
                                     <th>Responsable</th>
@@ -150,6 +151,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                 {UserInfo.data.riesgos.map((riesgo, index) => (
                                     <tr key={index} className="table-row">
                                         <td>{riesgo[1]}-{riesgo[12]}</td>
+                                        <td>{riesgo[13]}</td>
                                         <td>{riesgo[2]}</td>
                                         <td>{riesgo[3]}</td>
                                         <td>{riesgo[4]}</td>

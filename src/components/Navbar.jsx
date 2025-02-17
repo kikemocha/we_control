@@ -6,11 +6,11 @@ import Input from './common/Input';
 import Button from './common/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { type } from '@testing-library/user-event/dist/type';
 
 
 const Navbar = () => {
     const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, searchQuery, setSearchQuery} = useAuth();
-
     const location = useLocation();
 
     const [loading, setLoading] = useState(false)
@@ -18,12 +18,12 @@ const Navbar = () => {
     const [messageSucess, setSuccesMessage] = useState('');
     const [message, messagePopUp] = useState('');
 
-    const [idPerson, setIdPerson] = useState(userData.id);
-    const [firstName, setFirstName] = useState(userData.name);
-    const [lastName, setLastName] = useState(userData.surname);
-    const [cargoPerson, setCargoPerson] = useState(userData.role);
-    const [emailPerson, setEmail] = useState(userData.email);
-    const [phonePerson, setPhonePerson] = useState(userData.phone);
+    const [idPerson, setIdPerson] = useState(userData.id ? userData.id : '');
+    const [firstName, setFirstName] = useState(userData.name ? userData.name : '');
+    const [lastName, setLastName] = useState(userData.surname ? userData.surname : '');
+    const [cargoPerson, setCargoPerson] = useState(userData.role ? userData.role : '');
+    const [emailPerson, setEmail] = useState(userData.email ? userData.email : '');
+    const [phonePerson, setPhonePerson] = useState(userData.phone ? userData.phone : '');
 
 
     const [profilePopUp, setProfilePopUp] = useState(false);
