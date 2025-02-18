@@ -2,24 +2,19 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ element: Component, allowedRoles }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const { token, role } = useAuth();
 
-  if (!token) {
-    // Si no hay token, redirigir a la página de inicio de sesión
-
-    return <Navigate to="/" />;
+  if (!token || token === "null" || token === "undefined" || token.trim() === "") {
+    console.log("Redirigiendo al login");
+    return <Navigate to="/" replace />;
+  }  
+  if (!role || !allowedRoles?.includes(role)) {
+    return <Navigate to="/" replace />;
   }
+  
 
-  if (!allowedRoles.includes(role)) {
-    // Si el rol del usuario no está permitido, redirigir a una página de no autorizado
-
-    return <Navigate to="/" />;
-  }
-
-
-  // Si hay token y el rol está permitido, renderizar el componente
-  return <Component />;
+  return children;
 };
 
 export default ProtectedRoute;

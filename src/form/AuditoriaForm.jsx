@@ -9,7 +9,7 @@ import Input from '../components/common/Input';
 const AuditoriaForm = ({ show, onClose, fetchData, selectedYear}) => {
   const {selectedEmpresa, token} = useAuth();
   const [name, setName] = useState('');
-
+  const [allControls, setAllControls] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,6 +23,7 @@ const AuditoriaForm = ({ show, onClose, fetchData, selectedYear}) => {
       name: name,
       belongs_to: selectedEmpresa,
       year: selectedYear,
+      all_controls : allControls,
     };
 
     try {
@@ -81,6 +82,34 @@ const AuditoriaForm = ({ show, onClose, fetchData, selectedYear}) => {
               required
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
+          <div className='flex items-start'>
+            <div className="flex items-center h-5">
+              <input
+                id="helper-checkbox"
+                type="checkbox"
+                checked={allControls}
+                onChange={() => setAllControls(!allControls)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+            </div> 
+            <div className="ml-2 text-sm">
+              <label
+                htmlFor="helper-checkbox"
+                className="font-medium text-gray-900 "
+              >
+                Añadir todos los controles
+              </label>
+              <br />
+              <p
+                id="helper-checkbox-text"
+                className="text-xs font-normal text-gray-500"
+              >
+                Al seleccionar esta opción, esta Auditoría/Seguimiento quedará vinculada a todos los controles del año en curso. Solo se incluirán los controles que tengan un responsable asignado.
+                Si se elimina un control desde la sección 'Controles', también se eliminará de la Auditoría/Seguimiento. Del mismo modo, si se crean nuevos controles y se les asigna un responsable, se añadirán automáticamente
+              </p>
+            </div> 
+          </div>
+          
 
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}

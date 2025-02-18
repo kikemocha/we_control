@@ -152,6 +152,10 @@ const Auditorias = () => {
         fetchAllData();
     }, [selectedAuditoria, selectedYear]); 
     
+    const totalControls = AuditoriaData?.length || 0;
+    const goodCount = AuditoriaData?.filter(control => control[6] === "Verificado").length || 0;
+    const percentage = totalControls ? Math.floor((goodCount / totalControls) * 100) : 0;
+
 
     
     if (loading) {
@@ -231,7 +235,18 @@ const Auditorias = () => {
                     />
                     </svg>
                 </div>
-                <h3>{selectedAuditoriaName}</h3>
+                <div className='w-1/3 flex gap-4'>
+                    <h3 className='my-auto'>{selectedAuditoriaName} </h3>
+                    <div className="mt-2 w-full text-center">
+                        <span>{percentage}%</span>
+                        <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                            <div
+                            className="bg-primary h-3 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
                     {AuditoriaData && !loading ? (
                         <div>
                             {popupFormType === 'control' && (
@@ -268,6 +283,7 @@ const Auditorias = () => {
                                                 <thead className='no_main'>
                                                     <tr className="table-row">
                                                     <th>Número de Control</th>
+                                                    <th>Periodicidad</th>
                                                     <th>Nombre</th>
                                                     <th>Responsable</th>
                                                     <th>Fecha límite</th>
@@ -292,6 +308,7 @@ const Auditorias = () => {
                                                             )
                                                             }
                                                         </td>
+                                                        <td>{control[11]}</td>
                                                         <td>{control[1]}</td>
                                                         <td>{control[2]}</td>
                                                         <td>{control[3]}</td>
@@ -456,7 +473,21 @@ const Auditorias = () => {
                             {data.map((auditoria, index) => (
                                 <tr key={index} className="table-row">
                                     <td>{auditoria.name}</td>
-                                    <td>{Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%</td>
+                                    <td>
+                                        <div className="flex flex-col gap-0">
+                                            <span>
+                                            {Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%
+                                            </span>
+                                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                            <div
+                                                className="bg-primary h-3 rounded-full"
+                                                style={{
+                                                width: `${Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%`
+                                                }}
+                                            ></div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>{auditoria.createDate}</td>
                                     <td>
                                         <svg

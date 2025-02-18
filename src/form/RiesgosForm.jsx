@@ -1,5 +1,5 @@
 // RiesgosForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Popup.css'; // Asegúrate de tener los estilos
 import { useAuth } from '../context/AuthContext';
 
@@ -17,6 +17,17 @@ const RiesgosForm = ({ show, onClose, fetchData, messagePopUp, actualRiesgos, se
   const [successMessage, setSuccessMessage] = useState('');
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+      if (show) {
+        if (actualRiesgos.length > 0) {
+          const maxNumber = Math.max(...actualRiesgos.map(riesgo => parseInt(riesgo[1].replace('R', ''), 10) || 0));
+          setNumberName((maxNumber + 1).toString());
+        } else {
+          setNumberName('1');
+        }
+      }
+    }, [show, actualRiesgos]);
 
   const handleClose = () =>{
     setNumberName('');
