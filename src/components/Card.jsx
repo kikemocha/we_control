@@ -54,7 +54,8 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                     data_clean = response.data.activo.map(item => [item[1], item[3], item[4].split(',').length, item[5] === 'None' ? (item[3]) : item[5]])
                 }
                 else if (name === 'Seguimientos y Auditorías'){
-                    data_clean = response.data.map(item => [item[1], Math.floor(parseInt(item[2],10)/parseInt(item[1],10))+'%' ])
+                    console.log('DATA: ',response.data)
+                    data_clean = response.data.map(item => [item[1], Math.floor((parseInt(item[3], 10) / parseInt(item[2], 10)) * 100) + '%']);
                 }
                 else if (name === 'Responsables'){
                     data_clean = response.data.map(item => [item.name, item.surname,item.role,item.email])
