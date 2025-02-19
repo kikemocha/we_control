@@ -1,39 +1,17 @@
-3 Usuarios:
+git checkout master           # Asegurar que estamos en master
+git pull origin master        # Traer la versión más reciente de master
+git checkout -b estilos       # Crear y cambiar a la nueva rama
 
-1 despacho de abogados --> 1 admin
-Puede crear muchos gestores
-
-- admin:
-    - Crea Riesgos
-    - Crea Usuarios (Gestores y Responsables)
-    - Crea Controles
-    - Crea Auditorías
-
-- gestor:
-    - Crea Auditorías
-    - Asigna cada control a su responsable
-
-- responsable
-    - Tiene un control asignado y sube las evidencias
-
-Ejemplo:
-El jefe de una empresa quiere controlar los riesgos de su empresa, por lo que escoge a un par
-de gestores que se van a encargar de analizar los riesgos, estos gestores asignan cada control a un responsable.
-El admin crea los usuarios, las cuentas de los responsable y de los gestores
-
-Posteriormente los responsables
-En su feed aparecen sus auditorías con sus riesgos asociados  y podrán subir sus archivos
+git push -u origin estilos    # Subir la rama y establecer el tracking remoto
 
 
-Proceso:
-Crear un grupo de seguridad con inbound y outbound libre, es decir 0.0.0.0/0
-Crear RDS y añadirle este grupo de seguridad
-Creas una nueva VPC y creas dentro 2 subredes:
-Red --> 192.168.0.0/24
-subredes 
-    --> publica 192.168.0.0/25
-    --> privada 192.168.0.128/25
-Creamos una internet gateway que va ligada a una VPC, y se la asignamos a la route table
-de la subred pública
-añades una nueva ip table
-destino 0.0.0.0/0 target Gateway y le pones la IGW del iternet gateway
+# Realizar cambios en los archivos...
+
+git add .                     # Añadir todos los cambios al área de staging
+git commit -m "Descripción del cambio"  # Hacer commit con mensaje
+git push origin estilos        # Subir los cambios a la rama remota
+
+
+git checkout master            # Volver a la rama principal
+git branch -d estilos          # Borrar la rama local (si está fusionada)
+git push origin --delete estilos  # Borrar la rama en el repositorio remoto

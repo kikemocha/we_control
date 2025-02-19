@@ -239,7 +239,7 @@ const Auditorias = () => {
                     <h3 className='my-auto'>{selectedAuditoriaName} </h3>
                     <div className="mt-2 w-full text-center">
                         <span>{percentage}%</span>
-                        <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                        <div className="w-full bg-gray-200 rounded-full h-3  mt-1">
                             <div
                             className="bg-primary h-3 rounded-full"
                             style={{ width: `${percentage}%` }}
