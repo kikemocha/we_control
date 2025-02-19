@@ -45,7 +45,6 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, userData, s
         sessionToken: awsCredentials.SessionToken,
       }
     });
-
     const bucketName = 'empresa-' + userData[1]; // Tu bucket
     const maxLength = 255; // Máximo total de caracteres permitidos para el 'fileKey'
     const fileName = selectedFile.name;

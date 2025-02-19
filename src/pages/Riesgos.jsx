@@ -141,13 +141,21 @@ const Riesgos = () => {
             await fetchYear(); // Obtener los años disponibles
     
             if (selectedYear) {
-                await fetchAuditorias(); // Obtener las auditorías para el año seleccionado
+                fetchAuditorias(); // Obtener las auditorías para el año seleccionado
                 fetchData();
+                
             }
         };
     
         fetchAllData();
     }, [selectedYear]);
+
+    useEffect(() => {
+        if (selectedYear && selectedAuditoria) {
+          fetchData();
+        }
+      }, [selectedYear, selectedAuditoria]);
+      
     
 
 

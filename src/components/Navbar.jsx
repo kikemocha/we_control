@@ -7,7 +7,7 @@ import Button from './common/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { type } from '@testing-library/user-event/dist/type';
-
+import PhotoPopup from './CroppingImg';
 
 const Navbar = () => {
     const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, searchQuery, setSearchQuery} = useAuth();
@@ -36,6 +36,10 @@ const Navbar = () => {
     const [reNewPassword, setReNewPassword] = useState('');
     const [showActualPassword, setShowActualPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+
+    const [isHovered, setIsHovered] = useState(false);
+    const [showPhotoPopUp, setShowPhotoPopUp] = useState(false);
+
 
     useEffect(() => {
         let newCategory = 'Todas las Categorías';
@@ -135,6 +139,42 @@ const Navbar = () => {
           onClosePasswd();
         }
     }
+    const updateProfileImage = async (newImg) => {
+        setLoading(true);
+        const requestBody = {
+          firstName,
+          lastName,
+          cargoPerson,
+          id_person: idPerson,
+          phone: phonePerson,
+          profileImg: newImg, // Se asume que el backend espera "profileImg"
+        };
+    
+        try {
+          const response = await fetch(
+            "https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/updateUser",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(requestBody),
+            }
+          );
+    
+          if (response.ok) {
+            messagePopUp("Perfil actualizado correctamente", "success");
+          } else {
+            messagePopUp("Error actualizando el perfil", "error");
+          }
+        } catch (error) {
+          console.error(error);
+          messagePopUp("Error actualizando el perfil", "error");
+        } finally {
+          setLoading(false);
+        }
+      };
 
     const changePassword = async () => {
         setLoading(true);
@@ -207,10 +247,9 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            {console.log('categorySelected: ',categorySelected)}
             {profilePopUp && (
                 <div 
-                className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+                className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-40"
                 onClick={() => onClose()}  // Cierra el popup al hacer clic fuera
               >
                 <div 
@@ -230,10 +269,29 @@ const Navbar = () => {
                                 { userData.img && userData.img !== 'null'? (
                                     <div> {userData.img} </div>
                                 ): (
-                                    <div className="relative inline-flex items-center justify-center w-36 h-36 overflow-hidden rounded-full bg-gray-600">
-                                        <span className="text-4xl font-medium text-white">
-                                            {userData.name && userData.surname ? userData.name[0].toUpperCase() + userData.surname[0].toUpperCase() : ''}
-                                        </span>
+                                    <div 
+                                        className="relative inline-flex items-center justify-center w-36 h-36 overflow-hidden rounded-full bg-gray-600"
+                                        onMouseEnter={() => setIsHovered(true)}
+                                        onMouseLeave={() => setIsHovered(false)}
+                                    >
+                                        {isHovered ? (
+                                            <div 
+                                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 cursor-pointer"
+                                                onClick={() => {setShowPhotoPopUp(true)}}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-white">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
+                                                </svg>
+                                            </div>
+                                        ) : (
+                                            <span className="text-4xl font-medium text-white">
+                                            {userData.name && userData.surname
+                                                ? userData.name[0].toUpperCase() + userData.surname[0].toUpperCase()
+                                                : ""}
+                                            </span>
+                                        )}
+
                                     </div>
                                 )}
                                 <p className='text-gray-500 mt-2 text-sm'>
@@ -476,7 +534,17 @@ const Navbar = () => {
                 
                 <div>{userData.name}</div>
             </div>
+            <PhotoPopup
+                show={showPhotoPopUp}
+                setShow={setShowPhotoPopUp}
+                img={userData.img}
+                setImg={(newImg) => {
+                    userData.img = newImg;
+                    updateProfileImage(newImg);
+                  }}
+            />
         </div>
+        
     );
 };
 
