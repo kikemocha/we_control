@@ -14,6 +14,8 @@ const Auditorias = () => {
     const [error, setError] = useState(null);
     const [selectedAuditoria, setSelectedAuditoria] = useState(null);
     const [selectedAuditoriaName, setSelectedAuditoriaName] = useState(null);
+    const [selectedAuditoriaState, setSelectedAuditoriaState] = useState(0);
+
     const [AuditoriaData, setAuditoriaData] = useState(null);
 
     const [selectedYear, setSelectedYear] = useState(null);
@@ -58,13 +60,15 @@ const Auditorias = () => {
     };
 
 
-    const handleAuditoria = (id_auditoria, name) => {
+    const handleAuditoria = (id_auditoria, name, all_controls) => {
         setSelectedAuditoria(id_auditoria);
         setSelectedAuditoriaName(name);
+        setSelectedAuditoriaState(all_controls);
     };
     const handleReset = () => {
         setSelectedAuditoria(null);
         setSelectedAuditoriaName(null);
+        setSelectedAuditoriaState(false);
         setAuditoriaData([]);
       }
 
@@ -126,7 +130,8 @@ const Auditorias = () => {
                 name: auditoria[1], 
                 totalControles: auditoria[2], 
                 controlesVerificados: auditoria[3], 
-                createDate: auditoria[4]
+                createDate: auditoria[4],
+                all_controls : parseInt(auditoria[5]),
             }));
     
             setData(formattedData);
@@ -250,7 +255,7 @@ const Auditorias = () => {
                     {AuditoriaData && !loading ? (
                         <div>
                             {popupFormType === 'control' && (
-                                <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} selectedAuditoria={selectedAuditoria}/>
+                                <AuditoriaControlesForm show={showPopup} onClose={handleClosePopup} fetchData={fetchAuditoriaData} selectedAuditoria={selectedAuditoria} id_year={selectedYear}/>
                             )}
                             {popupFormType === 'auditoria' && (
                                 <AuditoriaForm show={showPopup} onClose={handleClosePopup} fetchData={fetchData} selectedYear={selectedYear}/>
@@ -260,20 +265,23 @@ const Auditorias = () => {
                                     <div className='text'>Total de controles:</div>
                                     <div className='number'>{AuditoriaData.length}</div>
                                 </div>
-                                <div onClick={() => handleOpenPopup('control')}>
-                                    <svg
-                                        viewBox="0 0 1024 1024"
-                                        fill="currentColor"
-                                        height="2em"
-                                        width="2em"
-                                        >
-                                        <defs>
-                                            <style />
-                                        </defs>
-                                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
-                                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
-                                    </svg>
-                                </div>
+                                {selectedAuditoriaState === 0  &&(
+                                    <div onClick={() => handleOpenPopup('control')}>
+                                        <svg
+                                            viewBox="0 0 1024 1024"
+                                            fill="currentColor"
+                                            height="2em"
+                                            width="2em"
+                                            >
+                                            <defs>
+                                                <style />
+                                            </defs>
+                                            <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
+                                            <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
+                                        </svg>
+                                    </div>
+                                )}
+                                
                             </div>
                             <div className='responsable_home'>
                                 <div className='responsable_main'>
@@ -491,7 +499,7 @@ const Auditorias = () => {
                                     <td>{auditoria.createDate}</td>
                                     <td>
                                         <svg
-                                            onClick={() => handleAuditoria(auditoria.id, auditoria.name)}
+                                            onClick={() => handleAuditoria(auditoria.id, auditoria.name, auditoria.all_controls)}
                                             viewBox="0 0 1024 1024"
                                             fill="currentColor"
                                             height="2em"
