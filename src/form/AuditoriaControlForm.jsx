@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css'; // Importa los estilos de D
 
 import Button from '../components/common/Button';
 
-const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria }) => {
+const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria, id_year }) => {
   const { selectedEmpresa, token } = useAuth();
   const [periocity, setPeriocity] = useState('Anual');
 
@@ -66,7 +66,7 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
   const fetchControles = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa=${selectedEmpresa}`, {
+      const response = await axios.get(`https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa=${selectedEmpresa}&id_year=${id_year}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -75,6 +75,9 @@ const AuditoriaControlesForm = ({ show, onClose, fetchData, selectedAuditoria })
       setLoading(false);
     } catch (error) {
       console.error('Error fetching controles:', error);
+    }
+    finally{
+      setLoading(false);
     }
   };
 
