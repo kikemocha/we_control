@@ -180,7 +180,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                                 </>
                                             ) : (
                                                 <>
-                                                <p onClick={() => handleShowIMGPopup(riesgo)}>{riesgo[7].split('/').slice(1).join('')}</p>
+                                                <p onClick={() => handleShowIMGPopup(riesgo)}>{riesgo[7].split('/').slice(3).join('')}</p>
                                                 <ShowFile
                                                     show={showIMGPopup}
                                                     onClose={() => setshowIMGPopup(false)}
