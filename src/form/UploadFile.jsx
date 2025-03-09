@@ -5,9 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 
-const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, userData, selectedAuditoria, fetchData}) => {
-  const { awsCredentials, token} = useAuth();
-
+const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAuditoria, fetchData}) => {
+  const { awsCredentials, token, userData} = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
@@ -45,21 +44,32 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, userData, s
         sessionToken: awsCredentials.SessionToken,
       }
     });
-    const bucketName = 'empresa-' + userData[1]; // Tu bucket
-    const maxLength = 255; // Máximo total de caracteres permitidos para el 'fileKey'
-    const fileName = selectedFile.name;
-    const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1); // Obtener la extensión del archivo
-    const baseFileName = fileName.substring(0, fileName.lastIndexOf('.')); // Obtener el nombre sin la extensión
-    const userPrefix = userData[0].split('@')[0];  // Prefijo del usuario
-    const uuid = uuidv4();  // Generar un UUID único
     
-    const totalFixedLength = `${userPrefix}/${uuid}_`.length + fileExtension.length + 1;  // +1 para el punto antes de la extensión
+    const maxLength = 255; // Máximo total de caracteres permitidos
+    const despachoId = userData.despacho_id;
+    const empresaId = userData.belongs_to;
+    const userId = userData.id;
+
+    const pathPrefix = `${despachoId}/${empresaId}/${userId}`;
+    const fileName = selectedFile.name; 
+    const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+    const baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
+    const uuid = uuidv4();
+
+
+    const totalFixedLength = 
+      pathPrefix.length + 1 +
+      uuid.length + 1 +
+      fileExtension.length + 1;
+
     const availableLengthForFileName = maxLength - totalFixedLength;
-    const truncatedFileName = baseFileName.substring(0, availableLengthForFileName); // Truncar el nombre sin la extensión
-    const fileKey = `${userPrefix}/${uuid}_${truncatedFileName}`;
-    
+    const truncatedFileName = baseFileName.substring(0, availableLengthForFileName);
+
+    const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
+    console.log('fileKey: ',fileKey);
+
     const params = {
-      Bucket: bucketName,
+      Bucket: 'wecontrolbucket',
       Key: fileKey, // Ruta del archivo en S3
       Body: selectedFile,
       ContentType: selectedFile.type

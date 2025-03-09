@@ -6,7 +6,6 @@ import Input from './common/Input';
 import Button from './common/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
-import { type } from '@testing-library/user-event/dist/type';
 import PhotoPopup from './CroppingImg';
 
 const Navbar = () => {
@@ -42,6 +41,7 @@ const Navbar = () => {
 
 
     useEffect(() => {
+        console.log('TOKEN: ',token);
         let newCategory = 'Todas las Categorías';
     
         if (location.pathname.includes('riesgos')) {

@@ -40,7 +40,7 @@ const Auditorias = () => {
     // Función para abrir el popup y almacenar el archivo y bucket seleccionados
     const handleShowFile = (fileKey, bucket, id_auditoria, id_control, state, order, control_name) => {
         setSelectedFile(fileKey);
-        setSelectedBucket(bucket);
+        setSelectedBucket('wecontrolbucket');
         setSelectedAuditoriaIMG(id_auditoria);
         setSelectedControlIMG(id_control);
         setSelectedStateIMG(state);
