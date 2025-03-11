@@ -41,7 +41,6 @@ const Navbar = () => {
 
 
     useEffect(() => {
-        console.log('TOKEN: ',token);
         let newCategory = 'Todas las Categorías';
     
         if (location.pathname.includes('riesgos')) {

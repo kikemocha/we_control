@@ -33,11 +33,11 @@ const Auditorias = () => {
     const [selectedControlIMG, setSelectedControlIMG] = useState(null);
     const [selectedStateIMG, setSelectedStateIMG] = useState(null);
     const [selectedControlName, setSelectedControlName] = useState(null);
-    
+    const [messageAdmin, setMessageAdmin] = useState(null);
     
 
     // Función para abrir el popup y almacenar el archivo y bucket seleccionados
-    const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name) => {
+    const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name, message_admin) => {
         console.log(archivos);
         setSelectedFiles(archivos);
         setSelectedAuditoriaIMG(id_auditoria);
@@ -46,6 +46,7 @@ const Auditorias = () => {
         setSelectedControlName(control_name);
         setSelecteControlOrder(order);
         setshowIMGPopup(true);
+        setMessageAdmin(message_admin);
     };
 
 
@@ -333,13 +334,14 @@ const Auditorias = () => {
                                                                     {archivos.length === 0 ? (
                                                                     <p>---</p>
                                                                     ) : (
+                                                            
                                                                     <p
                                                                         onClick={() => {
-                                                                        handleShowFile(archivos, control[8], control[9], control[6], control[12], control[0]);
+                                                                        handleShowFile(archivos, control[8], control[9], control[6], control[11], control[0], control[12]);
                                                                         }}
                                                                         style={{ cursor: 'pointer' }}
                                                                     >
-                                                                        {/* Muestra la cantidad de archivos */}
+                                                                        {console.log('FILE: ',control)}
                                                                         <p className='text-center mx-auto '>{archivos.length === 1 ? '1 Archivo Subido' : archivos.length+' Archivos Subidos'}</p>
                                                                     </p>
                                                                     )}
@@ -365,6 +367,7 @@ const Auditorias = () => {
                                                             state={selectedStateIMG}
                                                             fetchData={fetchAuditoriaData}
                                                             control_name={selectedControlName}
+                                                            message_admin={messageAdmin}
                                                             />
                                                         </div>
                                                     )}

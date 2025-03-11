@@ -194,6 +194,7 @@ const ShowFile = ({
         message,
         control_name
       };
+      console.log('requestBody: ',requestBody);
       const response = await fetch(
         'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoriaState',
         {
@@ -231,7 +232,6 @@ const ShowFile = ({
     // eslint-disable-next-line
   }, [archives]);
 
-  const [selectedFile, setSelectedFile] = useState(null);
   const hiddenFileInput = useRef(null);
 
   // 2. Función para abrir el input de archivo
@@ -325,18 +325,18 @@ const ShowFile = ({
   // 2. Hay múltiples archivos => lista
   if (archives.length > 1) {
     return (
-      <div className="popup-overlay">
+      <div className="popup-overlay !justify-around ">
         <div className="popup_img">
-        {loading && (
-          <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
-            <div role="status">
-              <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                  <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-              </svg>
+          {loading && (
+            <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+              <div role="status">
+                <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                </svg>
+              </div>
             </div>
-          </div>
-        )}
+          )}
           <button className="popup-close" onClick={handleClose}>
               <svg fill="none" viewBox="0 0 15 15" height="2em" width="2em">
                 <path
@@ -349,7 +349,7 @@ const ShowFile = ({
           </button>
           <h3 className="font-bold mb-6 my-7 text-center">{control_name}</h3>
 
-          <div className='h-[85%] overflow-scroll'>
+          <div className='h-[80%] overflow-scroll'>
             <ul>
               {archives.map((archiveKey, index) => (
                 <li index={index} className='bg-gray-300 w-[90%] mx-auto h-40 my-4 rounded-xl'>
@@ -368,23 +368,23 @@ const ShowFile = ({
               ))}
             </ul>
             {role === 'responsable' && (
-            <div className="flex flex-col justify-center items-center gap-4">
-              <button 
-                className="h-10 w-10 rounded-full bg-gray-400 text-xl font-bold"
-                onClick={handleClickAddFile}
-              >
-                +
-              </button>
-              {/* Input oculto */}
-              <input
-                type="file"
-                ref={hiddenFileInput}
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-                accept="application/pdf"
-              />
-            </div>
-          )}
+              <div className="flex flex-col justify-center items-center gap-4">
+                <button 
+                  className="h-10 w-10 rounded-full bg-gray-400 text-xl font-bold"
+                  onClick={handleClickAddFile}
+                >
+                  +
+                </button>
+                {/* Input oculto */}
+                <input
+                  type="file"
+                  ref={hiddenFileInput}
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  accept="application/pdf"
+                />
+              </div>
+            )}
             
           </div>
 
@@ -392,44 +392,81 @@ const ShowFile = ({
             <div className="popup-buttons flex justify-around">
               {state === 'Verificado' ? (
                 <>
-                  <button className="popup-button" onClick={() => setShowTextPopup(true)}>
+                  <button className="popup-button mt-3" onClick={() => setShowTextPopup(true)}>
                     No Validar
                   </button>
                 </>
               ) : state === 'Denegado' ? (
                 <>
-                  <button className="popup-button" onClick={handleVerify}>
+                  <button className="popup-button mt-3" onClick={handleVerify}>
                     Verificar
                   </button>
                 </>
               ) : (
                 <>
-                  <button className="popup-button" onClick={handleVerify}>
+                  <button className="popup-button mt-3" onClick={handleVerify}>
                     Verificar
                   </button>
-                  <button className="popup-button bg-red-300" onClick={handleshowDescription}>
+                  <button className="popup-button bg-red-300 mt-3" onClick={handleshowDescription}>
                     No validar
                   </button>
                 </>
               )}
             </div>
           )}
-
-          {/* Popup de texto (no validar) */}
-          {showTextPopup && (
-            <div className="comment-box">
+        </div>
+        {message_admin | message_admin!=='None' && (
+          <div className="h-3/4 w-1/4 bg-white rounded-3xl flex flex-col justify-center items-center relative">
+            <p
+              className="w-[80%] h-[80%] bg-gray-200 rounded-xl p-4 mt-4 mb-4 resize-none"
+            >
+              {message_admin}
+            </p>
+            {loading && (
+              <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+                <div role="status">
+                  <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                  </svg>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {showTextPopup && (
+            <div className="h-3/4 w-1/4 bg-white rounded-3xl flex flex-col justify-center items-center relative">
+              <button className="popup-close !translate-x-3 !-translate-y-4" onClick={() => {setShowTextPopup(false)}}>
+                <svg fill="none" viewBox="0 0 15 15" height="2em" width="2em">
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M11.782 4.032a.575.575 0 10-.813-.814L7.5 6.687 4.032 3.218a.575.575 0 00-.814.814L6.687 7.5l-3.469 3.468a.575.575 0 00.814.814L7.5 8.313l3.469 3.469a.575.575 0 00.813-.814L8.313 7.5l3.469-3.468z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
               <textarea
                 rows="4"
-                className="comment-area"
+                className="w-[80%] h-[80%] bg-gray-200 rounded-xl p-4 mt-4 mb-4 resize-none"
                 placeholder="Escribe un comentario..."
                 onChange={(e) => setMessage(e.target.value)}
               ></textarea>
               <button className="popup-button bg-red-300" onClick={handleDeny}>
                 No Validar
               </button>
+              {loading && (
+                <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+                  <div role="status">
+                    <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                    </svg>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-        </div>
       </div>
     );
   }
@@ -437,7 +474,7 @@ const ShowFile = ({
   
 
   return (
-    <div className="popup-overlay">
+    <div className="popup-overlay !justify-around">
       <div className="popup_img">
       {loading && (
           <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
@@ -506,9 +543,9 @@ const ShowFile = ({
             </button>
           </div>
         )}
-        {role === 'admin' && (
+        {role === 'admin' | role === 'gestor' && (
           <div className="popup-buttons flex justify-around">
-            {role === 'admin'  && (
+            {role === 'admin' | role === 'gestor' && (
               <button className="popup-button text-red-600" onClick={() => handleDelete(singleFile)}>
                 Eliminar
               </button>
@@ -537,20 +574,59 @@ const ShowFile = ({
             )}
           </div>
         )}
-        {showTextPopup && (
-          <div className="comment-box">
-            <textarea
-              rows="4"
-              className="comment-area"
-              placeholder="Escribe un comentario..."
-              onChange={(e) => setMessage(e.target.value)}
-            ></textarea>
-            <button className="popup-button bg-red-300" onClick={handleDeny}>
-              No Validar
-            </button>
+      </div>
+      {message_admin && message_admin !== 'None' && (
+          <div className="h-3/4 w-1/4 bg-white rounded-3xl flex flex-col justify-center items-center relative">
+            <p
+              className="w-[80%] h-[80%] bg-gray-200 rounded-xl p-4 mt-4 mb-4 resize-none"
+            >
+              {message_admin}
+            </p>
+            {loading && (
+              <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+                <div role="status">
+                  <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                  </svg>
+                </div>
+              </div>
+            )}
           </div>
         )}
-      </div>
+        {showTextPopup && (
+            <div className="h-3/4 w-1/4 bg-white rounded-3xl flex flex-col justify-center items-center relative">
+              <button className="popup-close !translate-x-3 !-translate-y-4" onClick={() => {setShowTextPopup(false)}}>
+                <svg fill="none" viewBox="0 0 15 15" height="2em" width="2em">
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M11.782 4.032a.575.575 0 10-.813-.814L7.5 6.687 4.032 3.218a.575.575 0 00-.814.814L6.687 7.5l-3.469 3.468a.575.575 0 00.814.814L7.5 8.313l3.469 3.469a.575.575 0 00.813-.814L8.313 7.5l3.469-3.468z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              <textarea
+                rows="4"
+                className="w-[80%] h-[80%] bg-gray-200 rounded-xl p-4 mt-4 mb-4 resize-none"
+                placeholder="Escribe un comentario..."
+                onChange={(e) => setMessage(e.target.value)}
+              ></textarea>
+              <button className="popup-button bg-red-300" onClick={handleDeny}>
+                No Validar
+              </button>
+              {loading && (
+                <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
+                  <div role="status">
+                    <svg aria-hidden="true" className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
     </div>
   );
 };

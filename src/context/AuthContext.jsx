@@ -105,19 +105,31 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     try {
-      const credentialsResponse = await axios.get('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials', {
-        headers: {
-          Authorization: `Bearer ${tokenAWS}`,
-        },
-        timeout: 3000, // 3 segundos de timeout
-      });
+      const credentialsResponse = await axios.get(
+        'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getCredentials',
+        {
+          headers: {
+            Authorization: `Bearer ${tokenAWS}`,
+          },
+          timeout: 3000,
+        }
+      );
       const credentials = credentialsResponse.data;
       setAwsCredentials(credentials);
-      console.log('Credenciales concedidas');
+      // Save credentials in sessionStorage as a JSON string
+      sessionStorage.setItem('awsCredentials', JSON.stringify(credentials));
+      console.log('AWS credentials stored in sessionStorage');
+  
+      // Schedule a refresh (e.g., refresh 5 minutes before 1 hour expires)
+      const refreshInterval = (3600 - 300) * 1000; // 55 minutes in milliseconds
+      setTimeout(() => {
+        fetchAwsCredentials(tokenAWS);
+      }, refreshInterval);
     } catch (error) {
       console.error('Error fetching AWS credentials:', error.message || error.response);
     }
   };
+  
 
   const fetchUserData = async (id_cognito, token) => {
     try {
