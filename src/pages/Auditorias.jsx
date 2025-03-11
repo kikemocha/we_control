@@ -27,8 +27,7 @@ const Auditorias = () => {
 
 
     const [showIMGPopup, setshowIMGPopup] = useState(false);
-    const [selectedFile, setSelectedFile] = useState(null); // Estado para almacenar la imgkey seleccionada
-    const [selectedBucket, setSelectedBucket] = useState(null); // Estado para almacenar el bucketName seleccionado
+    const [selectedFiles, setSelectedFiles] = useState(null); // Estado para almacenar la imgkey seleccionada
     const [selectedAuditoriaIMG, setSelectedAuditoriaIMG] = useState(null);
     const [selectedControlOrder, setSelecteControlOrder] = useState(null);
     const [selectedControlIMG, setSelectedControlIMG] = useState(null);
@@ -38,15 +37,15 @@ const Auditorias = () => {
     
 
     // Función para abrir el popup y almacenar el archivo y bucket seleccionados
-    const handleShowFile = (fileKey, bucket, id_auditoria, id_control, state, order, control_name) => {
-        setSelectedFile(fileKey);
-        setSelectedBucket('wecontrolbucket');
+    const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name) => {
+        console.log(archivos);
+        setSelectedFiles(archivos);
         setSelectedAuditoriaIMG(id_auditoria);
         setSelectedControlIMG(id_control);
         setSelectedStateIMG(state);
         setSelectedControlName(control_name);
         setSelecteControlOrder(order);
-        setshowIMGPopup(true); // Abrir el popup
+        setshowIMGPopup(true);
     };
 
 
@@ -304,15 +303,16 @@ const Auditorias = () => {
                                                     {AuditoriaData.map((control, index) => (
                                                     <tr key={index} className="table-row">
                                                         <td>
+                                                            {console.log(control)}
                                                             {
-                                                            control[11] === 'Anual' ? (
+                                                            control[10] === 'Anual' ? (
                                                                 control[0]
-                                                            ) : control[11] === 'Semestral' ? (
-                                                                `${control[0]} - S${control[10]}`
-                                                            ): control[11] === 'Cuatrimestral' ? (
-                                                                `${control[0]} - ${control[10]}_Cuatr`
-                                                            ): control[11] === 'Trimestral' && (
-                                                                `${control[0]} - T${control[10]}`
+                                                            ) : control[10] === 'Semestral' ? (
+                                                                `${control[0]} - S${control[11]}`
+                                                            ): control[10] === 'Cuatrimestral' ? (
+                                                                `${control[0]} - ${control[11]}_Cuatr`
+                                                            ): control[10] === 'Trimestral' && (
+                                                                `${control[0]} - T${control[11]}`
                                                             )
                                                             }
                                                         </td>
@@ -322,21 +322,30 @@ const Auditorias = () => {
                                                         <td>{control[3]}</td>
                                                         <td>{control[4] == 'None' ? '---' : control[4]}</td>
                                                         <td className="archive_responsable">
-                                                        <div className={control[5] === 'None' ? '' : 'archive'}>
-                                                            {control[5] === 'None' ? (
-                                                                <p>None</p>
-                                                            ) : (
-                                                                <p
-                                                                onClick={control[5] !== 'None' ? () => handleShowFile(control[5], `empresa-${control[7]}`,control[8],control[9],control[6], control[12], control[0]) : null}
-                                                                style={{ cursor: control[5] !== 'None' ? 'pointer' : 'default' }} // Cambiar el cursor para indicar si es clicable
-                                                                >
-                                                                    {control[5].split('/').slice(1).join('')}
-                                                                </p>
-                                                                
+                                                            {(() => {
+                                                                const archivosStr = control[5];
+                                                                const archivos = archivosStr && archivosStr !== 'None'
+                                                                ? archivosStr.split(',')
+                                                                : [];
 
-                                                            )}
-                                                            
-                                                        </div>
+                                                                return (
+                                                                <div className={archivos.length === 0 ? '' : 'archive'}>
+                                                                    {archivos.length === 0 ? (
+                                                                    <p>---</p>
+                                                                    ) : (
+                                                                    <p
+                                                                        onClick={() => {
+                                                                        handleShowFile(archivos, control[8], control[9], control[6], control[12], control[0]);
+                                                                        }}
+                                                                        style={{ cursor: 'pointer' }}
+                                                                    >
+                                                                        {/* Muestra la cantidad de archivos */}
+                                                                        <p className='text-center mx-auto '>{archivos.length === 1 ? '1 Archivo Subido' : archivos.length+' Archivos Subidos'}</p>
+                                                                    </p>
+                                                                    )}
+                                                                </div>
+                                                                );
+                                                            })()}
                                                         </td>
                                                         <td className={control[6] === 'Denegado' ? 'text-red-500' : control[6] === 'Verificado' ? 'text-green-600' : ''}>{control[6] === 'Denegado' ? 'No Validado' : control[6]}</td>
                                                     </tr>
@@ -349,8 +358,7 @@ const Auditorias = () => {
                                                             <ShowFile
                                                             show={showIMGPopup}
                                                             onClose={() => setshowIMGPopup(false)} // Cerrar el popup
-                                                            imgkey={selectedFile} // Pasar la imgkey almacenada en el estado
-                                                            bucketName={selectedBucket} // Pasar el bucketName almacenado en el estado
+                                                            archives={selectedFiles}
                                                             id_auditoria={selectedAuditoriaIMG}
                                                             id_control={selectedControlIMG}
                                                             order={selectedControlOrder}

@@ -29,6 +29,15 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAud
     event.target.value = null;
 };
 
+const sanitizeFileName = (name) => {
+  return name
+    .normalize('NFD')                      // Normaliza caracteres especiales
+    .replace(/[^\w.-]/g, '_')              // Reemplaza caracteres no permitidos por guión bajo
+    .replace(/_{2,}/g, '_')                 // Evita guiones bajos consecutivos
+    .replace(/^_|_$/g, '');                 // Remueve guiones bajos al inicio y final
+};
+
+
   const handleUpload = async () => {
     setLoading(true);
     if (!selectedFile) {
@@ -56,6 +65,8 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAud
     const baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
     const uuid = uuidv4();
 
+    const cleanFileName = sanitizeFileName(baseFileName);
+
 
     const totalFixedLength = 
       pathPrefix.length + 1 +
@@ -63,7 +74,7 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAud
       fileExtension.length + 1;
 
     const availableLengthForFileName = maxLength - totalFixedLength;
-    const truncatedFileName = baseFileName.substring(0, availableLengthForFileName);
+    const truncatedFileName = cleanFileName.substring(0, availableLengthForFileName);
 
     const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
     console.log('fileKey: ',fileKey);

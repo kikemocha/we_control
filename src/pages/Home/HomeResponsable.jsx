@@ -40,17 +40,15 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
         getAwsCredentials();
       }, [awsCredentials, fetchAwsCredentials, token]);
 
-    const [imgkey, setImgKey] = useState(null);
-    const [bucketName, setBucketName] = useState(null);
+    const [imgkeys, setImgKeys] = useState(null);
     const [controlName, setControlName] = useState(null);
     const [messageAdmin, setMessageAdmin] = useState(null);
     const [id_control, setIdControl] = useState(null);
     const [id_auditoria, setIdAuditoria] = useState(null);
     const [orderControl, setOrderControl] = useState(null);
 
-    const handleShowIMGPopup = (riesgo) =>{
-        setImgKey(riesgo[7])
-        setBucketName(`empresa-${riesgo[10]}`)
+    const handleShowIMGPopup = (riesgo, archivos) =>{
+        setImgKeys(archivos)
         setControlName(riesgo[1])
         setMessageAdmin(riesgo[11])
         setIdControl(riesgo[0])
@@ -157,11 +155,20 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                         <td>{riesgo[4]}</td>
                                         <td>{riesgo[5]}</td>
                                         <td>{riesgo[6] === 'None' ? '---' : riesgo[6]}</td>
-                                        <td className='archive_responsable'>
-                                            <div className={riesgo[7] === 'None' ? '' : 'archive mx-auto'}>
-                                            {riesgo[7] === 'None' ? (
-                                                <>
-                                                <button className='archive_button' onClick={() => {
+                                        <td className="archive_responsable">
+                                        {(() => {
+                                            const archivosStr = riesgo[7];
+                                            const archivos = archivosStr && archivosStr !== 'None'
+                                            ? archivosStr.split(',')
+                                            : [];
+
+ 
+                                            if (archivos.length === 0) {
+                                            return (
+                                                <div>
+                                                <button
+                                                    className="archive_button"
+                                                    onClick={() => {
                                                     setShowUploadPopup(true);
                                                     setSelectedControl(riesgo);
                                                     }}
@@ -177,26 +184,24 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                                     userData={UserAuditoriaData}
                                                     fetchData={getUserData}
                                                 />
-                                                </>
-                                            ) : (
-                                                <>
-                                                <p onClick={() => handleShowIMGPopup(riesgo)}>{riesgo[7].split('/').slice(3).join('')}</p>
-                                                <ShowFile
-                                                    show={showIMGPopup}
-                                                    onClose={() => setshowIMGPopup(false)}
-                                                    imgkey={imgkey}
-                                                    bucketName={bucketName}
-                                                    control_name={controlName}
-                                                    message_admin={messageAdmin}
-                                                    fetchData={getUserData}
-                                                    id_control={id_control}
-                                                    id_auditoria={id_auditoria}
-                                                    order={orderControl}
-                                                />
-                                                </>
-                                            )}
+                                                </div>
+                                            );
+                                            }
+                                            return (
+                                            <div className="archive mx-auto">
+                                                <p
+                                                onClick={() => handleShowIMGPopup(riesgo, archivos)}
+                                                style={{ cursor: 'pointer' }}
+                                                >
+                                                {archivos.length === 1
+                                                    ? '1 Archivo Subido'
+                                                    : `${archivos.length} Archivos Subidos`}
+                                                </p>
                                             </div>
+                                            );
+                                        })()}
                                         </td>
+
                                         <td className={riesgo[8] === 'Denegado' ? 'text-red-500' : ''}>
                                             {riesgo[8] === 'Denegado' ? 'No Validado' : riesgo[8]}
                                         </td>
@@ -253,6 +258,19 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                         </div>
                     </div>
                 </div>
+            )}
+            {showIMGPopup && (
+                <ShowFile
+                    show={showIMGPopup}
+                    onClose={() => setshowIMGPopup(false)}
+                    archives={imgkeys}            // <--- PASAMOS el array
+                    control_name={controlName}
+                    message_admin={messageAdmin}
+                    fetchData={getUserData}
+                    id_control={id_control}
+                    id_auditoria={id_auditoria}
+                    order={orderControl}
+                />
             )}
             </div>
 )};
