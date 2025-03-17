@@ -25,25 +25,27 @@ const ShowFile = ({
 
   // Para almacenar temporalmente el signedURL cuando hay 1 solo archivo PDF
   const [pdfSignedUrl, setPdfSignedUrl] = useState(null);
-
+  const attemptCountRef = useRef(0);
   // Intentos para reintentar credenciales
   useEffect(() => {
-    let attemptCount = 0;
     const checkAwsCredentials = async () => {
-      if (!awsCredentials?.AccessKeyId && attemptCount < 3) {
+      if (!awsCredentials?.AccessKeyId && attemptCountRef.current < 3) {
         setLoading(true);
-        attemptCount += 1;
+        attemptCountRef.current += 1;
         await fetchAwsCredentials(token);
-
-        if (!awsCredentials?.AccessKeyId && attemptCount < 3) {
+        // Se espera 1 segundo y se vuelve a comprobar si ya existen las credenciales
+        if (!awsCredentials?.AccessKeyId && attemptCountRef.current < 3) {
           setTimeout(checkAwsCredentials, 1000);
         } else {
           setLoading(false);
         }
       }
     };
-    checkAwsCredentials();
-  }, [awsCredentials, fetchAwsCredentials, token]);
+
+    if (!awsCredentials?.AccessKeyId) {
+      checkAwsCredentials();
+    }
+  }, [token, fetchAwsCredentials, awsCredentials?.AccessKeyId]);
 
   // Instancia del cliente S3
   const s3Client = new S3Client({
@@ -375,7 +377,7 @@ const ShowFile = ({
                 >
                   +
                 </button>
-                {/* Input oculto */}
+                
                 <input
                   type="file"
                   ref={hiddenFileInput}

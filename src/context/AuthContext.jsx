@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }) => {
           headers: {
             Authorization: `Bearer ${tokenAWS}`,
           },
-          timeout: 3000,
+          timeout: 10000,
         }
       );
       const credentials = credentialsResponse.data;
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      fetchAwsCredentials();
+      fetchAwsCredentials(token);
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');
@@ -192,7 +192,7 @@ export const AuthProvider = ({ children }) => {
   
     const now = Date.now();
     const expTimeMs = new Date(expTime).getTime();
-    const timeUntilRefresh = expTimeMs - now - 60000; // Renovar 10 segundos antes de que expire
+    const timeUntilRefresh = expTimeMs - now - 60000; // Renovar 1 min antes de que expire
     
     if (timeUntilRefresh > 0) {
       // Configura un timeout para renovar el token justo antes de que expire

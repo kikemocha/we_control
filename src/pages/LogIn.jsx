@@ -25,7 +25,7 @@ const LogIn = () => {
   
   useEffect(() => {
     // Comprueba si alguno de los tokens o el role está presente en sessionStorage
-    const isAuthenticated = sessionStorage.getItem('token')| sessionStorage.getItem('accessToken')  || sessionStorage.getItem('refreshToken') ;
+    const isAuthenticated = sessionStorage.getItem('token')|| sessionStorage.getItem('accessToken')  || sessionStorage.getItem('refreshToken') ;
     const userRole = sessionStorage.getItem('role') !== 'null';
 
     if (isAuthenticated && userRole) {

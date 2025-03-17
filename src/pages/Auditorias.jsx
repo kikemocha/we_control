@@ -38,7 +38,6 @@ const Auditorias = () => {
 
     // Función para abrir el popup y almacenar el archivo y bucket seleccionados
     const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name, message_admin) => {
-        console.log(archivos);
         setSelectedFiles(archivos);
         setSelectedAuditoriaIMG(id_auditoria);
         setSelectedControlIMG(id_control);
@@ -304,7 +303,6 @@ const Auditorias = () => {
                                                     {AuditoriaData.map((control, index) => (
                                                     <tr key={index} className="table-row">
                                                         <td>
-                                                            {console.log(control)}
                                                             {
                                                             control[10] === 'Anual' ? (
                                                                 control[0]
@@ -317,7 +315,7 @@ const Auditorias = () => {
                                                             )
                                                             }
                                                         </td>
-                                                        <td>{control[11]}</td>
+                                                        <td>{control[10]}</td>
                                                         <td>{control[1]}</td>
                                                         <td>{control[2]}</td>
                                                         <td>{control[3]}</td>
@@ -341,7 +339,6 @@ const Auditorias = () => {
                                                                         }}
                                                                         style={{ cursor: 'pointer' }}
                                                                     >
-                                                                        {console.log('FILE: ',control)}
                                                                         <p className='text-center mx-auto '>{archivos.length === 1 ? '1 Archivo Subido' : archivos.length+' Archivos Subidos'}</p>
                                                                     </p>
                                                                     )}
