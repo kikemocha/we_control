@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
+import { S3Client } from '@aws-sdk/client-s3';
 
 const AuthContext = createContext();
 
@@ -19,8 +20,19 @@ export const AuthProvider = ({ children }) => {
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
 
-  // AWS Credentials
-  const [awsCredentials, setAwsCredentials] = useState({});
+  const [awsCredentials, setAwsCredentials] = useState(() => {
+    const stored = sessionStorage.getItem('awsCredentials');
+    try {
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('Error parsing awsCredentials from sessionStorage:', error);
+      return {};
+    }
+  });
+  
+  
+
+  const [s3Client, setS3Client] = useState(null);
 
   const [userData, setUserData] = useState(() => {
     const storedUserData = sessionStorage.getItem('userData');
@@ -88,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       setSelectedEmpresa(null);
       setAwsCredentials(null);
       setUserData(null);
-      
+      setS3Client(null);
       // Limpiar el almacenamiento local
       sessionStorage.clear();
   
@@ -157,7 +169,24 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user data:', error);
     }
   };
-
+  
+  useEffect(() => {
+    sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials));
+    if (awsCredentials && awsCredentials.AccessKeyId) {
+      const client = new S3Client({
+        region: 'eu-west-1',
+        credentials: {
+          accessKeyId: awsCredentials.AccessKeyId,
+          secretAccessKey: awsCredentials.SecretAccessKey,
+          sessionToken: awsCredentials.SessionToken,
+        },
+      });
+      setS3Client(client);
+      console.log('S3Client creado y actualizado en el context.');
+    } else {
+      setS3Client(null);
+    }
+  }, [awsCredentials]);
 
   const refreshAccessToken = async () => {
     try {
@@ -238,7 +267,8 @@ export const AuthProvider = ({ children }) => {
     fetchAwsCredentials,
     refreshAccessToken,
     expirationTime,
-    setExpirationTime
+    setExpirationTime,
+    s3Client
   };
 
   

@@ -6,7 +6,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 
 const ShowFile = ({
-  archives = [],         // Array de rutas S3
+  archives = [],
   show,
   onClose,
   id_control,
@@ -131,6 +131,10 @@ const ShowFile = ({
   const generatePdfUrl = async (archiveKey) => {
     setLoading(true);
     try {
+      if (!s3Client) {
+        console.error('S3Client no disponible.');
+        return;
+      }
       const command = new GetObjectCommand({
         Bucket: 'wecontrolbucket',
         Key: archiveKey,
