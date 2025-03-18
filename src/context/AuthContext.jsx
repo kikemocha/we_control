@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
+  const [selectedEmpresaName, setSelectedEmpresaName] = useState(() => sessionStorage.getItem('selectedEmpresaName') || null);
 
   const [awsCredentials, setAwsCredentials] = useState(() => {
     const stored = sessionStorage.getItem('awsCredentials');
@@ -78,6 +79,10 @@ export const AuthProvider = ({ children }) => {
   }, [selectedEmpresa]);
 
   useEffect(() => {
+    sessionStorage.setItem('selectedEmpresaName', selectedEmpresaName);
+  }, [selectedEmpresaName]);
+
+  useEffect(() => {
     sessionStorage.setItem('awsCredentials', awsCredentials);
   }, [awsCredentials]);
 
@@ -98,6 +103,7 @@ export const AuthProvider = ({ children }) => {
       setRole(null);
       setCognitoId(null);
       setSelectedEmpresa(null);
+      setSelectedEmpresaName(null);
       setAwsCredentials(null);
       setUserData(null);
       setS3Client(null);
@@ -261,6 +267,8 @@ export const AuthProvider = ({ children }) => {
     signOut,
     selectedEmpresa,
     setSelectedEmpresa,
+    selectedEmpresaName,
+    setSelectedEmpresaName,
     awsCredentials,
     fetchUserData, 
     userData,

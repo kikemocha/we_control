@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import PhotoPopup from './CroppingImg';
 
 const Navbar = () => {
-    const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, searchQuery, setSearchQuery} = useAuth();
+    const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, selectedEmpresaName, searchQuery, setSearchQuery} = useAuth();
     const location = useLocation();
 
     const [loading, setLoading] = useState(false)
@@ -246,6 +246,7 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
+            {selectedEmpresaName}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-40"

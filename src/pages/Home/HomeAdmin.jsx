@@ -8,7 +8,7 @@ import EditEmpresasForm from "../../form/editForms/EditEmpresasForm";
 import Card from "../../components/Card";
 
 const HomeAdmin = ({getUserData, UserInfo}) => {
-    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery} = useAuth();
+    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery, setSelectedEmpresaName} = useAuth();
     const [showPopup, setShowPopup] = useState(false);
 
       // Admin -> Empresas Edit Form
@@ -31,7 +31,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
       <div>
         <div>
-          <svg fill="none" viewBox="0 0 15 15" height="3em" width="3em" onClick={() => setSelectedEmpresa(null)} className='close-icon text-red-500'>
+          <svg fill="none" viewBox="0 0 15 15" height="3em" width="3em" onClick={() => {setSelectedEmpresa(null); setSelectedEmpresaName(null)}} className='close-icon text-red-500'>
             <path
               fill="currentColor"
               fillRule="evenodd"
@@ -116,7 +116,11 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                     filteredEmpresas.map((empresa, index) => (
                       <div className='bussiness_boxes flex flex-col relative' key={index}>
                         <h3 className='font-bold'>{empresa[1]}</h3>
-                        <div className='grow flex' onClick={() => setSelectedEmpresa(empresa[0])}>
+                        <div className='grow flex' onClick={() => {
+                        setSelectedEmpresa(empresa[0]); 
+                        setSelectedEmpresaName(empresa[1]);
+
+                        }}>
                           <div className='w-3/4 mx-auto h-full flex-col flex'>
                             <h4 className='border-b-2 border-black w-3/4 mx-auto'>
                               <span className='px-3'>Contacto</span>
