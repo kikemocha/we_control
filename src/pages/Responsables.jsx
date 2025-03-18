@@ -131,7 +131,7 @@ const Responsables = () => {
                                     <th>Nombre</th>
                                     <th>Apellido</th>
                                     <th>Teléfono</th>
-                                    <th>Título</th>
+                                    <th>Cargo</th>
                                     <th>E-mail</th>
                                     <th>Controles Asignados</th>
                                     {/* <th>Ajustes</th> */}
