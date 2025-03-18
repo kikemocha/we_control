@@ -246,7 +246,7 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            {selectedEmpresaName}
+            {selectedEmpresaName !== 'null'|| !selectedEmpresaName ? selectedEmpresaName : ''}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-40"

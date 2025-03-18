@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const Card = ({name, singularName, href, index, apiURL}) => {
     const { selectedEmpresa, token } = useAuth();
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [selectedYear, setSelectedYear] = useState(null);
