@@ -19,7 +19,16 @@ export const AuthProvider = ({ children }) => {
   
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
-  const [selectedEmpresaName, setSelectedEmpresaName] = useState(() => sessionStorage.getItem('selectedEmpresaName') || null);
+  const [selectedEmpresaName, setSelectedEmpresaName] = useState(() => {
+    const stored = sessionStorage.getItem('selectedEmpresaName');
+    try {
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Error parsing selectedEmpresaName from sessionStorage:', error);
+      return null;
+    }
+  });
+  
 
   const [awsCredentials, setAwsCredentials] = useState(() => {
     const stored = sessionStorage.getItem('awsCredentials');
@@ -79,8 +88,9 @@ export const AuthProvider = ({ children }) => {
   }, [selectedEmpresa]);
 
   useEffect(() => {
-    sessionStorage.setItem('selectedEmpresaName', selectedEmpresaName);
+    sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName));
   }, [selectedEmpresaName]);
+  
 
   useEffect(() => {
     sessionStorage.setItem('awsCredentials', awsCredentials);

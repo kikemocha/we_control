@@ -75,7 +75,6 @@ const Navbar = () => {
     
 
     useEffect(() => {
-        // Si userData es null, intenta obtener los datos del usuario
         if (!userData) {
             console.log('UserData is null, fetching user data...');
             fetchUserData(cognitoId, token);
@@ -246,7 +245,7 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            {selectedEmpresaName}
+            {selectedEmpresaName?.name !== 'null'|| !selectedEmpresaName?.name ? selectedEmpresaName?.name : ''}
             {profilePopUp && (
                 <div 
                 className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-40"
@@ -507,13 +506,6 @@ const Navbar = () => {
                             onChange={(e) => setSearchQuery(e.target.value)} // Actualizar el estado global
                             />
                             
-                            <div className="absolute top-2 right-3 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
-                                    className="size-8 text-black cursor-pointer">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 15.75-2.489-2.489m0 0a3.375 3.375 0 1 0-4.773-4.773 3.375 3.375 0 0 0 4.774 4.774ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                            </div>
-
                         </div>
                         
                     </div>

@@ -7,11 +7,14 @@ import EmpresasForm from "../../form/EmpresasForm";
 import EditEmpresasForm from "../../form/editForms/EditEmpresasForm";
 import Card from "../../components/Card";
 
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { v4 as uuidv4 } from 'uuid';
+import S3Image from "../../components/S3Image";
+
 const HomeAdmin = ({getUserData, UserInfo}) => {
-    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery, setSelectedEmpresaName} = useAuth();
+    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery, selectedEmpresaName, setSelectedEmpresaName, s3Client, token, refreshAccessToken} = useAuth();
     const [showPopup, setShowPopup] = useState(false);
 
-      // Admin -> Empresas Edit Form
 
     const [showEditPopup, setshowEditPopup] = useState(false);
     const [selectedEditEmpresa, setSelectedEditEmpresa] = useState(null); // Empresa seleccionado para editar
@@ -24,8 +27,108 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
     const filteredEmpresas = UserInfo?.data?.empresas?.filter((empresa) =>
       empresa[1].toLowerCase().includes(searchQuery.toLowerCase()) // Filtra por nombre de empresa
     );
-
     
+    const empresaToObj = (empresa) => ({
+      id_empresa: empresa[0],
+      name: empresa[1],
+      stripe_id: empresa[2],
+      is_despacho: empresa[3],
+      created_by: empresa[4],
+      email: empresa[5],
+      web: empresa[6],
+      phone: empresa[7],
+      img: empresa[8],
+      CIF: empresa[9],
+    });
+
+    const handleUploadImage = async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+    
+      // Verifica que s3Client esté disponible
+      if (!s3Client) {
+        console.error("No se encontró el cliente S3. Verifica tus credenciales.");
+        return;
+      }
+    
+      const maxLength = 255;
+      const despachoId = userData.despacho_id;
+      const empresaId = selectedEmpresa; // id de la empresa
+      let pathPrefix = "";
+      if (userData.is_gestor === 0 && userData.is_responsable === 0) {
+        pathPrefix = `${userData.belongs_to}/${empresaId}`;
+      } else if (userData.is_gestor === 1 && userData.is_responsable === 0) {
+        pathPrefix = `${despachoId}/${empresaId}`;
+      }
+    
+      const fileName = file.name;
+      const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+      const baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
+      const uuid = uuidv4();
+      const cleanFileName = baseFileName.replace(/[^a-zA-Z0-9]/g, "_");
+      const totalFixedLength = pathPrefix.length + 1 + uuid.length + 1 + fileExtension.length + 1;
+      const availableLengthForFileName = maxLength - totalFixedLength;
+      const truncatedFileName = cleanFileName.substring(0, availableLengthForFileName);
+      const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
+      console.log("fileKey:", fileKey);
+    
+      const params = {
+        Bucket: "wecontrolbucket",
+        Key: fileKey,
+        Body: file,
+        ContentType: file.type
+      };
+    
+      // Función auxiliar para enviar el archivo
+      const sendFile = async (client) => {
+        const command = new PutObjectCommand(params);
+        return client.send(command);
+      };
+    
+      try {
+        await sendFile(s3Client);
+      } catch (error) {
+        if (error.message && error.message.includes("ExpiredToken")) {
+          console.warn("Token expirado. Refrescando credenciales...");
+          // Refrescar credenciales
+          await refreshAccessToken();
+          // Espera un poco para que el context actualice s3Client (por ejemplo, 1 segundo)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          try {
+            await sendFile(s3Client);
+          } catch (retryError) {
+            console.error("Error al subir imagen después de actualizar el token:", retryError);
+            return;
+          }
+        } else {
+          console.error("Error al subir imagen:", error);
+          return;
+        }
+      }
+    
+      console.log("Imagen subida correctamente:", fileKey);
+      const imageUrl = `https://${params.Bucket}.s3.eu-west-1.amazonaws.com/${fileKey}`;
+      // Actualiza el estado del objeto de la empresa para guardar la URL de la imagen
+      setSelectedEmpresaName(prev => ({ ...prev, img: imageUrl }));
+    
+      // Opcional: Actualiza el backend con la nueva imagen
+      const requestBody = {
+        empresa_img: fileKey,
+        empresa_id: selectedEmpresa
+      };
+      try {
+        await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoria', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(requestBody)
+        });
+      } catch (err) {
+        console.error("Error al actualizar backend con imagen:", err);
+      }
+    };
   
     return <div className='admin_home'>
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
@@ -40,42 +143,109 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             />
           </svg>
         </div>
-        <div className='home_hub'>
-          <div className={'big_card'}>
-            <Card
-              name='Controles'
-              singularName='control'
-              href='controles'
-              index={['Número', 'Nombre', 'Evidencias', 'Periodicidad', 'Riesgos en uso']}
-              apiURL={'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa='}
-            />
+
+        <div className="h-full w-full flex-col justify-betwee">
+          <div className="w-full h-full flex flex-row">
+            <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-100 rounded-3xl">
+              <div className="h-2/3 w-full flex">
+              {/* Columna de imagen */}
+              <div className="w-1/2 h-full flex items-center justify-center">
+                {selectedEmpresaName?.img && selectedEmpresaName.img !== 'None' && selectedEmpresaName.img !== '' ? (
+                    
+                    <div className="w-full h-full flex items-center justify-center p-12">
+                    <S3Image
+                      imgkey={selectedEmpresaName.img}
+                      className="w-full h-full max-h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                    <label className="bg-gray-300 px-4 py-2 rounded cursor-pointer">
+                        Subir img
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleUploadImage}
+                        />
+                    </label>
+                )}
+              </div>
+              <div className="w-1/2 h-full flex flex-col items-center justify-center">
+                <div className="">
+                  <p className=" text-center border-b-2 border-gray-600 ">{selectedEmpresaName?.name}</p>
+                </div>
+                <div className="mt-2">
+                {selectedEmpresaName?.CIF && selectedEmpresaName.CIF !== 'None' && selectedEmpresaName.CIF !== '' 
+                ? selectedEmpresaName.CIF 
+                : '------'}
+                </div>
+              </div>
+            </div>
+
+              <div className="h-1/3 w-full flex justify-around">
+                <div className="w-1/2 flex justify-center align-middle items-center">
+                  <select name="" id="" className="h-1/2 w-1/2 p-4 rounded-2xl">
+                    <option value="">2025</option>
+                    <option value="">2024</option>
+                    <option value="">2023</option>
+                    
+                  </select>
+                </div>
+                <div className="w-1/2 flex justify-around">
+                  <div>
+                    <ul className="h-full flex flex-col justify-center">
+                      <li className="border-b-2 border-gray-400">Valor Específico</li>
+                      <li className="my-2 text-center font-bold">0.05</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <ul className="h-full flex flex-col justify-center">
+                      <li className="border-b-2 border-gray-400">Valor Transversal</li>
+                      <li className="my-2 text-center font-bold">0.2</li>
+                    </ul>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+            <div className={'small_card'}>
+                <Card
+                  name='Controles'
+                  singularName='control'
+                  href='controles'
+                  index={['Número', 'Nombre', 'Evidencias', 'Periodicidad', 'Riesgos en uso']}
+                  apiURL={'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa='}
+                />
+              </div>
           </div>
-          <div className={'small_card'}>
-            <Card
-              name='Gestores'
-              singularName='gestor'
-              href='gestores'
-              index={['Nombre', 'email']}
-              apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
-            />
-          </div>
-          <div className={'big_card'}>
-            <Card
-              name='Riesgos'
-              singularName='riesgo'
-              href='riesgos'
-              index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
-              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
-            />
-          </div>
-          <div className={'small_card'}>
-            <Card
-              name='Seguimientos y Auditorías'
-              singularName='auditoría'
-              href='auditorias'
-              index={['Nombre', 'Progreso']}
-              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
-            />
+          <div className='home_hub mt-12'>
+            <div className={'small_card'}>
+              <Card
+                name='Gestores'
+                singularName='gestor'
+                href='gestores'
+                index={['Nombre', 'email']}
+                apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
+              />
+            </div>
+            <div className={'small_card'}>
+              <Card
+                name='Riesgos'
+                singularName='riesgo'
+                href='riesgos'
+                index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
+                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
+              />
+            </div>
+            <div className={'small_card'}>
+              <Card
+                name='Seguimientos y Auditorías'
+                singularName='auditoría'
+                href='auditorias'
+                index={['Nombre', 'Progreso']}
+                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -111,52 +281,41 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             </div>
             <div className='bussines_div overflow-auto h-full'>
               {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
-                <div className='admin_boxes overflow-y-auto h-full no-scrollbar'>
-                  {filteredEmpresas.length > 0 ? (
-                    filteredEmpresas.map((empresa, index) => (
-                      <div className='bussiness_boxes flex flex-col relative' key={index}>
-                        <h3 className='font-bold'>{empresa[1]}</h3>
-                        <div className='grow flex' onClick={() => {
-                        setSelectedEmpresa(empresa[0]); 
-                        setSelectedEmpresaName(empresa[1]);
-
-                        }}>
-                          <div className='w-3/4 mx-auto h-full flex-col flex'>
-                            <h4 className='border-b-2 border-black w-3/4 mx-auto'>
-                              <span className='px-3'>Contacto</span>
-                            </h4>
-                            <div className='flex flex-col justify-around grow h-full'>
-                              <div>{empresa[8] === 'None' ? '------' : empresa[8]}</div>
-                              <div>{empresa[10] === 'None' ? '------' : empresa[10]}</div>
-                              <div>
-                                <a 
-                                  className='z-40 text-blue-800 hover:text-purple-800' 
-                                  href={
-                                    empresa[9] === 'None' 
-                                      ? ' ' 
-                                      : empresa[9].startsWith('http') 
-                                        ? empresa[9] 
-                                        : `https://${empresa[9]}`
-                                  } 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                >
-                                  {empresa[9] === 'None' ? '------' : empresa[9]}
-                                </a>
-                              </div>
-                            </div>
+                <div className="w-4/5 mx-auto">
+                  <ul className="flex flex-col gap-4 pb-24">
+                    <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+                      <span>Nombre</span>
+                      <span>CIF</span>
+                      <span>Correo de contacto</span>
+                    </li>
+                    {filteredEmpresas.length > 0 ? (
+                      filteredEmpresas.map((empresa, index) => (
+                        <li
+                          key={index}
+                          className="grid grid-cols-3 gap-4 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative"
+                          onClick={() => {
+                            setSelectedEmpresa(empresa[0]);
+                            setSelectedEmpresaName(empresaToObj(empresa));
+                          }}
+                        >
+                          <span>{empresa[1]}</span>
+                          <span>
+                            {empresa[9] === 'None' || !empresa[9] ? '------' : empresa[9]}
+                          </span>
+                          <span className="overflow-hidden text-ellipsis">{empresa[6] === 'None' || !empresa[6] ? '------' : empresa[6]}</span>
+                          <div className='absolute right-3 top-4 hover:bg-gray-400 rounded-full'  onClick={(e) => {e.stopPropagation(); handleOpenEditPopup(empresa)}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                            </svg>
                           </div>
-                        </div>
-                        <div className='absolute right-3' style={{zIndex:'39'}} onClick={(e) => handleOpenEditPopup(empresa)}>
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7 bg-gray-300 p-1 rounded-full hover:bg-gray-500 hover:border-2 hover:border-black">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                          </svg>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-center w-full mt-4">No se encontraron empresas con ese nombre.</p>
-                  )}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-gray-500 text-center mt-4">
+                        No se encontraron empresas con ese nombre.
+                      </li>
+                    )}
+                  </ul>
                 </div>
               ) : (
                 <div className='admin_boxes'>

@@ -13,6 +13,7 @@ const Sidebar = () => {
   
   useEffect(() => {
     const currentTime = new Date().getTime(); // Obtén el tiempo actual en milisegundos
+    //console.log('expirationTime: ',expirationTime)
     if (expirationTime < currentTime) {
       alert('La sesión ha expirado');
       signOut(); // Llama a la función SignOut cuando el usuario acepte el alert
@@ -34,8 +35,7 @@ const Sidebar = () => {
     }
   }, [role, signOut]);
     return (
-        <div className="sidebar">
-          {console.log(expirationTime)}
+        <div className="sidebar">    
           <Link to="/home">
             <img className="logo_sidebar mx-auto" src={logo} alt="" />
           </Link>
