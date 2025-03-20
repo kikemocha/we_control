@@ -54,7 +54,6 @@ const Card = ({name, singularName, href, index, apiURL}) => {
                     data_clean = response.data.activo.map(item => [item[1], item[3], item[4].split(',').length, item[5] === 'None' ? (item[3]) : item[5]])
                 }
                 else if (name === 'Seguimientos y Auditorías'){
-                    console.log('DATA: ',response.data)
                     data_clean = response.data.map(item => [item[1], Math.floor((parseInt(item[3], 10) / parseInt(item[2], 10)) * 100) + '%']);
                 }
                 else if (name === 'Responsables'){
@@ -75,7 +74,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
 
     if (loading) {
         return (
-            <div className="relative h-full w-full xl:p-0 2xl:p-3">
+            <div className="relative h-full w-full">
             <span>
                 <h3 className="md:text-xs xl:text-xs 2xl:text-lg font-semibold">{name}</h3>
             </span>
@@ -137,7 +136,7 @@ const Card = ({name, singularName, href, index, apiURL}) => {
     }
 
     return (
-        <div className="relative h-full w-full xl:p-0 2xl:p-3">
+        <div className="relative h-full w-full">
             <span>
                 <h3 className="md:text-xs xl:text-xs 2xl:text-lg font-semibold">{name}</h3>
             </span>
