@@ -36,8 +36,7 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
       email: EmpresaEmail,
       phone: EmpresaPhone,
       web: EmpresaWeb,
-      valor_especifico: EmpresaValorEspecifico,
-      valor_transversal: EmpresaValorTransversal,
+      cif: EmpresaCIF
     };
 
     try {
@@ -71,12 +70,11 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
   };
   
   const handleClose = () => {
-    setEmpresaValorTransversal('');
-    setEmpresaValorEspecifico('');
     setEmpresaWeb('');
     setEmpresaPhone('');
     setEmpresaName('');
     setEmpresaEmail('');
+    setEmpresaCIF('');
     onClose();
   };
 
@@ -144,30 +142,6 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
-          <h4 className='mb-2 font-bold'>Valor Controles</h4>
-          <div className="grid md:grid-cols-2 md:gap-6">
-            <Input
-                label="Valor específico"
-                type="number"
-                name="valor_especifico"
-                value={EmpresaValorEspecifico}
-                onChange={(e) => setEmpresaValorEspecifico(e.target.value)}
-                step=".01"
-                required
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              />
-            <Input
-              label="Valor transversal"
-              type="number"
-              name="valor_transversal"
-              value={EmpresaValorTransversal}
-              onChange={(e) => setEmpresaValorTransversal(e.target.value)}
-              step=".01"
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            />
-          </div>
-          <br />
           <div></div>
           {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
           {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
