@@ -229,12 +229,13 @@ const Controles = () => {
                                     <table className="card_table">
                                     <thead>
                                         <tr className="table-row">
-                                            <th>Número</th>
+                                        <th>Número</th>
+                                            <th className='w-1/5 overflow-x-hidden'>Riesgos Asociados</th>
                                             <th>Nombre</th>
-                                            <th>Riesgo Asociado</th>
-                                            <th>Valor de Control</th>
                                             <th>Evidencias</th>
                                             <th>Periodicidad</th>
+                                            <th>Tipo de Control</th>
+                                            <th>Responsable</th>
                                             <th>Ajustes</th>
                                             
                                         </tr>

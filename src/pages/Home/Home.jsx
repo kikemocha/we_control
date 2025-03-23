@@ -85,6 +85,7 @@ const Home = () => {
 
   if (loading && role === 'admin') {
     return <div>
+      {'loading: '.loading}
               <br />
               <div className='total_add'>
               <div className='upper_box'>
@@ -107,11 +108,22 @@ const Home = () => {
                 </div>
               </div>
             
-              <div className='admin_boxes'>
+              <div className="w-4/5 mx-auto">
+                <ul className="flex flex-col gap-4 pb-24">
+                <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+                      <span>Nombre</span>
+                      <span>CIF</span>
+                      <span>Correo de contacto</span>
+                    </li>
                 {Array.from({ length: 8 }).map((_, index) => (
-                  <div className='bussiness_boxes skeleton'></div>
-                ))}
-              </div>; // Indicador de carga mientras se obtienen los datos
+                    <li
+                    key={index}
+                    className="skeleton grid grid-cols-3 gap-4 h-16 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative"
+                  >
+                  </li>
+                  ))}
+                </ul>
+              </div>
             </div> 
           
   }

@@ -106,9 +106,7 @@
     height: 100%;
     position: relative;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    justify-content: center;
-    align-items: center;
+    grid-template-columns: repeat(2, 1fr); /* Divide en 4 columnas iguales */
 }
 .close-icon {
     z-index: 9989;
@@ -125,8 +123,8 @@
 }
 
 .small_card{
-    padding: 0px;
-    width: 50vh;
+    padding: 20px;
+    width: 60vh;
     height: 40vh;
 }
 

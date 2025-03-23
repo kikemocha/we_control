@@ -188,7 +188,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             />
           </svg>
         </div>
-
         <div className="h-full w-full flex-col justify-betwee">
           <div className="w-full h-full flex flex-row">
             <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-100 rounded-3xl">
@@ -268,34 +267,32 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                 />
               </div>
           </div>
-          <div className='home_hub mt-12'>
-            <div className={'small_card'}>
-              <Card
-                name='Gestores'
-                singularName='gestor'
-                href='gestores'
-                index={['Nombre', 'email']}
-                apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
-              />
-            </div>
-            <div className={'small_card'}>
-              <Card
-                name='Riesgos'
-                singularName='riesgo'
-                href='riesgos'
-                index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
-                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
-              />
-            </div>
-            <div className={'small_card'}>
-              <Card
-                name='Seguimientos y Auditorías'
-                singularName='auditoría'
-                href='auditorias'
-                index={['Nombre', 'Progreso']}
-                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
-              />
-            </div>
+          <div className={'small_card'}>
+            <Card
+              name='Gestores'
+              singularName='gestor'
+              href='gestores'
+              index={['Nombre', 'email']}
+              apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
+            />
+          </div>
+          <div className={'big_card'}>
+            <Card
+              name='Riesgos'
+              singularName='riesgo'
+              href='riesgos'
+              index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
+              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
+            />
+          </div>
+          <div className={'small_card'}>
+            <Card
+              name='Seguimientos y Auditorías'
+              singularName='auditoría'
+              href='auditorias'
+              index={['Nombre', 'Progreso']}
+              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
+            />
           </div>
         </div>
       </div>
@@ -368,10 +365,21 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                   </ul>
                 </div>
               ) : (
-                <div className='admin_boxes'>
-                  {Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className='bussiness_boxes skeleton'></div>
-                  ))}
+                <div className="w-4/5 mx-auto">
+                  <ul className="flex flex-col gap-4 pb-24">
+                  <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+                        <span>Nombre</span>
+                        <span>CIF</span>
+                        <span>Correo de contacto</span>
+                      </li>
+                  {Array.from({ length: 8 }).map((_, index) => (
+                      <li
+                      key={index}
+                      className="skeleton grid grid-cols-3 gap-4 h-16 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative"
+                    >
+                    </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
