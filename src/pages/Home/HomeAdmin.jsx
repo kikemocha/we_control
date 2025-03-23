@@ -143,109 +143,42 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             />
           </svg>
         </div>
-
-        <div className="h-full w-full flex-col justify-betwee">
-          <div className="w-full h-full flex flex-row">
-            <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-100 rounded-3xl">
-              <div className="h-2/3 w-full flex">
-              {/* Columna de imagen */}
-              <div className="w-1/2 h-full flex items-center justify-center">
-                {selectedEmpresaName?.img && selectedEmpresaName.img !== 'None' && selectedEmpresaName.img !== '' ? (
-                    
-                    <div className="w-full h-full flex items-center justify-center p-12">
-                    <S3Image
-                      imgkey={selectedEmpresaName.img}
-                      className="w-full h-full max-h-full object-contain"
-                    />
-                  </div>
-                ) : (
-                    <label className="bg-gray-300 px-4 py-2 rounded cursor-pointer">
-                        Subir img
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleUploadImage}
-                        />
-                    </label>
-                )}
-              </div>
-              <div className="w-1/2 h-full flex flex-col items-center justify-center">
-                <div className="">
-                  <p className=" text-center border-b-2 border-gray-600 ">{selectedEmpresaName?.name}</p>
-                </div>
-                <div className="mt-2">
-                {selectedEmpresaName?.CIF && selectedEmpresaName.CIF !== 'None' && selectedEmpresaName.CIF !== '' 
-                ? selectedEmpresaName.CIF 
-                : '------'}
-                </div>
-              </div>
-            </div>
-
-              <div className="h-1/3 w-full flex justify-around">
-                <div className="w-1/2 flex justify-center align-middle items-center">
-                  <select name="" id="" className="h-1/2 w-1/2 p-4 rounded-2xl">
-                    <option value="">2025</option>
-                    <option value="">2024</option>
-                    <option value="">2023</option>
-                    
-                  </select>
-                </div>
-                <div className="w-1/2 flex justify-around">
-                  <div>
-                    <ul className="h-full flex flex-col justify-center">
-                      <li className="border-b-2 border-gray-400">Valor Específico</li>
-                      <li className="my-2 text-center font-bold">0.05</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <ul className="h-full flex flex-col justify-center">
-                      <li className="border-b-2 border-gray-400">Valor Transversal</li>
-                      <li className="my-2 text-center font-bold">0.2</li>
-                    </ul>
-                  </div>
-                </div>
-                
-              </div>
-            </div>
-            <div className={'small_card'}>
-                <Card
-                  name='Controles'
-                  singularName='control'
-                  href='controles'
-                  index={['Número', 'Nombre', 'Evidencias', 'Periodicidad', 'Riesgos en uso']}
-                  apiURL={'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa='}
-                />
-              </div>
+        <div className='home_hub'>
+          <div className={'big_card'}>
+            <Card
+              name='Controles'
+              singularName='control'
+              href='controles'
+              index={['Número', 'Nombre', 'Evidencias', 'Periodicidad', 'Riesgos en uso']}
+              apiURL={'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getControlesData?id_empresa='}
+            />
           </div>
-          <div className='home_hub mt-12'>
-            <div className={'small_card'}>
-              <Card
-                name='Gestores'
-                singularName='gestor'
-                href='gestores'
-                index={['Nombre', 'email']}
-                apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
-              />
-            </div>
-            <div className={'small_card'}>
-              <Card
-                name='Riesgos'
-                singularName='riesgo'
-                href='riesgos'
-                index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
-                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
-              />
-            </div>
-            <div className={'small_card'}>
-              <Card
-                name='Seguimientos y Auditorías'
-                singularName='auditoría'
-                href='auditorias'
-                index={['Nombre', 'Progreso']}
-                apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
-              />
-            </div>
+          <div className={'small_card'}>
+            <Card
+              name='Gestores'
+              singularName='gestor'
+              href='gestores'
+              index={['Nombre', 'email']}
+              apiURL = 'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa='
+            />
+          </div>
+          <div className={'big_card'}>
+            <Card
+              name='Riesgos'
+              singularName='riesgo'
+              href='riesgos'
+              index={['Nombre', 'Valor inherente', 'Número de Controles Asociados', 'Valor Residual']}
+              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getRiesgosData?id_empresa='
+            />
+          </div>
+          <div className={'small_card'}>
+            <Card
+              name='Seguimientos y Auditorías'
+              singularName='auditoría'
+              href='auditorias'
+              index={['Nombre', 'Progreso']}
+              apiURL='https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getAuditorias?id_empresa='
+            />
           </div>
         </div>
       </div>
