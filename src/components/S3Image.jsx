@@ -4,34 +4,32 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { useAuth } from '../context/AuthContext';
 
 const S3Image = ({ imgkey, className }) => {
-  const {token, s3Client} = useAuth()
+  const {token, s3Client, awsCredentials} = useAuth()
   const bucketName = 'wecontrolbucket';
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const { awsCredentials } = useAuth();
-
   useEffect(() => {
+    if (!s3Client) return; // Espera a que s3Client esté definido
+  
     const fetchAwsCredentialsAndImage = async () => {
       try {
-        // Paso 3: Obtener la URL firmada de S3
-        const command = new GetObjectCommand({ Bucket: bucketName, Key: imgkey});
+        const command = new GetObjectCommand({ Bucket: bucketName, Key: imgkey });
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        
-        // Paso 4: Establecer la URL de la imagen
         setImageUrl(url);
-        
       } catch (err) {
         setError('No tienes permisos para ver esta imagen o hubo un problema.');
         console.error('Error fetching image from S3:', err);
-      } finally{
-        setLoading(false);  
+      } finally {
+        setLoading(false);
       }
     };
-
+  
     fetchAwsCredentialsAndImage();
-  }, [bucketName, imgkey, token, awsCredentials]);
+  }, [s3Client, bucketName, imgkey, token, awsCredentials]);
+  
+  
 
   if (!s3Client) return <p>Cargando configuración de S3...</p>;
   if (!imgkey) return <p>No hay imagen para mostrar.</p>;

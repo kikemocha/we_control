@@ -7,7 +7,7 @@ import EmpresasForm from "../../form/EmpresasForm";
 import EditEmpresasForm from "../../form/editForms/EditEmpresasForm";
 import Card from "../../components/Card";
 
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import S3Image from "../../components/S3Image";
 
@@ -129,6 +129,51 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
         console.error("Error al actualizar backend con imagen:", err);
       }
     };
+
+    const handleDeleteEmpresaImg = async (imgKey) =>{
+      if (!s3Client) {
+        console.error("No S3 client available");
+        return;
+      }
+      const requestBody = {
+        empresa_img: imgKey,
+        empresa_id: selectedEmpresa
+      };
+      const params = {
+        Bucket: "wecontrolbucket",
+        Key: imgKey,
+      };
+      try {
+        try {
+          const command = new DeleteObjectCommand(params);
+          await s3Client.send(command);
+          console.log("Image deleted from S3:", imgKey);
+          // Actualiza el estado para borrar la imagen
+          setSelectedEmpresaName((prev) => ({ ...prev, img: null }));
+        } catch (error) {
+          console.error("Error deleting image from S3:", error);
+        }
+        const response = await fetch(
+          'https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteFile',
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+      } catch (err) {
+        console.error("Error al actualizar backend con imagen:", err);
+      }
+    };
+    const handleDeleteImage = async () => {
+      if (selectedEmpresaName?.img) {
+        await handleDeleteEmpresaImg(selectedEmpresaName.img);
+        setSelectedEmpresaName((prev) => ({ ...prev, img: null }));
+      }
+    };
   
     return <div className='admin_home'>
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
@@ -149,7 +194,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-100 rounded-3xl">
               <div className="h-2/3 w-full flex">
               {/* Columna de imagen */}
-              <div className="w-1/2 h-full flex items-center justify-center">
+              <div className="w-1/2 h-full flex items-center justify-center relative">
                 {selectedEmpresaName?.img && selectedEmpresaName.img !== 'None' && selectedEmpresaName.img !== '' ? (
                     
                     <div className="w-full h-full flex items-center justify-center p-12">
@@ -157,6 +202,11 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                       imgkey={selectedEmpresaName.img}
                       className="w-full h-full max-h-full object-contain"
                     />
+                    <div className="absolute top-1 right-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="red" className="size-6 cursor-pointer" onClick={handleDeleteImage}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </div>
                   </div>
                 ) : (
                     <label className="bg-gray-300 px-4 py-2 rounded cursor-pointer">
