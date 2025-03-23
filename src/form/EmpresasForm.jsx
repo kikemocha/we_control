@@ -11,6 +11,7 @@ import Input from '../components/common/Input';
 const EmpresasForm = ({ show, onClose, fetchData }) => {
   const {cognitoId, token} = useAuth();
   const [EmpresaName, setEmpresaName] = useState('');
+  const [EmpresaCIF, setEmpresaCIF] = useState('');
   const [EmpresaEmail, setEmpresaEmail] = useState('');
   const [EmpresaPhone, setEmpresaPhone] = useState('');
   const [EmpresaWeb, setEmpresaWeb] = useState('');
@@ -55,7 +56,7 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
         setSuccessMessage(result.message);
         setErrorMessage('');
         fetchData(); // Recargar la lista de empresas
-        onClose();
+        handleClose();
       } else {
         setErrorMessage(result.message);
         setSuccessMessage('');
@@ -65,8 +66,18 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
       setSuccessMessage('');
     } finally{
       setLoading(false);
-      onClose();
+      handleClose();
     }
+  };
+  
+  const handleClose = () => {
+    setEmpresaValorTransversal('');
+    setEmpresaValorEspecifico('');
+    setEmpresaWeb('');
+    setEmpresaPhone('');
+    setEmpresaName('');
+    setEmpresaEmail('');
+    onClose();
   };
 
 
@@ -76,7 +87,7 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
   return (
     <div className="popup-overlay">
       <div className="popup form_control">
-        <button className="popup-close" onClick={onClose}>
+        <button className="popup-close" onClick={handleClose}>
           <svg fill="none" viewBox="0 0 15 15" height="1em" width="1em">
             <path
               fill="currentColor"
@@ -97,6 +108,15 @@ const EmpresasForm = ({ show, onClose, fetchData }) => {
               required
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
+          <Input
+            label="CIF Empresa"
+            type="text"
+            name="name"
+            value={EmpresaCIF}
+            onChange={(e) => setEmpresaCIF(e.target.value)}
+            required
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          />
           <div className='w-full'>
             <h4 className='mb-2 font-bold'>Contacto</h4>
             <Input

@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 
-const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAuditoria, fetchData}) => {
-  const { awsCredentials, token, userData} = useAuth();
+const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAuditoria, fetchData, refreshAccessToken}) => {
+  const { token, userData, s3Client} = useAuth();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
@@ -38,98 +38,125 @@ const sanitizeFileName = (name) => {
 };
 
 
-  const handleUpload = async () => {
-    setLoading(true);
-    if (!selectedFile) {
-      setUploadError('Por favor, selecciona un archivo primero.');
+const handleUpload = async () => {
+  setLoading(true);
+  if (!selectedFile) {
+    setUploadError('Por favor, selecciona un archivo primero.');
+    return;
+  }
+
+  // Usa el s3Client que ya viene del context
+  if (!s3Client) {
+    setUploadError('No se encontró el cliente S3. Intenta refrescar la página.');
+    setLoading(false);
+    return;
+  }
+
+  const maxLength = 255; // Máximo total de caracteres permitidos
+  const despachoId = userData.despacho_id;
+  const empresaId = userData.belongs_to;
+  const userId = userData.id;
+  const pathPrefix = `${despachoId}/${empresaId}/${userId}`;
+  const fileName = selectedFile.name;
+  const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+  const baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
+  const uuid = uuidv4();
+
+  const cleanFileName = sanitizeFileName(baseFileName);
+
+  const totalFixedLength =
+    pathPrefix.length + 1 +
+    uuid.length + 1 +
+    fileExtension.length + 1;
+
+  const availableLengthForFileName = maxLength - totalFixedLength;
+  const truncatedFileName = cleanFileName.substring(0, availableLengthForFileName);
+
+  const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
+  console.log('fileKey: ', fileKey);
+
+  const params = {
+    Bucket: 'wecontrolbucket',
+    Key: fileKey,
+    Body: selectedFile,
+    ContentType: selectedFile.type
+  };
+
+  // Función para enviar la imagen
+  const sendFile = async (client) => {
+    const command = new PutObjectCommand(params);
+    return client.send(command);
+  };
+
+  try {
+    // Intentar enviar con el s3Client actual
+    await sendFile(s3Client);
+  } catch (error) {
+    if (error.message && error.message.includes("ExpiredToken")) {
+      console.warn("Token expirado. Refrescando credenciales...");
+      // Actualizar token y credenciales
+      await refreshAccessToken();
+      // Esperar un poco para que el contexto se actualice (opcional, 1 segundo)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Reintentar con el nuevo s3Client (se supone que el useEffect del context ya lo actualizó)
+      if (!s3Client) {
+        setUploadError('Error al actualizar el S3Client tras refrescar credenciales.');
+        setLoading(false);
+        return;
+      }
+      try {
+        await sendFile(s3Client);
+      } catch (errorRetry) {
+        console.error('Error al subir la imagen después de refrescar el token:', errorRetry);
+        setUploadError('Error al subir la imagen tras actualizar el token. Inténtalo de nuevo.');
+        setLoading(false);
+        return;
+      }
+    } else {
+      console.error('Error al subir la imagen:', error);
+      setUploadError('Error al subir la imagen. Inténtalo de nuevo.');
+      setLoading(false);
       return;
     }
-    // Configurar S3Client con las credenciales temporales
-    const s3Client = new S3Client({
-      region: 'eu-west-1',
-      credentials: {
-        accessKeyId: awsCredentials.AccessKeyId,
-        secretAccessKey: awsCredentials.SecretAccessKey,
-        sessionToken: awsCredentials.SessionToken,
-      }
-    });
-    
-    const maxLength = 255; // Máximo total de caracteres permitidos
-    const despachoId = userData.despacho_id;
-    const empresaId = userData.belongs_to;
-    const userId = userData.id;
+  }
 
-    const pathPrefix = `${despachoId}/${empresaId}/${userId}`;
-    const fileName = selectedFile.name; 
-    const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
-    const baseFileName = fileName.substring(0, fileName.lastIndexOf('.'));
-    const uuid = uuidv4();
+  // Si llega aquí, la imagen se subió correctamente
+  onUpload(selectedFile);
 
-    const cleanFileName = sanitizeFileName(baseFileName);
-
-
-    const totalFixedLength = 
-      pathPrefix.length + 1 +
-      uuid.length + 1 +
-      fileExtension.length + 1;
-
-    const availableLengthForFileName = maxLength - totalFixedLength;
-    const truncatedFileName = cleanFileName.substring(0, availableLengthForFileName);
-
-    const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
-    console.log('fileKey: ',fileKey);
-
-    const params = {
-      Bucket: 'wecontrolbucket',
-      Key: fileKey, // Ruta del archivo en S3
-      Body: selectedFile,
-      ContentType: selectedFile.type
-    };
-
-    try {
-      const command = new PutObjectCommand(params);
-      const data = await s3Client.send(command);
-      // console.log('Archivo subido correctamente:', data);
-      onUpload(selectedFile); // Llamada a onUpload después de la carga
-
-      const requestBody = {
-        id_control: selectedControl[0],
-        id_auditoria: selectedAuditoria,
-        archive: fileKey,
-        order: selectedControl[12]
-      };
-      try {
-        const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoria', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          fetchData();
-          onClose();
-          setLoading(false);
-
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      finally{
-        handleClose();
-        setLoading(false);
-      }
-  
-
-    } catch (error) {
-      console.error('Error al subir el archivo:', error);
-      setUploadError('Error al subir el archivo. Inténtalo de nuevo.');
-    }
+  // Realiza la actualización en tu backend (opcional)
+  const requestBody = {
+    id_control: selectedControl[0],
+    id_auditoria: selectedAuditoria,
+    archive: fileKey,
+    order: selectedControl[12]
   };
+
+  try {
+    const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/UpdateControlAuditoria', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      fetchData();
+      onClose();
+    } else {
+      console.error('Error en la respuesta del servidor:', result);
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    handleClose();
+    setLoading(false);
+  }
+};
+
 
   const handleClose = () => {
     setSelectedFile(null);
