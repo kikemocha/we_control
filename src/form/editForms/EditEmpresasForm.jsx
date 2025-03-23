@@ -8,15 +8,14 @@ import Input from '../../components/common/Input';
 
 
 
-const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, phone, web, v_esp, v_trn, messagePopUp}) => {
+const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, phone, web, cif, messagePopUp}) => {
   const { token } = useAuth();
   const [EmpresaId, setEmpresaId] = useState('');
   const [EmpresaName, setEmpresaName] = useState('');
   const [EmpresaEmail, setEmpresaEmail] = useState('');
   const [EmpresaPhone, setEmpresaPhone] = useState('');
   const [EmpresaWeb, setEmpresaWeb] = useState('');
-  const [EmpresaValorEspecifico, setEmpresaValorEspecifico] = useState('');
-  const [EmpresaValorTransversal, setEmpresaValorTransversal] = useState('');
+  const [EmpresaCIF, setEmpresaCIF] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -30,9 +29,8 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
     setEmpresaEmail(email || '');
     setEmpresaPhone(phone || '');
     setEmpresaWeb(web || '');
-    setEmpresaValorEspecifico(v_esp || '');
-    setEmpresaValorTransversal(v_trn || '');
-  }, [empresa_id, name, email, phone, web, v_esp, v_trn]); // Lista de dependencias
+    setEmpresaCIF(cif || '');
+  }, [empresa_id, name, email, phone, web, cif]); // Lista de dependencias
 
 
 
@@ -42,8 +40,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
     setEmpresaEmail('');
     setEmpresaPhone('');
     setEmpresaWeb('');
-    setEmpresaValorEspecifico('');
-    setEmpresaValorTransversal('');
+    setEmpresaCIF('');
     setErrorMessage('');
     setSuccessMessage('');
     onClose();
@@ -52,16 +49,13 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
   const handleEdit = async (e) => {
     setLoading(true);
     e.preventDefault();
-
-
     const requestBody = {
       name: EmpresaName,
       empresa_id: EmpresaId,
       email: EmpresaEmail,
       phone: EmpresaPhone,
       web: EmpresaWeb,
-      valor_especifico: EmpresaValorEspecifico,
-      valor_transversal: EmpresaValorTransversal,
+      cif: EmpresaCIF,
     };
     
     try {
@@ -103,8 +97,6 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
       email: EmpresaEmail,
       phone: EmpresaPhone,
       web: EmpresaWeb,
-      valor_especifico: EmpresaValorEspecifico,
-      valor_transversal: EmpresaValorTransversal,
     };
 
     try {
@@ -145,6 +137,15 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               required={true}
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
+            <Input
+              label="CIF Empresa"
+              type="text"
+              name="cif"
+              value={EmpresaCIF == 'None' ? '' : EmpresaCIF}
+              onChange={(e) => setEmpresaCIF(e.target.value)}
+              required={true}
+              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            />
           <div className='w-full'>
             <h4 className='mb-6 font-bold'>Contacto</h4>
             <Input
@@ -170,29 +171,6 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               value={EmpresaPhone == 'None' ? '' : EmpresaPhone}
               onChange={(e) => setEmpresaPhone(e.target.value)}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-            />
-          </div>
-          <h4 className='mb-2 font-bold'>Valor Controles</h4>
-          <div className="grid md:grid-cols-2 md:gap-6">
-            <Input
-                label="Valor específico"
-                type="number"
-                name="valor_especifico"
-                value={EmpresaValorEspecifico}
-                onChange={(e) => setEmpresaValorEspecifico(e.target.value)}
-                step=".01"
-                required
-                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              />
-            <Input
-              label="Valor transversal"
-              type="number"
-              name="valor_transversal"
-              value={EmpresaValorTransversal}
-              onChange={(e) => setEmpresaValorTransversal(e.target.value)}
-              step=".01"
-              required
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
           </div>
           <br />

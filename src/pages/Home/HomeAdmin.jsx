@@ -231,11 +231,12 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                             setSelectedEmpresaName(empresaToObj(empresa));
                           }}
                         >
+                          {console.log('empresa: ',empresa)}
                           <span>{empresa[1]}</span>
                           <span>
                             {empresa[9] === 'None' || !empresa[9] ? '------' : empresa[9]}
                           </span>
-                          <span className="overflow-hidden text-ellipsis">{empresa[6] === 'None' || !empresa[6] ? '------' : empresa[6]}</span>
+                          <span className="overflow-hidden text-ellipsis">{empresa[5] === 'None' || !empresa[5] ? '------' : empresa[5]}</span>
                           <div className='absolute right-3 top-4 hover:bg-gray-400 rounded-full'  onClick={(e) => {e.stopPropagation(); handleOpenEditPopup(empresa)}}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
@@ -277,11 +278,10 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                   fetchData={getUserData}
                   empresa_id={selectedEditEmpresa[0]} 
                   name={selectedEditEmpresa[1]} 
-                  email={selectedEditEmpresa[8]} 
-                  phone={selectedEditEmpresa[10]} 
-                  web={selectedEditEmpresa[9]} 
-                  v_esp={selectedEditEmpresa[6]} 
-                  v_trn={selectedEditEmpresa[7]}
+                  email={selectedEditEmpresa[5]} 
+                  phone={selectedEditEmpresa[7]} 
+                  web={selectedEditEmpresa[6]} 
+                  cif={selectedEditEmpresa[9]}
                   />    
           )}
           </div>
