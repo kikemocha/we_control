@@ -70,7 +70,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
       const availableLengthForFileName = maxLength - totalFixedLength;
       const truncatedFileName = cleanFileName.substring(0, availableLengthForFileName);
       const fileKey = `${pathPrefix}/${uuid}_${truncatedFileName}.${fileExtension}`;
-      console.log("fileKey:", fileKey);
     
       const params = {
         Bucket: "wecontrolbucket",
@@ -106,7 +105,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
         }
       }
     
-      console.log("Imagen subida correctamente:", fileKey);
       const imageUrl = `https://${params.Bucket}.s3.eu-west-1.amazonaws.com/${fileKey}`;
       // Actualiza el estado del objeto de la empresa para guardar la URL de la imagen
       setSelectedEmpresaName(prev => ({ ...prev, img: imageUrl }));
@@ -231,7 +229,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                             setSelectedEmpresaName(empresaToObj(empresa));
                           }}
                         >
-                          {console.log('empresa: ',empresa)}
                           <span>{empresa[1]}</span>
                           <span>
                             {empresa[9] === 'None' || !empresa[9] ? '------' : empresa[9]}

@@ -5,11 +5,11 @@ import { useAuth } from '../../context/AuthContext';
 
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-
+import DeleteForm from '../DeleteForm';
 
 
 const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, phone, web, cif, messagePopUp}) => {
-  const { token } = useAuth();
+  const { token, userData } = useAuth();
   const [EmpresaId, setEmpresaId] = useState('');
   const [EmpresaName, setEmpresaName] = useState('');
   const [EmpresaEmail, setEmpresaEmail] = useState('');
@@ -18,7 +18,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
   const [EmpresaCIF, setEmpresaCIF] = useState('');
 
   const [loading, setLoading] = useState(false);
-
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -86,25 +86,36 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
     }
   };
 
-  const handleDelete = async (e) =>{
+  const handleDelete = async () =>{
     setLoading(true);
-    e.preventDefault();
 
 
     const requestBody = {
-      name: EmpresaName,
-      empresa_id: EmpresaId,
-      email: EmpresaEmail,
-      phone: EmpresaPhone,
-      web: EmpresaWeb,
+      empresa: userData.belongs_to + "/" + EmpresaId + "/"
     };
 
     try {
-      console.log('Borrando Empresa: ', requestBody);
+      const response = await fetch('https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/deleteEmpresas', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      if (response.ok) {
+        fetchData();
+        onClose();
+        setLoading(false);
+        messagePopUp('Empresa borrada correctamente', 'success')
+      }
+      else{
+        messagePopUp('Error borrando la empresa', 'error')
+      }
     } catch (error) {
-      setErrorMessage('Error al enviar los datos al servidor');
-      setSuccessMessage('');
+      console.log(error);
     } finally{
+      fetchData();
       setLoading(false);
       onClose();
     }
@@ -132,7 +143,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               label="Nombre Empresa"
               type="text"
               name="name"
-              value={EmpresaName == 'None' ? '' : EmpresaName}
+              value={EmpresaName === 'None' ? '' : EmpresaName}
               onChange={(e) => setEmpresaName(e.target.value)}
               required={true}
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -141,7 +152,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               label="CIF Empresa"
               type="text"
               name="cif"
-              value={EmpresaCIF == 'None' ? '' : EmpresaCIF}
+              value={EmpresaCIF === 'None' ? '' : EmpresaCIF}
               onChange={(e) => setEmpresaCIF(e.target.value)}
               required={true}
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -152,7 +163,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               label="e-mail"
               type="text"
               name="email"
-              value={EmpresaEmail == 'None' ? '' : EmpresaEmail}
+              value={EmpresaEmail === 'None' ? '' : EmpresaEmail}
               onChange={(e) => setEmpresaEmail(e.target.value)}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
@@ -160,7 +171,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               label="Web"
               type="text"
               name="web"
-              value={EmpresaWeb == 'None' ? '' : EmpresaWeb}
+              value={EmpresaWeb === 'None' ? '' : EmpresaWeb}
               onChange={(e) => setEmpresaWeb(e.target.value)}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
@@ -168,7 +179,7 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
               label="Teléfono"
               type="text"
               name="phone"
-              value={EmpresaPhone == 'None' ? '' : EmpresaPhone}
+              value={EmpresaPhone === 'None' ? '' : EmpresaPhone}
               onChange={(e) => setEmpresaPhone(e.target.value)}
               className="block py-2.5 mb-8 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             />
@@ -189,15 +200,15 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             {loading ? 'Cargando...' : 'Guardar Cambios'}
           </Button>
 
-          {/* <Button
-            onClick={handleDelete}
+          <Button
+            onClick={(e)=>{e.preventDefault(); setShowDeletePopup(true)}}
             className={`delete text-black font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             disabled={loading}
           >
             {loading ? 'Cargando...' : 'Eliminar Empresa'}
-          </Button> */}
+          </Button>
           </div>
 
         </form>
@@ -211,7 +222,24 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             </div>
           </div>
         )}
+        
       </div>
+      {showDeletePopup && (
+          <DeleteForm
+            show={showDeletePopup}
+            onClose={()=>{setShowDeletePopup(false)}}
+            deleteFunction={handleDelete}
+            message={`
+              Al borrar esta empresa se borrarán todos los controles, 
+              riesgos, evidencias, etc... 
+              Se guardarán en una copia de seguridad durante 3 meses, en caso de querer recuperar los datos tendrá que ponerse en contacto 
+              con el soporte. 
+              `}
+            onCloseFather={()=>{onClose()}}
+            loading={loading}
+            bottomMessage={'¿Estás seguro que quieres eliminar esta empresa?'}
+          />
+        )}
     </div>
   );
 };
