@@ -13,7 +13,6 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [showIMGPopup, setshowIMGPopup] = useState(false);
 
-    const [UserAuditoriaData, setUserAuditoriaData] = useState(null);
     const [selectedControl, setSelectedControl] = useState({});
 
     const handleUpload = async (file) => {
@@ -48,34 +47,16 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const [orderControl, setOrderControl] = useState(null);
 
     const handleShowIMGPopup = (riesgo, archivos) =>{
+        console.log('riesgos: ', riesgo)
         setImgKeys(archivos)
         setControlName(riesgo[1])
-        setMessageAdmin(riesgo[11])
+        setMessageAdmin(riesgo[10])
         setIdControl(riesgo[0])
         setIdAuditoria(riesgo[9])
-        setOrderControl(riesgo[12])
+        setOrderControl(riesgo[11])
         setshowIMGPopup(true)
     };
 
-    const fetchUserAuditoriaData = async () => {
-        try {
-            const response = await axios.get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getUserAuditoriaData?id_cognito="+cognitoId,
-              {headers : {
-                'Authorization' : `Bearer ${token}`
-              }}
-            );
-            let data_clean = [];
-            data_clean = response.data
-            setUserAuditoriaData(data_clean);
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
-      };
-    useEffect(()=>{
-        fetchUserAuditoriaData();
-    },[])
 
     if (loading || !awsCredentials) {
         return <div className='responsable_main'>
@@ -148,8 +129,8 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                 <tbody>
                                 {UserInfo.data.riesgos.map((riesgo, index) => (
                                     <tr key={index} className="table-row">
-                                        <td>{riesgo[1]}-{riesgo[12]}</td>
-                                        <td>{riesgo[13]}</td>
+                                        <td>{riesgo[1]}-{riesgo[11]}</td>
+                                        <td>{riesgo[12]}</td>
                                         <td>{riesgo[2]}</td>
                                         <td>{riesgo[3]}</td>
                                         <td>{riesgo[4]}</td>
@@ -181,7 +162,6 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                                     onUpload={handleUpload}
                                                     selectedControl={selectedControl}
                                                     selectedAuditoria={selectedControl[9]}
-                                                    userData={UserAuditoriaData}
                                                     fetchData={getUserData}
                                                 />
                                                 </div>

@@ -122,13 +122,13 @@ const handleUpload = async () => {
 
   // Si llega aquí, la imagen se subió correctamente
   onUpload(selectedFile);
-
+  console.log('selectedControl: ',selectedControl)
   // Realiza la actualización en tu backend (opcional)
   const requestBody = {
     id_control: selectedControl[0],
     id_auditoria: selectedAuditoria,
     archive: fileKey,
-    order: selectedControl[12]
+    order: selectedControl[11]
   };
 
   try {

@@ -394,7 +394,7 @@ const ShowFile = ({
             
           </div>
 
-          {role === 'admin' && (
+          {role === 'admin' || role === 'gestor' && (
             <div className="popup-buttons flex justify-around">
               {state === 'Verificado' ? (
                 <>
@@ -421,7 +421,7 @@ const ShowFile = ({
             </div>
           )}
         </div>
-        {message_admin | message_admin!=='None' && (
+        {message_admin && message_admin !== 'None' && (
           <div className="h-3/4 w-1/4 bg-white rounded-3xl flex flex-col justify-center items-center relative">
             <p
               className="w-[80%] h-[80%] bg-gray-200 rounded-xl p-4 mt-4 mb-4 resize-none"
@@ -549,9 +549,10 @@ const ShowFile = ({
             </button>
           </div>
         )}
-        {role === 'admin' | role === 'gestor' && (
+        
+        {role === 'admin' || role === 'gestor' && (
           <div className="popup-buttons flex justify-around">
-            {role === 'admin' | role === 'gestor' && (
+            {role === 'admin' || role === 'gestor' && (
               <button className="popup-button text-red-600" onClick={() => handleDelete(singleFile)}>
                 Eliminar
               </button>

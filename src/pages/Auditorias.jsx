@@ -302,20 +302,21 @@ const Auditorias = () => {
                                                 <tbody>
                                                     {AuditoriaData.map((control, index) => (
                                                     <tr key={index} className="table-row">
+                                                        {console.log(control)}
                                                         <td>
                                                             {
-                                                            control[10] === 'Anual' ? (
+                                                            control[9] === 'Anual' ? (
                                                                 control[0]
-                                                            ) : control[10] === 'Semestral' ? (
-                                                                `${control[0]} - S${control[11]}`
-                                                            ): control[10] === 'Cuatrimestral' ? (
-                                                                `${control[0]} - ${control[11]}_Cuatr`
-                                                            ): control[10] === 'Trimestral' && (
-                                                                `${control[0]} - T${control[11]}`
+                                                            ) : control[9] === 'Semestral' ? (
+                                                                `${control[0]} - S${control[10]}`
+                                                            ): control[9] === 'Cuatrimestral' ? (
+                                                                `${control[0]} - ${control[10]}_Cuatr`
+                                                            ): control[9] === 'Trimestral' && (
+                                                                `${control[0]} - T${control[10]}`
                                                             )
                                                             }
                                                         </td>
-                                                        <td>{control[10]}</td>
+                                                        <td>{control[9]}</td>
                                                         <td>{control[1]}</td>
                                                         <td>{control[2]}</td>
                                                         <td>{control[3]}</td>
@@ -335,7 +336,7 @@ const Auditorias = () => {
                                                             
                                                                     <p
                                                                         onClick={() => {
-                                                                        handleShowFile(archivos, control[8], control[9], control[6], control[11], control[0], control[12]);
+                                                                        handleShowFile(archivos, control[7], control[8], control[6], control[10], control[0], control[11]);
                                                                         }}
                                                                         style={{ cursor: 'pointer' }}
                                                                     >
