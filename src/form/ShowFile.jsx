@@ -393,8 +393,8 @@ const ShowFile = ({
             )}
             
           </div>
-
-          {role === 'admin' || role === 'gestor' && (
+          
+          {(role === 'admin' || role === 'gestor') && (
             <div className="popup-buttons flex justify-around">
               {state === 'Verificado' ? (
                 <>
@@ -550,9 +550,9 @@ const ShowFile = ({
           </div>
         )}
         
-        {role === 'admin' || role === 'gestor' && (
+        {(role === 'admin' || role === 'gestor') && (
           <div className="popup-buttons flex justify-around">
-            {role === 'admin' || role === 'gestor' && (
+            {(role === 'admin' || role === 'gestor') && (
               <button className="popup-button text-red-600" onClick={() => handleDelete(singleFile)}>
                 Eliminar
               </button>
