@@ -231,7 +231,8 @@ const EditEmpresasForm = ({ show, onClose, fetchData, empresa_id, name, email, p
             deleteFunction={handleDelete}
             message={`
               Al borrar esta empresa se borrarán todos los controles, 
-              riesgos, evidencias, etc... 
+              riesgos, evidencias, etc...
+              Los usuario también serán eliminados y no tendrán acceso a la plataformas
               Se guardarán en una copia de seguridad durante 3 meses, en caso de querer recuperar los datos tendrá que ponerse en contacto 
               con el soporte. 
               `}
