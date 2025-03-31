@@ -7,9 +7,12 @@ import Button from './common/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import PhotoPopup from './CroppingImg';
+import MFAModal from './MFAModal';
+import { updateMFAPreference } from 'aws-amplify/auth';
+
 
 const Navbar = () => {
-    const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, selectedEmpresaName, searchQuery, setSearchQuery} = useAuth();
+    const {role, userData, token, fetchUserData, cognitoId, selectedEmpresa, selectedEmpresaName, searchQuery, setSearchQuery, mfaEnable, setMfaEnable} = useAuth();
     const location = useLocation();
 
     const [loading, setLoading] = useState(false)
@@ -24,6 +27,8 @@ const Navbar = () => {
     const [emailPerson, setEmail] = useState(userData.email ? userData.email : '');
     const [phonePerson, setPhonePerson] = useState(userData.phone ? userData.phone : '');
 
+    const [showMultiFactor, setShowMultiFactor] = useState(false);
+    const [showDisableMultiFactor, setShowDisableMultiFactor] = useState(false);
 
     const [profilePopUp, setProfilePopUp] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -242,6 +247,22 @@ const Navbar = () => {
     }, [categorySelected])
     
 
+    const handleDisableMultifactor = async () => {
+        setLoading(true);
+        setMessageError('');
+        try {
+          // Deshabilitamos MFA para SMS y TOTP (ajusta según los métodos que uses)
+          await updateMFAPreference({ sms: 'DISABLED', totp: 'DISABLED' });
+          // Actualiza el estado para reflejar que MFA está deshabilitado
+          setMfaEnable(false);
+          setShowDisableMultiFactor(false);
+          messagePopUp('Multifactor authentication disabled successfully', 'success');
+        } catch (error) {
+          setMessageError(error.message || 'Error disabling multifactor authentication');
+        } finally {
+          setLoading(false);
+        }
+      };
 
     return (
         <div className="navbar">
@@ -375,11 +396,74 @@ const Navbar = () => {
                             >
                                 {loading ? 'Cargando...' : 'Cambiar Contraseña'}
                             </Button>
+                            {!mfaEnable ? 
+                                <Button
+                                    onClick={(e)=>{e.preventDefault(); setShowMultiFactor(true)}}
+                                    className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Cargando...' : 'Activar Multifactor'}
+                                </Button> 
+                            : 
+                                <Button
+                                    onClick={(e)=>{e.preventDefault(); setShowDisableMultiFactor(true)}}
+                                    className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Cargando...' : 'Desactivar Multifactor'}
+                                </Button>
+                            }
                             </div>
                         </div>
 
                     </div>
                 </div>
+                {showDisableMultiFactor && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 p-6 z-50" onClick={(e) => e.stopPropagation()}>
+                    <div className="relative bg-white rounded-xl shadow-lg p-6 w-1/3 h-1/2 flex flex-col justify-evenly px-24" onClick={(e) => e.stopPropagation()}>
+                      <button 
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                        onClick={()=> setShowDisableMultiFactor(false)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="red" className="h-6 w-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+
+                        <div className='font-bold text-center'>¿Estás seguro que quiere deshabilitar la autenticacion con multifactor?</div>
+                        <div className='w-full flex justify-around'>
+                            <Button
+                                onClick={(e)=>{handleDisableMultifactor(e)}}
+                                className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={loading}
+                            >
+                                {loading ? 'Cargando...' : 'Sí'}
+                            </Button>
+                            <Button
+                                onClick={()=> setShowDisableMultiFactor(false)}
+                                className={`text-black font-bold text-sm w-40 h-14 px-5 py-2.5 text-center ${
+                                loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={loading}
+                            >
+                                {loading ? 'Cargando...' : 'NO'}
+                            </Button>
+                        </div>
+                    </div>
+                  </div>
+                )}
+                { showMultiFactor && (
+                <MFAModal 
+                    onClose={() => setShowMultiFactor(false)} 
+                    token={token}
+                />
+                )}
                     {showChangePassword &&(
                         <div className='relative ml-12 w-1/4 h-1/2 bg-white rounded-xl' onClick={(e) => e.stopPropagation()}>
                         <button className="popup-close" onClick={(e)=>{ e.preventDefault(); onClosePasswd(false);}}>

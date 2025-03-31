@@ -47,7 +47,9 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(() => {
     const storedUserData = sessionStorage.getItem('userData');
     return storedUserData ? JSON.parse(storedUserData) : null;
-});
+  });
+
+  const [mfaEnable, setMfaEnable] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -66,6 +68,10 @@ export const AuthProvider = ({ children }) => {
         setUserData(JSON.parse(userData)); // Convertirlo al objeto cuando se extrae
     }
 }, []);
+
+  useEffect(()=>{
+    sessionStorage.setItem('mfaEnable', mfaEnable);
+  }, [mfaEnable]);
 
   useEffect(() => {
     sessionStorage.setItem('refreshToken', refreshToken);
@@ -117,6 +123,7 @@ export const AuthProvider = ({ children }) => {
       setAwsCredentials(null);
       setUserData(null);
       setS3Client(null);
+      setMfaEnable(false);
       // Limpiar el almacenamiento local
       sessionStorage.clear();
   
@@ -286,7 +293,9 @@ export const AuthProvider = ({ children }) => {
     refreshAccessToken,
     expirationTime,
     setExpirationTime,
-    s3Client
+    s3Client,
+    mfaEnable,
+    setMfaEnable
   };
 
   
