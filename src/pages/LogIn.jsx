@@ -12,11 +12,14 @@ const LogIn = () => {
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState(''); // Nueva contraseña
   const [confirmNewPassword, setConfirmNewPassword] = useState(''); // Confirmación de la nueva contraseña
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaRequired, setMfaRequired] = useState(false);
+
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
   const [JWTtoken, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime} = useAuth();
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime, setMfaEnable} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(null);
@@ -81,11 +84,15 @@ const LogIn = () => {
         await fetchUserData(cognitoId, idToken);
         navigate('/home');
 
-      } else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        setIsNewPasswordRequired(true); // Muestra el formulario de nueva contraseña
-      } else {
-        setError(`Debe completar el siguiente paso: ${nextStep.signInStep}`);
-      }
+      } else if (nextStep && (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE' ||
+          nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_SMS_CODE')) {
+          // MFA challenge triggered
+          setMfaRequired(true);
+        }else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+          setIsNewPasswordRequired(true); // Muestra el formulario de nueva contraseña
+        } else {
+          setError(`Debe completar el siguiente paso: ${nextStep.signInStep}`);
+        }
     } catch (authError) {
       setError(authError.message || "Error al iniciar sesión.");
       console.error('Error signing in', authError);
@@ -93,6 +100,49 @@ const LogIn = () => {
       setLoading(false);
     }
   };
+
+  const handleMfaSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await confirmSignIn({ challengeResponse: mfaCode });
+      if (result.isSignedIn) {
+        // Repetir la misma lógica de guardado de tokens que haces en handleSubmit:
+        const session = await fetchAuthSession(); // obtén la sesión de Cognito
+        const cognitoId = session.userSub;
+        const exp = session.tokens.idToken.payload.exp;
+        
+        // OJO: usa tu appClientId correcto
+        const appClientId = '3p4sind7orh97u1urvh9fktpmr';
+        const accessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
+        const refreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
+        const idToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+        
+        // Guárdalos en tu contexto y sessionStorage
+        setToken(idToken);
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+        setCognitoId(cognitoId);
+        setExpirationTime(new Date(exp * 1000));
+  
+        // Llama a tus funciones que dependan del token (fetchAwsCredentials, fetchUserData, etc.)
+        await fetchAwsCredentials(idToken);
+        await fetchUserData(cognitoId, idToken);
+        setMfaEnable(true);
+        
+        navigate('/home');
+      } else {
+        setError("MFA verification failed.");
+      }
+    } catch (error) {
+      setError(error.message || "Error verifying MFA code.");
+      console.error("Error verifying MFA code:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   
 
   const handleNewPasswordSubmit = async (event) => {
@@ -249,7 +299,42 @@ const LogIn = () => {
             {loading ? 'Cargando...' : 'Cambiar Contraseña'}
           </Button>
         </form>
-      ) : (
+      ) : mfaRequired ? (
+        <form onSubmit={handleMfaSubmit} className="h-96 w-96">
+          <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
+              {/* Input field */}
+              <input
+                label="Código MFA"
+                type="text"
+                name="mfaCode"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value)}
+                required
+                placeholder=" "
+                className={`block py-2.5 px-4 w-full h-14 text-md text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
+              />
+              {/* Label that "floats" */}
+              <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
+                <label
+                  htmlFor={"email"}
+                  >
+                  Código Multifactor
+                </label>
+                <p className='text-gray-500 ml-5'></p>
+              </div>
+            </div>
+          <Button
+            type="submit"
+            className={`text-black w-48 mx-auto my-auto bg-yellow-400 font-bold rounded-full text-xl px-5 py-2.5 text-center ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={loading}
+          >
+            {loading ? 'Cargando...' : 'Enviar'}
+          </Button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </form>
+      ) :  (
         <form onSubmit={handleSubmit} className='h-96 w-96'>
             <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
               {/* Input field */}
