@@ -14,10 +14,6 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const [showIMGPopup, setshowIMGPopup] = useState(false);
 
     const [selectedControl, setSelectedControl] = useState({});
-
-    const handleUpload = async (file) => {
-        // Aquí va tu lógica de carga de archivos usando S3
-    };
     
     useEffect(() => {
         const getAwsCredentials = async () => {
@@ -121,7 +117,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                     <th>Evidencias</th>
                                     <th>Responsable</th>
                                     <th>Fecha límite</th>
-                                    <th>Fecha de evidencias</th>
+                                    <th>Última Modificación</th>
                                     <th>Archivos subidos</th>
                                     <th>Estado</th>
                                 </tr>
@@ -159,7 +155,6 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                                 <FileUploadPopup
                                                     show={showUploadPopup}
                                                     onClose={() => setShowUploadPopup(false)}
-                                                    onUpload={handleUpload}
                                                     selectedControl={selectedControl}
                                                     selectedAuditoria={selectedControl[9]}
                                                     fetchData={getUserData}
