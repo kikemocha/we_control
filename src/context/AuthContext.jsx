@@ -229,7 +229,7 @@ export const AuthProvider = ({ children }) => {
   
       const newExpirationTime = new Date(exp * 1000); // `exp` está en segundos, convertir a milisegundos
       setExpirationTime(newExpirationTime);
-
+      await fetchAwsCredentials(newIdToken);
       console.log('Tokens renovados con éxito');
     } catch (error) {
       console.error('Error al renovar el token:', error);

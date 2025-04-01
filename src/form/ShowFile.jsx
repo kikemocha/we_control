@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Popup.css'; 
 import { useAuth } from '../context/AuthContext';
-import { S3Client, DeleteObjectCommand, GetObjectCommand, PutObjectCommand} from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,7 +18,7 @@ const ShowFile = ({
   order
 }) => {
   const [uploadError, setUploadError] = useState('');
-  const { role, token, awsCredentials, fetchAwsCredentials, userData } = useAuth(); 
+  const { role, token, awsCredentials, fetchAwsCredentials, userData, s3Client, refreshAccessToken } = useAuth(); 
   const [message, setMessage] = useState('');
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,16 +47,22 @@ const ShowFile = ({
     }
   }, [token, fetchAwsCredentials, awsCredentials?.AccessKeyId]);
 
-  // Instancia del cliente S3
-  const s3Client = new S3Client({
-    region: 'eu-west-1',
-    credentials: {
-      accessKeyId: awsCredentials?.AccessKeyId || '',
-      secretAccessKey: awsCredentials?.SecretAccessKey || '',
-      sessionToken: awsCredentials?.SessionToken || '',
-    },
-  });
 
+  const executeS3Command = async (command) => {
+    try {
+      return await s3Client.send(command);
+    } catch (error) {
+      if (error.message && error.code.includes("ExpiredToken")) {
+        console.warn("ExpiredToken detected. Refreshing token...");
+        await refreshAccessToken();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Retry with updated credentials
+        return await s3Client.send(command);
+      }
+      throw error;
+    }
+  };
+  
   // Cerrar popup
   const handleClose = () => {
     setShowTextPopup(false);
@@ -75,7 +81,7 @@ const ShowFile = ({
         Key: archiveKey,
       };
       const deleteCommand = new DeleteObjectCommand(params);
-      await s3Client.send(deleteCommand);
+      await executeS3Command(deleteCommand);
 
       // 2. Llamar a tu API para marcarlo en BD
       const requestBody = {
@@ -118,7 +124,19 @@ const ShowFile = ({
         Key: archiveKey,
       });
       // Generar el signed URL (1 hora)
-      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      let signedUrl;
+      try {
+        signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      } catch (error) {
+        if (error.message && error.message.includes("ExpiredToken")) {
+          console.warn("ExpiredToken detected during getSignedUrl. Refreshing token...");
+          await refreshAccessToken();
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        } else {
+          throw error;
+        }
+      }
       window.open(signedUrl, '_blank'); // Abrir en otra pestaña
     } catch (error) {
       console.error('Error generando link de descarga:', error);
@@ -131,18 +149,26 @@ const ShowFile = ({
   const generatePdfUrl = async (archiveKey) => {
     setLoading(true);
     try {
-      if (!s3Client) {
-        console.error('S3Client no disponible.');
-        return;
-      }
       const command = new GetObjectCommand({
         Bucket: 'wecontrolbucket',
         Key: archiveKey,
       });
-      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      let signedUrl;
+      try {
+        signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      } catch (error) {
+        if (error.message && error.message.includes("ExpiredToken")) {
+          console.warn("ExpiredToken detected during getSignedUrl for PDF. Refreshing token...");
+          await refreshAccessToken();
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        } else {
+          throw error;
+        }
+      }
       setPdfSignedUrl(signedUrl);
     } catch (error) {
-      console.error('Error generando link de descarga:', error);
+      console.error('Error generating PDF preview link:', error);
     } finally {
       setLoading(false);
     }
@@ -363,7 +389,8 @@ const ShowFile = ({
                     <p
                       className='text-blue-700 underline cursor-pointer'
                       onClick={() => handleDownload(archiveKey)}
-                    >{archiveKey.split('_').slice(1).join('_')}</p>
+                    >{archiveKey.split('_').slice(1).join('_')}
+                    </p>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="size-6 text-red-600 cursor-pointer"
                       onClick={()=>{handleDelete(archiveKey)}}
                       >
