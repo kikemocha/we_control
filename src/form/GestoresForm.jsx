@@ -78,19 +78,19 @@ const GestoresForm = ({ show, onClose, fetchData, actualGestores}) => {
       
       const result = await response.json();
 
-        console.log("API Response Result:", result); // Debug log
-        console.log("API Response Status:", response.status); // Debug log
-
         if (response.ok) {
             fetchData();
             setSuccessMessage(result.message || 'Operación exitosa');
             setErrorMessage('');
             handleClose();
         } else {
+          if (result.error === 'User already exists') {
+            setErrorMessage('El usuario ya se encuentra en registrado en la plataforma, contacta con el servicio técnico para solucionar el problema soporte@wecontrolapp.com');
+          } else {
+            setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
+          }
           // Manejar errores en la respuesta de la API
-          setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
           setSuccessMessage('');
-          console.error("API Error Response:", result); // Debug log
       }
   } catch (error) {
       // Manejar errores en la solicitud/fetch

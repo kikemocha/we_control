@@ -10,7 +10,7 @@ const FileUploadPopup = ({ show, onClose, onUpload, selectedControl, selectedAud
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
-  
+
   const [loading, setLoading] = useState(false)
 
   const fileInputRef = useRef(null);

@@ -126,12 +126,14 @@ const Gestores = () => {
                                     <tr className="table-row">
                                         <th>Nombre</th>
                                         <th>Apellido</th>
-                                        <th>Título</th>
+                                        <th>Cargo   </th>
                                         <th>E-mail</th>
+                                        <th>Teléfono</th>
                                         <th>Ajustes</th>
                                     </tr>
                                     {Array.from({ length: 8 }).map((_, index) => (
                                         <tr key={index} className="table-row">
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>

@@ -47,20 +47,27 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
 
       const result = await response.json();
 
-      if (response.ok) {
-        onClose();
-        setSuccessMessage(result.message);
-        setErrorMessage('');
-      } else {
-        setErrorMessage(result.message);
-        setSuccessMessage('');
+        if (response.ok) {
+            fetchData();
+            setSuccessMessage(result.message || 'Operación exitosa');
+            setErrorMessage('');
+            onClose();
+        } else {
+          if (result.error === 'User already exists') {
+            setErrorMessage('El usuario ya se encuentra en registrado en la plataforma, contacta con el servicio técnico para solucionar el problema soporte@wecontrolapp.com');
+          } else {
+            setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
+          }
+          // Manejar errores en la respuesta de la API
+          setSuccessMessage('');
       }
-    } catch (error) {
-      setErrorMessage('Error al enviar los datos al servidor');
+  } catch (error) {
+      // Manejar errores en la solicitud/fetch
+      setErrorMessage('Ha ocurrido un error con el servidor, vuelve a probar en unos minutos. Si el error persiste, contacta con el soporte.');
       setSuccessMessage('');
-    } finally{
-      fetchData();
-      setLoading(false);
+      console.error("Request Error:", error); // Debug log
+    } finally {
+        setLoading(false);
     }
   };
   if (!show) return null;
@@ -140,6 +147,21 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
             {loading ? 'Cargando...' : 'Nuevo Responsable'}
           </Button>
         </form>
+        {
+          errorMessage ? (
+            <p className='h-7 text-center' style={{ color: 'red' }}>{errorMessage}</p>
+            ): (
+              <p className='h-7'></p>
+            )}
+          {
+          successMessage ? 
+          (
+          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
+
+          ):(
+            <p className='h7'></p>
+          )
+        }
         {loading && (
           <div className="absolute top-0 left-0 w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10 rounded-xl">
             <div role="status">

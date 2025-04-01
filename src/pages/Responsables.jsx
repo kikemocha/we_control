@@ -3,7 +3,7 @@ import {React, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import ResponsablesForm from '../form/ResponsablesForm';
-
+import EditPersonForm from '../form/editForms/EditPersonForm';
 
 const Responsables = () => {
     const {selectedEmpresa, token, searchQuery} = useAuth();
@@ -15,6 +15,26 @@ const Responsables = () => {
     const handleOpenPopup = () => setShowPopup(true);
     const handleClosePopup = () => setShowPopup(false);
 
+    const [messagePopUp, setMessagePopUp] = useState('');
+    const [messageStatePopUp, setMessageStatePopUp] = useState('');
+    const [messageIsVisible, setMessageIsVisible] = useState(false);
+    const [showMessagePopUp, setShowMessagePopUp] = useState(false);
+
+    const handleCloseMessagePopUp = (message, messageState) => {
+        setMessageStatePopUp(messageState); 
+        setMessagePopUp(message); // Establece el mensaje que se mostrará
+        setShowMessagePopUp(true); // Muestra el popup
+        setMessageIsVisible(true); // Controla la animación de entrada
+    
+        // Después de 2 segundos, empieza la animación de salida y cierra el popup
+        setTimeout(() => {
+            setMessageIsVisible(false); // Activamos la animación de salida
+          setTimeout(() => {
+            setShowMessagePopUp(false); // Remueve el popup después de que la animación termine
+            setMessagePopUp(''); // Limpia el mensaje
+          }, 500); // 500 ms es la duración de la animación de salida
+        }, 2000); // El popup permanece visible durante 2 segundos
+    };
 
     const fetchData = async () => {
         try {
@@ -44,6 +64,14 @@ const Responsables = () => {
         responsable.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
         responsable.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const [showEditPopup, setshowEditPopup] = useState(false);
+    const [selectedResponsable, setSelectedResponsable] = useState(null); // Riesgo seleccionado para editar
+    const handleOpenEditPopup = (responsable) => {
+        setSelectedResponsable(responsable);  // Guardar el item seleccionado
+        setshowEditPopup(true);
+      };
+    const handleCloseEditPopup = () => setshowEditPopup(false);
 
     
     if (loading) {
@@ -134,7 +162,7 @@ const Responsables = () => {
                                     <th>Cargo</th>
                                     <th>E-mail</th>
                                     <th>Controles Asignados</th>
-                                    {/* <th>Ajustes</th> */}
+                                    <th>Ajustes</th>
                                 </tr>
                                 {filteredResponsables.map((responsable, index) => (
                                     <tr key={index} className="table-row">
@@ -144,16 +172,17 @@ const Responsables = () => {
                                         <td>{responsable.role}</td>
                                         <td>{responsable.email}</td>
                                         <td>{responsable.cuenta}</td>
-                                        {/* <td className='flex align-middle justify-center'>
+                                        <td className='flex align-middle justify-center'>
                                             <svg
                                                 viewBox="0 0 24 24"
                                                 fill="currentColor"
                                                 height="2.5em"
                                                 width="2.5em"
+                                                onClick={(e) => handleOpenEditPopup(responsable)}
                                                 >
                                                 <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                                             </svg>
-                                        </td> */}
+                                        </td>
                                     </tr>
                                 ))}
                             </table>
@@ -163,7 +192,22 @@ const Responsables = () => {
                 </div>) : (
                     <div> Loading ...</div>
                 )}
-        
+        {showEditPopup && selectedResponsable && (
+                    <EditPersonForm
+                        show={showEditPopup}
+                        onClose={handleCloseEditPopup}
+                        fetchData={fetchData}
+                        id_cognito={selectedResponsable.id_cognito}
+                        id_person={selectedResponsable.id_user} 
+                        first_name={selectedResponsable.name} 
+                        last_name={selectedResponsable.surname} 
+                        cargo={selectedResponsable.role}
+                        email={selectedResponsable.email}
+                        phone={selectedResponsable.phone}
+                        messagePopUp={handleCloseMessagePopUp}
+                        
+                    />    
+                )}
     </div>
 };
 

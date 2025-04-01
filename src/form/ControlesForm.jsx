@@ -190,10 +190,8 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
       const result = await response.json();
 
       if (response.ok) {
-
         setSuccessMessage(result.message);
-        setErrorMessage('');
-        fetchData(); // Recargar la lista de controles
+        setErrorMessage('Control creado correctamente');
         handleClose();
       } else {
         setErrorMessage(result.message);
@@ -203,6 +201,8 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
       setErrorMessage('Error al enviar los datos al servidor');
       setSuccessMessage('');
     } finally{
+      handleClose();
+      fetchData();
       resetValues();
       setLoading(false);
     }
@@ -346,7 +346,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
                       className={`riesgo-item ${selectedResponsable === responsable.id_user ? 'selected' : ''}`} 
                       onClick={() => handleResponsableClick(responsable.id_user)}
                     >
-                      <strong>{responsable.name}</strong>
+                      <strong className='mr-4'>{responsable.name}</strong>
                       <p>{responsable.email}</p>
                     </div>
                   ))}

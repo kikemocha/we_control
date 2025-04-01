@@ -302,7 +302,6 @@ const Auditorias = () => {
                                                 <tbody>
                                                     {AuditoriaData.map((control, index) => (
                                                     <tr key={index} className="table-row">
-                                                        {console.log(control)}
                                                         <td>
                                                             {
                                                             control[9] === 'Anual' ? (
@@ -347,6 +346,7 @@ const Auditorias = () => {
                                                                 );
                                                             })()}
                                                         </td>
+                                                        {console.log(control)}
                                                         <td className={control[6] === 'Denegado' ? 'text-red-500' : control[6] === 'Verificado' ? 'text-green-600' : ''}>{control[6] === 'Denegado' ? 'No Validado' : control[6]}</td>
                                                     </tr>
                                                     ))}

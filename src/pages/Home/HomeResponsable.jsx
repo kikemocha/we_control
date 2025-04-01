@@ -134,7 +134,7 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                                         <td>{riesgo[2]}</td>
                                         <td>{riesgo[3]}</td>
                                         <td>{riesgo[4]}</td>
-                                        <td>{riesgo[5]}</td>
+                                        <td>{riesgo[5] === 'None' ? '---' : riesgo[5]}</td>
                                         <td>{riesgo[6] === 'None' ? '---' : riesgo[6]}</td>
                                         <td className="archive_responsable">
                                         {(() => {
