@@ -7,26 +7,11 @@ import './Layout.css';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-    const {role, selectedEmpresa, signOut, expirationTime} = useAuth();
-    const location = useLocation();
+  const {role, selectedEmpresa, signOut} = useAuth();
+  const location = useLocation();
   
-  
-  useEffect(() => {
-    const currentTime = new Date().getTime(); // Obtén el tiempo actual en milisegundos
-    //console.log('expirationTime: ',expirationTime)
-    if (expirationTime < currentTime) {
-      alert('La sesión ha expirado');
-      signOut(); // Llama a la función SignOut cuando el usuario acepte el alert
-    }
-  }, [expirationTime, location]);
-
 
   useEffect(() => {
-    // Verifica que signOut está definido
-    if (!signOut) {
-      console.error('signOut function is not defined');
-      return;
-    }
 
     // Ejecutar signOut si el role es null
     if (role === 'null') {

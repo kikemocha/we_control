@@ -154,12 +154,6 @@ export const AuthProvider = ({ children }) => {
       // Save credentials in sessionStorage as a JSON string
       sessionStorage.setItem('awsCredentials', JSON.stringify(credentials));
       console.log('AWS credentials stored in sessionStorage');
-  
-      // Schedule a refresh (e.g., refresh 5 minutes before 1 hour expires)
-      const refreshInterval = (3600 - 300) * 1000; // 55 minutes in milliseconds
-      setTimeout(() => {
-        fetchAwsCredentials(tokenAWS);
-      }, refreshInterval);
     } catch (error) {
       console.error('Error fetching AWS credentials:', error.message || error.response);
     }
@@ -177,7 +171,7 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      fetchAwsCredentials(token);
+      await fetchAwsCredentials(token);
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');

@@ -19,7 +19,7 @@ const LogIn = () => {
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
   const [JWTtoken, setJWTToken] = useState(null);
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, fetchAwsCredentials, setExpirationTime, setMfaEnable} = useAuth();
+  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, setExpirationTime, setMfaEnable} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(null);
@@ -37,19 +37,6 @@ const LogIn = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    // Verificamos que el token no sea null o undefined
-    if (JWTtoken) {
-      const fetchAWS = async () => {
-        try {
-          await fetchAwsCredentials(JWTtoken);
-        } catch (error) {
-          console.error('Error fetching AWS credentials:', error);
-        }
-      };
-      fetchAWS();
-    }
-  }, [JWTtoken]);
 
   const handleSubmit = async (event, providedPassword = null) => {
     if (event) event.preventDefault();
@@ -80,7 +67,6 @@ const LogIn = () => {
         setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
-        await fetchAwsCredentials(idToken);
         await fetchUserData(cognitoId, idToken);
         navigate('/home');
 
@@ -126,8 +112,6 @@ const LogIn = () => {
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
   
-        // Llama a tus funciones que dependan del token (fetchAwsCredentials, fetchUserData, etc.)
-        await fetchAwsCredentials(idToken);
         await fetchUserData(cognitoId, idToken);
         setMfaEnable(true);
         

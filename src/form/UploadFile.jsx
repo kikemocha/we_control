@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fetchData, refreshAccessToken }) => {
-  const { token, userData, s3Client } = useAuth();
+  const { token, userData, s3Client, awsCredentials } = useAuth();
   const [archives, setArchives] = useState([]);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
@@ -73,6 +73,15 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   };
 
   const uploadFile = async (file) => {
+
+    if (!awsCredentials?.AccessKeyId) {
+      console.warn("No hay credenciales de AWS disponibles, actualizando...");
+      await refreshAccessToken();
+      if (!awsCredentials?.AccessKeyId) {
+        throw new Error("No se pudieron obtener credenciales válidas.");
+      }
+    }
+    
     const fileKey = getFileKey(file);
     const params = {
       Bucket: 'wecontrolbucket',
