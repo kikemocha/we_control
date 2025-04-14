@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 import { S3Client } from '@aws-sdk/client-s3';
+import { json } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -209,7 +210,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // Llama a fetchAuthSession para forzar la renovación de los tokens
       const session = await fetchAuthSession({ forceRefresh: true });
-      
+      console.log("Session recibida:", session)
       const cognitoId = session.userSub;
       const exp = session.tokens.idToken.payload.exp;
       const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client

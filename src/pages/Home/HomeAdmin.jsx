@@ -11,7 +11,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 const HomeAdmin = ({getUserData, UserInfo}) => {
-    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery, selectedEmpresaName, setSelectedEmpresaName, s3Client, token, refreshAccessToken} = useAuth();
+    const { userData, setSelectedEmpresa, selectedEmpresa, searchQuery, setSelectedEmpresaName, s3Client, token, refreshAccessToken} = useAuth();
     const [showPopup, setShowPopup] = useState(false);
 
 
