@@ -18,7 +18,7 @@ const Layout = () => {
             console.log(`Verificando token: ahora = ${now}, expiración = ${expTime}`);
             if (now > expTime) {
               console.log("El token ha expirado, cerrando sesión...");
-              alert("Your session has expired");
+              alert("Tu sesión ha expirado!, vuelve a iniciar sesión");
               signOut();
             }
           }

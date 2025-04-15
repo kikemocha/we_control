@@ -18,7 +18,7 @@ const ShowFile = ({
   order
 }) => {
   const [uploadError, setUploadError] = useState('');
-  const { role, token, awsCredentials, fetchAwsCredentials, userData, s3Client, refreshAccessToken } = useAuth(); 
+  const { role, token, expirationTime, userData, s3Client, refreshAccessToken } = useAuth(); 
   const [message, setMessage] = useState('');
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,25 +28,21 @@ const ShowFile = ({
   const attemptCountRef = useRef(0);
   // Intentos para reintentar credenciales
   useEffect(() => {
-    const checkAwsCredentials = async () => {
-      if (!awsCredentials?.AccessKeyId && attemptCountRef.current < 3) {
-        setLoading(true);
-        attemptCountRef.current += 1;
-        await fetchAwsCredentials(token);
-        // Se espera 1 segundo y se vuelve a comprobar si ya existen las credenciales
-        if (!awsCredentials?.AccessKeyId && attemptCountRef.current < 3) {
-          setTimeout(checkAwsCredentials, 1000);
-        } else {
+    const checkAndRefreshToken = async () => {
+      if (expirationTime) {
+        const now = new Date();
+        const expTime = new Date(expirationTime);
+        console.log(`Verificando token: ahora = ${now.getTime()}, expiración = ${expTime.getTime()}`);
+        if (now > expTime) {
+          console.log("El token ha expirado, renovando token...");
+          setLoading(true);
+          await refreshAccessToken();
           setLoading(false);
         }
       }
     };
-
-    if (!awsCredentials?.AccessKeyId) {
-      checkAwsCredentials();
-    }
-  }, [token, fetchAwsCredentials, awsCredentials?.AccessKeyId]);
-
+    checkAndRefreshToken();
+  }, [expirationTime, refreshAccessToken]);
 
   const executeS3Command = async (command) => {
     try {
@@ -54,9 +50,11 @@ const ShowFile = ({
     } catch (error) {
       if (error.message && error.code.includes("ExpiredToken")) {
         console.warn("ExpiredToken detected. Refreshing token...");
+        setLoading(true);
         await refreshAccessToken();
         await new Promise(resolve => setTimeout(resolve, 1000));
-        // Retry with updated credentials
+        setLoading(false);
+        // Retry con las nuevas credenciales
         return await s3Client.send(command);
       }
       throw error;
@@ -425,9 +423,11 @@ const ShowFile = ({
             <div className="popup-buttons flex justify-around">
               {state === 'Verificado' ? (
                 <>
-                  <button className="popup-button mt-3" onClick={() => setShowTextPopup(true)}>
-                    No Validar
-                  </button>
+                  {!showTextPopup && 
+                    <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
+                      No Validar
+                    </button>
+                  }
                 </>
               ) : state === 'Denegado' ? (
                 <>
@@ -440,9 +440,11 @@ const ShowFile = ({
                   <button className="popup-button mt-3" onClick={handleVerify}>
                     Verificar
                   </button>
-                  <button className="popup-button bg-red-300 mt-3" onClick={handleshowDescription}>
-                    No validar
-                  </button>
+                  {!showTextPopup && 
+                    <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
+                      No Validar
+                    </button>
+                  }
                 </>
               )}
             </div>
@@ -584,11 +586,15 @@ const ShowFile = ({
                 Eliminar
               </button>
             )}
+            
             {state === 'Verificado' ? (
               <>
-                <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
-                  No Validar
-                </button>
+                {!showTextPopup && 
+                  <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
+                    No Validar
+                  </button>
+                }
+                
               </>
             ) : state === 'Denegado' ? (
               <>
@@ -601,8 +607,8 @@ const ShowFile = ({
                 <button className="popup-button " onClick={handleVerify}>
                   Verificar
                 </button>
-                <button className="popup-button text-red-800" onClick={handleshowDescription}>
-                  No validar
+                <button className="popup-button bg-red-300" onClick={handleDeny}>
+                  No Validar
                 </button>
               </>
             )}
@@ -647,8 +653,8 @@ const ShowFile = ({
                 onChange={(e) => setMessage(e.target.value)}
               ></textarea>
               <button className="popup-button bg-red-300" onClick={handleDeny}>
-                No Validar
-              </button>
+                  No Validar
+                </button>
               {loading && (
                 <div className="absolute top-0 left-0 rounded-3xl w-full h-full bg-gray-400 bg-opacity-70 flex justify-center items-center z-10">
                   <div role="status">

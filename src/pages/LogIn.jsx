@@ -1,10 +1,9 @@
 import React, { useState, useEffect} from 'react';
-import { signIn, fetchAuthSession, confirmSignIn } from 'aws-amplify/auth';
+import { signIn, fetchAuthSession, confirmSignIn, signOut } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 import logo from '../we_control.png' ;
-import { signOut } from 'aws-amplify/auth';
 import Button from '../components/common/Button';
 
 const LogIn = () => {
@@ -18,13 +17,12 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
-  const [JWTtoken, setJWTToken] = useState(null);
   const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, setExpirationTime, setMfaEnable} = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword ] = useState(null);
-  const [showNewPassword, setShowNewPassword ] = useState(null);
-  const [showNewConfirmPassword, setShowNewConfirmPassword ] = useState(null);
+  const [showPassword, setShowPassword ] = useState(false);
+  const [showNewPassword, setShowNewPassword ] = useState(false);
+  const [showNewConfirmPassword, setShowNewConfirmPassword ] = useState(false);
   
   useEffect(() => {
     // Comprueba si alguno de los tokens o el role está presente en sessionStorage
@@ -48,23 +46,18 @@ const LogIn = () => {
       const { isSignedIn, nextStep } = await signIn({ username: email, password: passwordToUse });
   
       if (isSignedIn) {
-        const session = await fetchAuthSession(); // Obtén la sesión actual
+        const session = await fetchAuthSession();
         const cognitoId = session.userSub;
         const exp = session.tokens.idToken.payload.exp;
 
-        const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
-        const accessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-        const refreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-        const idToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+        const accessToken = session.tokens.accessToken.toString();
+        const idToken = session.tokens.idToken.toString();
   
         sessionStorage.setItem('accessToken', accessToken);
-        sessionStorage.setItem('refreshToken', refreshToken);
         sessionStorage.setItem('idToken', idToken);
         
-        setToken(idToken); // Guarda el token en el contexto
-        setJWTToken(idToken);
+        setToken(idToken);
         setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
         await fetchUserData(cognitoId, idToken);
@@ -72,10 +65,10 @@ const LogIn = () => {
 
       } else if (nextStep && (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE' ||
           nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_SMS_CODE')) {
-          // MFA challenge triggered
+
           setMfaRequired(true);
         }else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-          setIsNewPasswordRequired(true); // Muestra el formulario de nueva contraseña
+          setIsNewPasswordRequired(true); 
         } else {
           setError(`Debe completar el siguiente paso: ${nextStep.signInStep}`);
         }
@@ -94,25 +87,22 @@ const LogIn = () => {
     try {
       const result = await confirmSignIn({ challengeResponse: mfaCode });
       if (result.isSignedIn) {
-        // Repetir la misma lógica de guardado de tokens que haces en handleSubmit:
-        const session = await fetchAuthSession(); // obtén la sesión de Cognito
+        const session = await fetchAuthSession();
         const cognitoId = session.userSub;
         const exp = session.tokens.idToken.payload.exp;
+
+        const accessToken = session.tokens.accessToken.toString();
+        const idToken = session.tokens.idToken.toString();
+  
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('idToken', idToken);
         
-        // OJO: usa tu appClientId correcto
-        const appClientId = '3p4sind7orh97u1urvh9fktpmr';
-        const accessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-        const refreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-        const idToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
-        
-        // Guárdalos en tu contexto y sessionStorage
         setToken(idToken);
         setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
         setCognitoId(cognitoId);
         setExpirationTime(new Date(exp * 1000));
-  
         await fetchUserData(cognitoId, idToken);
+
         setMfaEnable(true);
         
         navigate('/home');

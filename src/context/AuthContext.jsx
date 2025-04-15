@@ -9,7 +9,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
   const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem('accessToken') || null);
-  const [refreshToken, setRefreshToken] = useState(() => sessionStorage.getItem('refreshToken') || null);
+
   const [expirationTime, setExpirationTime] = useState(() => {
     const storedTime = sessionStorage.getItem('expirationTime');
     return storedTime ? new Date(storedTime) : null;
@@ -75,10 +75,6 @@ export const AuthProvider = ({ children }) => {
   }, [mfaEnable]);
 
   useEffect(() => {
-    sessionStorage.setItem('refreshToken', refreshToken);
-  }, [refreshToken]);
-
-  useEffect(() => {
     sessionStorage.setItem('token', token);
   }, [token]);
 
@@ -116,7 +112,6 @@ export const AuthProvider = ({ children }) => {
       // Limpiar el estado en el contexto de React
       setToken(null);
       setAccessToken(null);
-      setRefreshToken(null);
       setRole(null);
       setCognitoId(null);
       setSelectedEmpresa(null);
@@ -208,21 +203,18 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      // Llama a fetchAuthSession para forzar la renovación de los tokens
       const session = await fetchAuthSession({ forceRefresh: true });
-      console.log("Session recibida:", session)
-      const cognitoId = session.userSub;
       const exp = session.tokens.idToken.payload.exp;
-      const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
-      const newAccessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-      const newRefreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-      const newIdToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+      const newAccessToken = session.tokens.accessToken.toString();
+      const newIdToken = session.tokens.idToken.toString();
+
+      sessionStorage.setItem('accessToken', newAccessToken);
+      sessionStorage.setItem('idToken', newIdToken);
 
       setAccessToken(newAccessToken);
       setToken(newIdToken);
-      setRefreshToken(newRefreshToken);
   
-      const newExpirationTime = new Date(exp * 1000); // `exp` está en segundos, convertir a milisegundos
+      const newExpirationTime = new Date(exp * 1000);
       setExpirationTime(newExpirationTime);
       await fetchAwsCredentials(newIdToken);
       console.log('Tokens renovados con éxito');
@@ -268,8 +260,6 @@ export const AuthProvider = ({ children }) => {
     setToken,
     accessToken,
     setAccessToken,
-    refreshToken,
-    setRefreshToken,
     role,
     setRole,
     searchQuery,
