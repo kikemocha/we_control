@@ -4,23 +4,39 @@
     width: 100%;
     display: flex;
 }
+@media only screen and (min-width: 600px) {
+    /*Tablets y PC*/
+    .form_login{
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        height: 90%;
+        margin: auto;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        color: white;
+    }
+
+    .form_login img{
+        height: 40%;
+        width: auto;
+        margin-bottom: 50px;
+        object-fit: contain;
+    }
+}
 .form_login{
-    display: flex;
-    flex-direction: column;
-    background-color: black;
-    width: 600px;
-    height: 800px;
+    width: 90%;
     margin: auto;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-    color: white;
 }
 .form_login img{
-    height: 300px;
-    width: 300px;
+    height: 40%;
+    width: auto;
     margin-bottom: 50px;
+    padding: 0px 40px;
+    object-fit: contain;
 }
+
 
 .form_login form{
     display: flex;

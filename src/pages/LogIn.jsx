@@ -335,9 +335,8 @@ const LogIn = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       ) :  (
-        <form onSubmit={handleSubmit} className='h-96 w-96'>
-            <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
-              {/* Input field */}
+        <form onSubmit={handleSubmit} className='h-96 w-full flex items-center sm:w-96'>
+            <div className="relative z-0 w-3/4 sm:w-full mb-6 group bg-white rounded-full">
               <input
                 type="text"
                 name="email"
@@ -347,7 +346,6 @@ const LogIn = () => {
                 placeholder=" "
                 className={`block py-2.5 px-4 w-full h-14 text-md text-black bg-transparent border-0 rounded-full border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-yellow-300 peer`}
               />
-              {/* Label that "floats" */}
               <div className=" flex px-4 peer-focus:font-medium absolute text-lg text-gray-600 duration-300 transform -translate-y-9 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-white peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-9 peer-valid:text-white">
                 <label
                   htmlFor={"email"}
@@ -359,7 +357,7 @@ const LogIn = () => {
               
             </div>
 
-            <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
+            <div className="relative z-0 w-3/4 sm:w-full mb-6 group bg-white rounded-full">
               {password && (
                 showPassword ? (
                   <svg 
