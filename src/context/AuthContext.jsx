@@ -224,7 +224,7 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const scheduleTokenRefresh = (expTime) => {
+  const scheduleTokenRefresh = async (expTime) => {
     if (refreshTimeout) {
       clearTimeout(refreshTimeout);
     }
@@ -235,14 +235,16 @@ export const AuthProvider = ({ children }) => {
     
     if (timeUntilRefresh > 0) {
       // Configura un timeout para renovar el token justo antes de que expire
-      const timeoutId = setTimeout(() => {
-        refreshAccessToken();
+      const timeoutId = setTimeout( async () => {
+        await refreshAccessToken();
       }, timeUntilRefresh);
       
       setRefreshTimeout(timeoutId);
     } else {
+      // Si el tiempo restante es muy bajo, renovamos el token inmediatamente
       console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
-      refreshAccessToken();
+      // Solo renovamos una vez aquí, no necesitamos otro refresh
+      await refreshAccessToken();  // Renovación directa sin timeout
     }
   };
   
