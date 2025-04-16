@@ -2,13 +2,14 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 import { S3Client } from '@aws-sdk/client-s3';
+import { json } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
   const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem('accessToken') || null);
-  const [refreshToken, setRefreshToken] = useState(() => sessionStorage.getItem('refreshToken') || null);
+
   const [expirationTime, setExpirationTime] = useState(() => {
     const storedTime = sessionStorage.getItem('expirationTime');
     return storedTime ? new Date(storedTime) : null;
@@ -74,10 +75,6 @@ export const AuthProvider = ({ children }) => {
   }, [mfaEnable]);
 
   useEffect(() => {
-    sessionStorage.setItem('refreshToken', refreshToken);
-  }, [refreshToken]);
-
-  useEffect(() => {
     sessionStorage.setItem('token', token);
   }, [token]);
 
@@ -115,7 +112,6 @@ export const AuthProvider = ({ children }) => {
       // Limpiar el estado en el contexto de React
       setToken(null);
       setAccessToken(null);
-      setRefreshToken(null);
       setRole(null);
       setCognitoId(null);
       setSelectedEmpresa(null);
@@ -154,12 +150,6 @@ export const AuthProvider = ({ children }) => {
       // Save credentials in sessionStorage as a JSON string
       sessionStorage.setItem('awsCredentials', JSON.stringify(credentials));
       console.log('AWS credentials stored in sessionStorage');
-  
-      // Schedule a refresh (e.g., refresh 5 minutes before 1 hour expires)
-      const refreshInterval = (3600 - 300) * 1000; // 55 minutes in milliseconds
-      setTimeout(() => {
-        fetchAwsCredentials(tokenAWS);
-      }, refreshInterval);
     } catch (error) {
       console.error('Error fetching AWS credentials:', error.message || error.response);
     }
@@ -177,7 +167,7 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      fetchAwsCredentials(token);
+      await fetchAwsCredentials(token);
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');
@@ -213,21 +203,18 @@ export const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      // Llama a fetchAuthSession para forzar la renovación de los tokens
       const session = await fetchAuthSession({ forceRefresh: true });
-      
-      const cognitoId = session.userSub;
       const exp = session.tokens.idToken.payload.exp;
-      const appClientId = '3p4sind7orh97u1urvh9fktpmr'; // ID de tu App Client
-      const newAccessToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.accessToken`);
-      const newRefreshToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.refreshToken`);
-      const newIdToken = sessionStorage.getItem(`CognitoIdentityServiceProvider.${appClientId}.${cognitoId}.idToken`);
+      const newAccessToken = session.tokens.accessToken.toString();
+      const newIdToken = session.tokens.idToken.toString();
+
+      sessionStorage.setItem('accessToken', newAccessToken);
+      sessionStorage.setItem('idToken', newIdToken);
 
       setAccessToken(newAccessToken);
       setToken(newIdToken);
-      setRefreshToken(newRefreshToken);
   
-      const newExpirationTime = new Date(exp * 1000); // `exp` está en segundos, convertir a milisegundos
+      const newExpirationTime = new Date(exp * 1000);
       setExpirationTime(newExpirationTime);
       await fetchAwsCredentials(newIdToken);
       console.log('Tokens renovados con éxito');
@@ -237,7 +224,7 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const scheduleTokenRefresh = (expTime) => {
+  const scheduleTokenRefresh = async (expTime) => {
     if (refreshTimeout) {
       clearTimeout(refreshTimeout);
     }
@@ -248,14 +235,16 @@ export const AuthProvider = ({ children }) => {
     
     if (timeUntilRefresh > 0) {
       // Configura un timeout para renovar el token justo antes de que expire
-      const timeoutId = setTimeout(() => {
-        refreshAccessToken();
+      const timeoutId = setTimeout( async () => {
+        await refreshAccessToken();
       }, timeUntilRefresh);
       
       setRefreshTimeout(timeoutId);
     } else {
+      // Si el tiempo restante es muy bajo, renovamos el token inmediatamente
       console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
-      refreshAccessToken();
+      // Solo renovamos una vez aquí, no necesitamos otro refresh
+      await refreshAccessToken();  // Renovación directa sin timeout
     }
   };
   
@@ -273,8 +262,6 @@ export const AuthProvider = ({ children }) => {
     setToken,
     accessToken,
     setAccessToken,
-    refreshToken,
-    setRefreshToken,
     role,
     setRole,
     searchQuery,

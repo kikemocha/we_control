@@ -1,17 +1,34 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './Popup.css';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
-const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fetchData, refreshAccessToken }) => {
-  const { token, userData, s3Client } = useAuth();
+const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fetchData }) => {
+  const { token, userData, s3Client, awsCredentials, expirationTime, refreshAccessToken } = useAuth();
   const [archives, setArchives] = useState([]);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+      const checkAndRefreshToken = async () => {
+        if (expirationTime) {
+          const now = new Date();
+          const expTime = new Date(expirationTime);
+          console.log(`Verificando token: ahora = ${now.getTime()}, expiración = ${expTime.getTime()}`);
+          if (now > expTime) {
+            console.log("El token ha expirado, renovando token...");
+            setLoading(true);
+            await refreshAccessToken();
+            setLoading(false);
+          }
+        }
+      };
+      checkAndRefreshToken();
+    }, [expirationTime, refreshAccessToken]);
 
   // Handler: agregar archivo vía input o drag/drop
   const handleFileChange = (e) => {
@@ -73,6 +90,15 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   };
 
   const uploadFile = async (file) => {
+
+    if (!awsCredentials?.AccessKeyId) {
+      console.warn("No hay credenciales de AWS disponibles, actualizando...");
+      await refreshAccessToken();
+      if (!awsCredentials?.AccessKeyId) {
+        throw new Error("No se pudieron obtener credenciales válidas.");
+      }
+    }
+    
     const fileKey = getFileKey(file);
     const params = {
       Bucket: 'wecontrolbucket',

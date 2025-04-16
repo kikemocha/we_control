@@ -333,20 +333,19 @@ const Auditorias = () => {
                                                                     <p>---</p>
                                                                     ) : (
                                                             
-                                                                    <p
+                                                                    <div
                                                                         onClick={() => {
                                                                         handleShowFile(archivos, control[7], control[8], control[6], control[10], control[0], control[11]);
                                                                         }}
                                                                         style={{ cursor: 'pointer' }}
                                                                     >
                                                                         <p className='text-center mx-auto '>{archivos.length === 1 ? '1 Archivo Subido' : archivos.length+' Archivos Subidos'}</p>
-                                                                    </p>
+                                                                    </div>
                                                                     )}
                                                                 </div>
                                                                 );
                                                             })()}
                                                         </td>
-                                                        {console.log(control)}
                                                         <td className={control[6] === 'Denegado' ? 'text-red-500' : control[6] === 'Verificado' ? 'text-green-600' : ''}>{control[6] === 'Denegado' ? 'No Validado' : control[6]}</td>
                                                     </tr>
                                                     ))}
