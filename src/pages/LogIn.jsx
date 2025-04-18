@@ -50,6 +50,8 @@ const LogIn = () => {
         const cognitoId = session.userSub;
         const exp = session.tokens.idToken.payload.exp;
 
+        console.log('SESION: ',session);
+        
         const accessToken = session.tokens.accessToken.toString();
         const idToken = session.tokens.idToken.toString();
   

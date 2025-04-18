@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => { sessionStorage.setItem('cognitoId', cognitoId); }, [cognitoId]);
   useEffect(() => { sessionStorage.setItem('selectedEmpresa', selectedEmpresa); }, [selectedEmpresa]);
   useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);
-  useEffect(() => { sessionStorage.setItem('awsCredentials', awsCredentials);}, [awsCredentials]);
+  useEffect(() => { sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials)); }, [awsCredentials]);
   useEffect(() => { sessionStorage.setItem('expirationTime', expirationTime?.toString() || ''); }, [expirationTime]);
   
 
@@ -111,9 +111,19 @@ export const AuthProvider = ({ children }) => {
       );
       const credentials = credentialsResponse.data;
       setAwsCredentials(credentials);
-      // Save credentials in sessionStorage as a JSON string
       sessionStorage.setItem('awsCredentials', JSON.stringify(credentials));
-      console.log('AWS credentials stored in sessionStorage');
+      const client = new S3Client({
+        region: 'eu-west-1',
+        credentials: {
+            accessKeyId: credentials.AccessKeyId,
+            secretAccessKey: credentials.SecretAccessKey,
+            sessionToken: credentials.SessionToken,
+          },
+      });
+      setS3Client(client);
+
+
+      console.log('S3Client creado y actualizado en el context');
     } catch (error) {
       console.error('Error fetching AWS credentials:', error.message || error.response);
     }
@@ -146,24 +156,15 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user data:', error);
     }
   };
-  
+
   useEffect(() => {
-    sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials));
-    if (awsCredentials && awsCredentials.AccessKeyId) {
-      const client = new S3Client({
-        region: 'eu-west-1',
-        credentials: {
-          accessKeyId: awsCredentials.AccessKeyId,
-          secretAccessKey: awsCredentials.SecretAccessKey,
-          sessionToken: awsCredentials.SessionToken,
-        },
-      });
-      setS3Client(client);
-      console.log('S3Client creado y actualizado en el context.');
-    } else {
-      setS3Client(null);
+    if (accessToken && !refreshTimeoutRef.current) {
+      refreshAccessToken();
     }
-  }, [awsCredentials]);
+    return () => {
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    };
+  }, []);
 
   const refreshAccessToken = async () => {
     try {
@@ -178,8 +179,10 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.setItem('accessToken', newAccessToken);
       sessionStorage.setItem('idToken', newIdToken);
 
-      setAccessToken(newAccessToken);
-      setToken(newIdToken);
+      if (newAccessToken !== accessToken) {
+        setAccessToken(newAccessToken);
+        setToken(newIdToken);
+      }
   
       setExpirationTime(new Date(exp * 1000));
       await fetchAwsCredentials(newIdToken);
@@ -198,14 +201,7 @@ export const AuthProvider = ({ children }) => {
   
 
 
-  useEffect(() => {
-    if (accessToken && !refreshTimeoutRef.current) {
-      refreshAccessToken();
-    }
-    return () => {
-      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
-    };
-  }, [accessToken]);
+  
   
 
   const value = {
