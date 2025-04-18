@@ -25,24 +25,26 @@ const ShowFile = ({
 
   // Para almacenar temporalmente el signedURL cuando hay 1 solo archivo PDF
   const [pdfSignedUrl, setPdfSignedUrl] = useState(null);
-  const attemptCountRef = useRef(0);
-  // Intentos para reintentar credenciales
+  const [timeSkewError, setTimeSkewError] = useState(null);
+  const hasCheckedRef = useRef(false);
+
   useEffect(() => {
-    const checkAndRefreshToken = async () => {
-      if (expirationTime) {
-        const now = new Date();
-        const expTime = new Date(expirationTime);
-        console.log(`Verificando token: ahora = ${now.getTime()}, expiración = ${expTime.getTime()}`);
-        if (now > expTime) {
-          console.log("El token ha expirado, renovando token...");
-          setLoading(true);
-          await refreshAccessToken();
-          setLoading(false);
-        }
+    // sólo al primer render
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
+
+    if (expirationTime) {
+      const nowMs = Date.now();
+      const expMs = new Date(expirationTime).getTime();
+      // si ya expiró o falta menos de 1 minuto
+      if (nowMs + 60_000 >= expMs) {
+        setLoading(true);
+        refreshAccessToken()
+          .catch(console.error)
+          .finally(() => setLoading(false));
       }
-    };
-    checkAndRefreshToken();
-  }, [expirationTime, refreshAccessToken]);
+    }
+  }, []); // <–– vacío, NO expirationTime aquí
 
   const executeS3Command = async (command) => {
     try {
@@ -121,21 +123,43 @@ const ShowFile = ({
         Bucket: 'wecontrolbucket',
         Key: archiveKey,
       });
-      // Generar el signed URL (1 hora)
-      let signedUrl;
+      let presignedUrl;
+
+      // 2) attempt to getSignedUrl, catching both ExpiredToken and skew
       try {
-        signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-      } catch (error) {
-        if (error.message && error.message.includes("ExpiredToken")) {
-          console.warn("ExpiredToken detected during getSignedUrl. Refreshing token...");
+        presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      } catch (err) {
+        const msg = err.message || '';
+        if (msg.includes('ExpiredToken')) {
+          console.warn("ExpiredToken detected. Refreshing token...");
           await refreshAccessToken();
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        } else {
-          throw error;
+          await new Promise(r => setTimeout(r, 1000));
+          presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        }
+        else if (msg.includes('Request is not yet valid')) {
+          setTimeSkewError(
+            'Hemos detectado que la hora de tu equipo está desincronizada. ' +
+            'Por favor ajusta la hora de tu sistema y vuelve a intentarlo.'
+          );
+          return;
+        }
+        else {
+          throw err;
         }
       }
-      window.open(signedUrl, '_blank'); // Abrir en otra pestaña
+      const res = await fetch(presignedUrl);
+      if (!res.ok) {
+        const text = await res.text();
+        if (text.includes('Request is not yet valid')) {
+          setTimeSkewError(
+            'Hemos detectado que la hora de tu equipo está desincronizada. ' +
+            'Por favor ajusta la hora de tu sistema y vuelve a intentarlo.'
+          );
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      window.open(presignedUrl, '_blank');
     } catch (error) {
       console.error('Error generando link de descarga:', error);
     } finally {
@@ -151,20 +175,23 @@ const ShowFile = ({
         Bucket: 'wecontrolbucket',
         Key: archiveKey,
       });
-      let signedUrl;
-      try {
-        signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-      } catch (error) {
-        if (error.message && error.message.includes("ExpiredToken")) {
-          console.warn("ExpiredToken detected during getSignedUrl for PDF. Refreshing token...");
-          await refreshAccessToken();
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        } else {
-          throw error;
+      const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+      const res = await fetch(presignedUrl);
+      if (!res.ok) {
+        const text = await res.text();
+        if (text.includes('Request is not yet valid')) {
+          // 2. Detectamos time skew y salimos
+          setTimeSkewError(
+            'Hemos detectado que la hora de tu equipo está desincronizada. ' +
+            'Por favor ajusta la hora de tu sistema y vuelve a intentarlo.'
+          );
+          return;
         }
+        throw new Error(`HTTP ${res.status}`);
       }
-      setPdfSignedUrl(signedUrl);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      setPdfSignedUrl(blobUrl);
     } catch (error) {
       console.error('Error generating PDF preview link:', error);
     } finally {
@@ -337,6 +364,19 @@ const ShowFile = ({
 
 
   if (!show) return null;
+
+  if (timeSkewError) {
+    return (
+      <div className="popup-overlay">
+        <div className="popup_img">
+          <button className="popup-close" onClick={onClose}>×</button>
+          <div className="p-4 bg-yellow-100 text-yellow-800 rounded text-center mt-24">
+            {timeSkewError}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 1. No hay archivos
   if (!archives || archives.length === 0) {
@@ -544,7 +584,10 @@ const ShowFile = ({
               style={{ border: '1px solid #ccc', marginBottom: '1rem' }}
             ></iframe>
           ) : (
-            <p>Generando vista previa PDF...</p>
+            <div className="w-[80%] flex items-center justify-center mx-auto" style={{height:'70%'}}>
+              <p className='text-center'>Generando vista previa PDF ...</p>
+            </div>
+
           )
         ) : (
           <div>

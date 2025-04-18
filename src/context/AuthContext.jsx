@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 import { S3Client } from '@aws-sdk/client-s3';
@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
     const storedTime = sessionStorage.getItem('expirationTime');
     return storedTime ? new Date(storedTime) : null;
   });
-  const [refreshTimeout, setRefreshTimeout] = useState(null);
   
   const [role, setRole] = useState(() => sessionStorage.getItem('role') || null);
   
@@ -54,61 +53,26 @@ export const AuthProvider = ({ children }) => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    sessionStorage.setItem('accessToken', accessToken);
-  }, [accessToken]);
+  const refreshTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    if (userData) {
-        sessionStorage.setItem('userData', JSON.stringify(userData));
-    }
-}, [userData]);
-
-  useEffect(() => {
-    if (userData && typeof userData === 'string') {
-        setUserData(JSON.parse(userData)); // Convertirlo al objeto cuando se extrae
-    }
-}, []);
-
-  useEffect(()=>{
-    sessionStorage.setItem('mfaEnable', mfaEnable);
-  }, [mfaEnable]);
-
-  useEffect(() => {
-    sessionStorage.setItem('token', token);
-  }, [token]);
-
-  useEffect(() => {
-    sessionStorage.setItem('role', role);
-  }, [role]);
-
-  useEffect(() => {
-    sessionStorage.setItem('cognitoId', cognitoId);
-  }, [cognitoId]);
-
-  useEffect(() => {
-    sessionStorage.setItem('selectedEmpresa', selectedEmpresa);
-  }, [selectedEmpresa]);
-
-  useEffect(() => {
-    sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName));
-  }, [selectedEmpresaName]);
-  
-
-  useEffect(() => {
-    sessionStorage.setItem('awsCredentials', awsCredentials);
-  }, [awsCredentials]);
-
-  useEffect(() => {
-    sessionStorage.setItem('expirationTime', expirationTime?.toString() || '');
-  }, [expirationTime]);
+  useEffect(() => { sessionStorage.setItem('accessToken', accessToken); }, [accessToken]);
+  useEffect(() => { if (userData) {sessionStorage.setItem('userData', JSON.stringify(userData)); }}, [userData]);
+  useEffect(() => { if (userData && typeof userData === 'string') { setUserData(JSON.parse(userData)); }}, []);
+  useEffect(()=>  { sessionStorage.setItem('mfaEnable', mfaEnable); }, [mfaEnable]);
+  useEffect(() => { sessionStorage.setItem('token', token); }, [token]);
+  useEffect(() => { sessionStorage.setItem('role', role); }, [role]);
+  useEffect(() => { sessionStorage.setItem('cognitoId', cognitoId); }, [cognitoId]);
+  useEffect(() => { sessionStorage.setItem('selectedEmpresa', selectedEmpresa); }, [selectedEmpresa]);
+  useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);
+  useEffect(() => { sessionStorage.setItem('awsCredentials', awsCredentials);}, [awsCredentials]);
+  useEffect(() => { sessionStorage.setItem('expirationTime', expirationTime?.toString() || ''); }, [expirationTime]);
   
 
   const signOut = async () => {
     try {
       console.log('Cerrando sesión...');
       await awsSignOut(); // Sign out from AWS Cognito
-      clearTimeout(refreshTimeout);
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
       // Limpiar el estado en el contexto de React
       setToken(null);
       setAccessToken(null);
@@ -204,7 +168,10 @@ export const AuthProvider = ({ children }) => {
   const refreshAccessToken = async () => {
     try {
       const session = await fetchAuthSession({ forceRefresh: true });
-      const exp = session.tokens.idToken.payload.exp;
+      //const exp = session.tokens.idToken.payload.exp;
+      
+      const { exp, auth_time } = session.tokens.idToken.payload;
+      
       const newAccessToken = session.tokens.accessToken.toString();
       const newIdToken = session.tokens.idToken.toString();
 
@@ -214,47 +181,31 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(newAccessToken);
       setToken(newIdToken);
   
-      const newExpirationTime = new Date(exp * 1000);
-      setExpirationTime(newExpirationTime);
+      setExpirationTime(new Date(exp * 1000));
       await fetchAwsCredentials(newIdToken);
-      console.log('Tokens renovados con éxito');
+
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+
+      const ttlMs   = (exp - auth_time) * 1000;
+      const delayMs = Math.max(0, ttlMs - 60_000);
+      refreshTimeoutRef.current = setTimeout(refreshAccessToken, delayMs);
+
+      console.log(`Tokens renewed; next refresh in ${Math.round(delayMs/1000)}s.`);
     } catch (error) {
       console.error('Error al renovar el token:', error);
-    }
-  };
-
-
-  const scheduleTokenRefresh = async (expTime) => {
-    if (refreshTimeout) {
-      clearTimeout(refreshTimeout);
-    }
-  
-    const now = Date.now();
-    const expTimeMs = new Date(expTime).getTime();
-    const timeUntilRefresh = expTimeMs - now - 60000; // Renovar 1 min antes de que expire
-    
-    if (timeUntilRefresh > 0) {
-      // Configura un timeout para renovar el token justo antes de que expire
-      const timeoutId = setTimeout( async () => {
-        await refreshAccessToken();
-      }, timeUntilRefresh);
-      
-      setRefreshTimeout(timeoutId);
-    } else {
-      // Si el tiempo restante es muy bajo, renovamos el token inmediatamente
-      console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
-      // Solo renovamos una vez aquí, no necesitamos otro refresh
-      await refreshAccessToken();  // Renovación directa sin timeout
     }
   };
   
 
 
   useEffect(() => {
-    if (expirationTime) {
-      scheduleTokenRefresh(expirationTime);
+    if (accessToken && !refreshTimeoutRef.current) {
+      refreshAccessToken();
     }
-  }, [expirationTime]);
+    return () => {
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    };
+  }, [accessToken]);
   
 
   const value = {

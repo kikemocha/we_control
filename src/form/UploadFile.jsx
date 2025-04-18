@@ -10,25 +10,9 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploadError, setUploadError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [timeSkewError, setTimeSkewError] = useState(null);
 
   const fileInputRef = useRef(null);
-
-  useEffect(() => {
-      const checkAndRefreshToken = async () => {
-        if (expirationTime) {
-          const now = new Date();
-          const expTime = new Date(expirationTime);
-          console.log(`Verificando token: ahora = ${now.getTime()}, expiración = ${expTime.getTime()}`);
-          if (now > expTime) {
-            console.log("El token ha expirado, renovando token...");
-            setLoading(true);
-            await refreshAccessToken();
-            setLoading(false);
-          }
-        }
-      };
-      checkAndRefreshToken();
-    }, [expirationTime, refreshAccessToken]);
 
   // Handler: agregar archivo vía input o drag/drop
   const handleFileChange = (e) => {
@@ -90,7 +74,6 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   };
 
   const uploadFile = async (file) => {
-
     if (!awsCredentials?.AccessKeyId) {
       console.warn("No hay credenciales de AWS disponibles, actualizando...");
       await refreshAccessToken();
@@ -107,28 +90,35 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
       ContentType: file.type,
     };
 
-    const sendFile = async (client) => {
-      const command = new PutObjectCommand(params);
-      return client.send(command);
+    const sendFile = async () => {
+      try {
+        await s3Client.send(new PutObjectCommand(params));
+      } catch (err) {
+        const msg = err.message || '';
+        const code = err.Code || err.name || '';
+        if (msg.includes('ExpiredToken')) {
+          // refresco de token…
+          await refreshAccessToken();
+          await new Promise(r => setTimeout(r, 1000));
+          return s3Client.send(new PutObjectCommand(params));
+        }
+        if (code === 'RequestTimeTooSkewed'
+          || msg.includes('RequestTimeTooSkewed')
+          || msg.includes('Request is not yet valid')) {
+          // hora desincronizada
+          setTimeSkewError(
+            'Hemos detectado que la hora de tu equipo está desincronizada. ' +
+            'Por favor ajusta la hora de tu sistema y vuelve a intentarlo.'
+          );
+          // lanzamos para abortar el bucle for en handleUpload
+          throw new Error('TIME_SKEW');
+        }
+        throw err;
+      }
     };
 
-    try {
-      await sendFile(s3Client);
-    } catch (error) {
-      if (error.message && error.message.includes("ExpiredToken")) {
-        console.warn("Token expirado. Refrescando credenciales...");
-        await refreshAccessToken();
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        try {
-          await sendFile(s3Client);
-        } catch (retryError) {
-          throw new Error("Error después de refrescar el token");
-        }
-      } else {
-        throw error;
-      }
-    }
-
+    await sendFile();
+    if (timeSkewError) return;
     const requestBody = {
       id_control: selectedControl[0],
       id_auditoria: selectedAuditoria,
@@ -152,9 +142,11 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
       const result = await response.json();
       throw new Error(result.message || "Error en la API");
     }
+    
   };
 
   const handleUpload = async () => {
+    if (timeSkewError) return; 
     if (archives.length === 0) {
       setUploadError('Por favor, selecciona un archivo primero.');
       return;
@@ -172,6 +164,7 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
       setUploadError('Error al subir archivos. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
+      handleClose();
     }
   };
 
@@ -183,6 +176,17 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   };
 
   if (!show) return null;
+
+  if (timeSkewError) {
+    return (
+      <div className="popup-overlay">
+        <div className="popup_img p-4 bg-yellow-100 text-yellow-800 rounded text-center">
+          {timeSkewError}
+          <button onClick={onClose} className="mt-4 popup-button">Cerrar</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="popup-overlay">
