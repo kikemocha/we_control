@@ -5,10 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import Input from './common/Input';
 import Button from './common/Button';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import PhotoPopup from './CroppingImg';
 import MFAModal from './MFAModal';
 import { updateMFAPreference } from 'aws-amplify/auth';
+import logo from '../we_control.png'
 
 
 const Navbar = () => {
@@ -44,6 +45,8 @@ const Navbar = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [showPhotoPopUp, setShowPhotoPopUp] = useState(false);
 
+    const [menuOpen, setMenuOpen] = useState(false);
+    const toggleMenu = () => setMenuOpen((prev) => !prev);
 
     useEffect(() => {
         let newCategory = 'Todas las Categorías';
@@ -576,7 +579,7 @@ const Navbar = () => {
               </div>
 
             )}
-            <div className='w-1/2'>
+            <div className='hidden sm:block sm:w-1/2'>
                 {categorySelected !== 'Home' & categorySelected !== 'Auditorías y Seguimientos' ? (
                     <form className="w-full mx-auto relative">
                     <div className="flex md:h-3 lg:h-6 xl:h-8 h-full">
@@ -610,6 +613,82 @@ const Navbar = () => {
                 
                 <div>{userData.name}</div>
             </div>
+            <div className='flex flex-row h-full justify-between px-10 sm:hidden w-full'>
+                <Link to="/home" className='h-5/6 my-auto'>
+                    <img className="h-full" src={logo} alt="Logo" />
+                </Link>
+                <button
+                    onClick={toggleMenu}
+                    type="button"
+                    className="inline-flex my-auto items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                    aria-controls="navbar-default"
+                    aria-expanded={menuOpen}
+                >
+                    <span className="sr-only">Abrir menú</span>
+                    <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M1 1h15M1 7h15M1 13h15"
+                    />
+                    </svg>
+                </button>
+                {/* El menú se muestra u oculta según el estado menuOpen */}
+                <div className={`z-40 ${menuOpen ? 'absolute' : 'hidden'} w-full h-full left-0 bg-black bg-opacity-15`} onClick={()=>{setMenuOpen(false)}}>
+                    <div className={`${menuOpen ? 'block' : 'hidden'} w-full md:block md:w-auto mt-12 bg-white absolute right-0`} style={{ zIndex: 9999 }}>
+                        <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+                        <li>
+                            <a
+                            href="#"
+                            className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0"
+                            aria-current="page"
+                            >
+                            Perfil
+                            </a>
+                        </li>
+                        {selectedEmpresa && 
+                            <div>
+                                <li>
+                                    <a
+                                    href="#"
+                                    className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                                    >
+                                    Riesgos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                    href="#"
+                                    className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                                    >
+                                    Controles
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                    href="#"
+                                    className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                                    >
+                                    Responsables
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                    href="#"
+                                    className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                                    >
+                                    Gestores
+                                    </a>
+                                </li>
+                            </div>
+                        }
+                        
+                        </ul>
+                    </div>
+                </div>
+                </div>
             <PhotoPopup
                 show={showPhotoPopUp}
                 setShow={setShowPhotoPopUp}

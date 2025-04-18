@@ -34,14 +34,21 @@ body {
     margin-bottom: 60px;
 }
 .sidebar {
-    position: relative;
-    border-right: 1px solid grey;
-    margin: 0px;
-    margin-right: 40px;
-    width: 140px;
-    height: 100vh;
-    padding: 10% 20px;
-    text-align: center;
+    display: none;
+}
+
+@media only screen and (min-width: 600px) {
+    .sidebar {
+        display: block;
+        position: relative;
+        border-right: 1px solid grey;
+        margin: 0;
+        margin-right: 40px;
+        width: 140px;
+        height: 100vh;
+        padding: 10% 20px;
+        text-align: center;
+    }
 }
 .sidebar .link_activate{
     font-weight: bold;
@@ -91,6 +98,7 @@ body {
 
 /* Estilos para el navbar */
 .navbar {
+    width: 100vw;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -104,10 +112,18 @@ body {
     margin-right: 40px;
 }
 
-
 .navbar .user-info {
-    display: flex;
-    align-items: center;
+    display: none;
+}
+
+@media only screen and (min-width: 600px) {
+    .navbar {
+        width: 100%;
+    }
+    .navbar .user-info {
+        display: flex;
+        align-items: center;
+    }
 }
 
 .navbar .user-info div {

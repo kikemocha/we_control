@@ -129,12 +129,8 @@
 }
 
 /* ADMIN */
-.bussines_box{
-    height: 100%;
-}
-.bussines_div{
-    height: 90%;
-}
+
+
 .admin_boxes {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -345,13 +341,14 @@
     }
 
 }
-.total_add{
-    display: flex;
-    align-items: center;    
-    justify-content: space-between;
+.upper_box{
+    width: 66.66666%;
+    margin-left: 10px;
+    font-size: 0.8em;
 }
+
 .total_add svg{
-    margin-right: 200px;
+    margin: auto;
     background-color: #e5f301FF;
     border-radius: 100px;
     padding: 10px;
@@ -359,6 +356,38 @@
     width: 40px;
     cursor: pointer;
 }
+.bussines_div{
+    height: 70%;
+}
+.bussines_box{
+    height: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+    .upper_box{
+        background-color: purple;
+        width: 300px;
+        font-size: 1em;
+    }
+    .total_add svg{
+        margin-right: 200px;
+    }
+    .bussines_div{
+        height: 90%;
+    }
+    .bussines_box{
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.total_add{
+    display: flex;
+    align-items: center;    
+    justify-content: space-between;
+    width: 100%;
+}
+
 
 .paperbin{
     display: flex;

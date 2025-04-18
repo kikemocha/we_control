@@ -18,7 +18,7 @@ const Layout = () => {
                 <Sidebar />
                 <div className="content min-h-screen flex flex-col">
                     <Navbar />
-                    <div className="content-padding flex-grow overflow-hidden">
+                    <div className="sm:content-padding flex-grow overflow-hidden">
                         <Outlet />
                     </div>
                 </div>

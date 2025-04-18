@@ -183,7 +183,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
       
     ) : (
           <div className='bussines_box'>
-            <h3 className="md:text-xs lg:text-sm xl:text-md 2xl:text-lg ">Hola {userData.name}</h3>
+            <h3 className="my-2 sm:my-0 ml-4 sm:ml-0 text-xs md:text-xs lg:text-sm xl:text-md 2xl:text-lg ">Hola {userData.name}</h3>
             <EmpresasForm show={showPopup} onClose={() => {setShowPopup(false)}} fetchData={getUserData}/>
             <div className='total_add'>
               <div className='upper_box'>
@@ -195,7 +195,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                   )}
                   
               </div>
-              <div onClick={() => {setShowPopup(true)}}>
+              <div onClick={() => {setShowPopup(true)}} className="w-1/3 sm:w-auto">
                   <svg
                       viewBox="0 0 1024 1024"
                       fill="currentColor"
@@ -212,9 +212,9 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
             </div>
             <div className='bussines_div overflow-auto h-full'>
               {UserInfo && UserInfo.data && UserInfo.data.empresas ? (
-                <div className="w-4/5 mx-auto">
+                <div className="w-5/6 sm:w-4/5 mx-auto">
                   <ul className="flex flex-col gap-4 pb-24">
-                    <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+                    <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold text-xs sm:text-md">
                       <span>Nombre</span>
                       <span>CIF</span>
                       <span>Correo de contacto</span>
@@ -223,7 +223,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                       filteredEmpresas.map((empresa, index) => (
                         <li
                           key={index}
-                          className="grid grid-cols-3 gap-4 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative"
+                          className="grid grid-cols-3 gap-4 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative text-xxs sm:text-md"
                           onClick={() => {
                             setSelectedEmpresa(empresa[0]);
                             setSelectedEmpresaName(empresaToObj(empresa));
@@ -233,7 +233,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                           <span>
                             {empresa[9] === 'None' || !empresa[9] ? '------' : empresa[9]}
                           </span>
-                          <span className="overflow-hidden text-ellipsis">{empresa[5] === 'None' || !empresa[5] ? '------' : empresa[5]}</span>
+                          <span className="overflow-hidden text-ellipsis pr-12">{empresa[5] === 'None' || !empresa[5] ? '------' : empresa[5]}</span>
                           <div className='absolute right-3 top-4 hover:bg-gray-400 rounded-full'  onClick={(e) => {e.stopPropagation(); handleOpenEditPopup(empresa)}}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
