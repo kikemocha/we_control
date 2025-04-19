@@ -157,14 +157,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const hasScheduledRefresh = useRef(false);
+
   useEffect(() => {
-    if (accessToken && !refreshTimeoutRef.current) {
+    if (accessToken && !hasScheduledRefresh.current) {
+      hasScheduledRefresh.current = true;
+      // programa la primera renovación
       refreshAccessToken();
     }
     return () => {
-      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     };
-  }, []);
+  }, [accessToken]);
 
   const refreshAccessToken = async () => {
     try {
@@ -190,7 +196,7 @@ export const AuthProvider = ({ children }) => {
       if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
 
       const ttlMs   = (exp - auth_time) * 1000;
-      const delayMs = Math.max(0, ttlMs - 60_000);
+      const delayMs = Math.max(0, ttlMs - 60000);
       refreshTimeoutRef.current = setTimeout(refreshAccessToken, delayMs);
 
       console.log(`Tokens renewed; next refresh in ${Math.round(delayMs/1000)}s.`);
