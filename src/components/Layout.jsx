@@ -7,28 +7,28 @@ import { Helmet } from 'react-helmet';
 
 import './Layout.css';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Layout = () => {
-    const {expirationTime, signOut} = useAuth();
+    const {token, signOut} = useAuth();
     useEffect(() => {
-        const handleVisibilityChange = () => {
-          if (document.visibilityState === 'visible' && expirationTime) {
-            const now = new Date().getTime();
-            const expTime = new Date(expirationTime).getTime();
-            console.log(`Verificando token: ahora = ${now}, expiración = ${expTime}`);
-            if (now > expTime) {
-              console.log("El token ha expirado, cerrando sesión...");
-              alert("Tu sesión ha expirado!, vuelve a iniciar sesión");
-              signOut();
-            }
+      const interceptor = axios.interceptors.response.use(
+        res => res,
+        err => {
+          if (err.response?.status === 401) {
+            alert('Tu sesión ha expirado! Vuelve a iniciar sesión.');
+            signOut();
+          }else{
+            console.log('Token Correcto');
           }
-        };
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        return () => {
-          document.removeEventListener("visibilitychange", handleVisibilityChange);
-        };
-      }, [expirationTime, signOut]);
-      
+          return Promise.reject(err);
+        }
+      );
+      return () => {
+        // limpiar interceptor al desmontar
+        axios.interceptors.response.eject(interceptor);
+      };
+    }, [signOut]);
 
     return (
         <div>

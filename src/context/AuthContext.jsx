@@ -10,13 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
   const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem('accessToken') || null);
 
-  const [expirationTime, setExpirationTime] = useState(() => {
-    const storedTime = sessionStorage.getItem('expirationTime');
-    return storedTime ? new Date(storedTime) : null;
-  });
+  const timerRef = useRef(null);
+  const leadMs = 2 * 60_000;
   
   const [role, setRole] = useState(() => sessionStorage.getItem('role') || null);
   
+  const [expirationTime, setExpirationTime] = useState(
+    () => Number(sessionStorage.getItem('expirationTime')) || null
+  );
+
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
   const [selectedEmpresaName, setSelectedEmpresaName] = useState(() => {
@@ -65,8 +67,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => { sessionStorage.setItem('selectedEmpresa', selectedEmpresa); }, [selectedEmpresa]);
   useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);
   useEffect(() => { sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials)); }, [awsCredentials]);
-  useEffect(() => { sessionStorage.setItem('expirationTime', expirationTime?.toString() || ''); }, [expirationTime]);
-  
+  useEffect(() => {if (expirationTime) {sessionStorage.setItem('expirationTime', expirationTime.toString()); }}, [expirationTime]);
 
   const signOut = async () => {
     try {
@@ -141,7 +142,6 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      await fetchAwsCredentials(token);
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');
@@ -157,57 +157,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const hasScheduledRefresh = useRef(false);
-
-  useEffect(() => {
-    if (accessToken && !hasScheduledRefresh.current) {
-      hasScheduledRefresh.current = true;
-      // programa la primera renovación
-      refreshAccessToken();
-    }
-    return () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-    };
-  }, [accessToken]);
 
   const refreshAccessToken = async () => {
     try {
       const session = await fetchAuthSession({ forceRefresh: true });
-      //const exp = session.tokens.idToken.payload.exp;
-      
-      const { exp, auth_time } = session.tokens.idToken.payload;
-      
-      const newAccessToken = session.tokens.accessToken.toString();
-      const newIdToken = session.tokens.idToken.toString();
+      const { exp, iat } = session.tokens.idToken.payload;
 
-      sessionStorage.setItem('accessToken', newAccessToken);
-      sessionStorage.setItem('idToken', newIdToken);
+      const ttlMs = (exp - iat) * 1000;
+      const delay = Math.max(0, ttlMs - leadMs);
+      const expMs = exp * 1000;
+      setExpirationTime(expMs);
 
-      if (newAccessToken !== accessToken) {
-        setAccessToken(newAccessToken);
-        setToken(newIdToken);
-      }
-  
-      setExpirationTime(new Date(exp * 1000));
+      const newAccess = session.tokens.accessToken.toString();
+      const newIdToken     = session.tokens.idToken.toString();
+      setAccessToken(newAccess);
+      setToken(newIdToken);
+      sessionStorage.setItem('accessToken', newAccess);
+      sessionStorage.setItem('token',     newIdToken);
+
+      // refresca AWS creds u otras tareas…
       await fetchAwsCredentials(newIdToken);
+      console.log(`Tokens renovados; próximo refresh en ${Math.round(delay/1000)}s`);
 
-      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+      timerRef.current = setTimeout(refreshAccessToken, delay);
 
-      const ttlMs   = (exp - auth_time) * 1000;
-      const delayMs = Math.max(0, ttlMs - 60000);
-      refreshTimeoutRef.current = setTimeout(refreshAccessToken, delayMs);
-
-      console.log(`Tokens renewed; next refresh in ${Math.round(delayMs/1000)}s.`);
-    } catch (error) {
-      console.error('Error al renovar el token:', error);
+    } catch (err) {
+      console.error('Error al renovar token:', err);
+      // si falla, podrías forzar un retry en 1 min:
+      setTimeout(refreshAccessToken, 60_000);
     }
   };
-  
-
 
   
+  
+
   
 
   const value = {
@@ -231,11 +214,10 @@ export const AuthProvider = ({ children }) => {
     userData,
     fetchAwsCredentials,
     refreshAccessToken,
-    expirationTime,
-    setExpirationTime,
     s3Client,
     mfaEnable,
-    setMfaEnable
+    setMfaEnable,
+    expirationTime
   };
 
   

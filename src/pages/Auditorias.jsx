@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import AuditoriaForm from '../form/AuditoriaForm';
 import AuditoriaControlesForm from '../form/AuditoriaControlForm';
+import EditAuditoriaForm from '../form/editForms/EditAuditoriaForm';
 
 import ShowFile from '../form/ShowFile';
 
@@ -25,6 +26,13 @@ const Auditorias = () => {
     const [popupFormType, setPopupFormType] = useState(''); // Nuevo estado para controlar qué formulario mostrar
 
 
+    const handleCloseEditPopup = () => setshowEditPopup(false);
+    const [showEditPopup, setshowEditPopup] = useState(false);
+    const [selectedAuditoriaEdit, setSelectedAuditoriaEdit] = useState(null);
+    const handleOpenEditPopup = (auditoria) => {
+        setSelectedAuditoriaEdit(auditoria);  // Guardar el item seleccionado
+        setshowEditPopup(true);
+    };
 
     const [showIMGPopup, setshowIMGPopup] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState(null); // Estado para almacenar la imgkey seleccionada
@@ -476,55 +484,61 @@ const Auditorias = () => {
                     <div className="table-container">
                         <div>
                             <table className="card_table">
-                            <thead>
-                            <tr className="table-row">
-                                <th>Nombre</th>
-                                <th>Progreso</th>
-                                <th>Fecha de Creación</th>
-                                <th>Detalle</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            {data.map((auditoria, index) => (
-                                <tr key={index} className="table-row">
-                                    <td>{auditoria.name}</td>
-                                    <td>
-                                        <div className="flex flex-col gap-0">
-                                            <span>
-                                            {Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%
-                                            </span>
-                                            <div className="w-full bg-gray-200 rounded-full h-3">
-                                            <div
-                                                className="bg-primary h-3 rounded-full"
-                                                style={{
-                                                width: `${Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%`
-                                                }}
-                                            ></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{auditoria.createDate}</td>
-                                    <td>
-                                        <svg
-                                            onClick={() => handleAuditoria(auditoria.id, auditoria.name, auditoria.all_controls)}
-                                            viewBox="0 0 1024 1024"
-                                            fill="currentColor"
-                                            height="2em"
-                                            width="2em"
-                                            className='mx-auto'
-                                        >
-                                            <path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z" />
-                                        </svg>
-                                    </td>
+                                <thead>
+                                <tr className="table-row">
+                                    <th>Nombre</th>
+                                    <th>Progreso</th>
+                                    <th>Fecha de Creación</th>
+                                    <th>Detalle</th>
                                 </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+
+                                {data.map((auditoria, index) => (
+                                    <tr 
+                                        key={index} className="table-row cursor-pointer hover:bg-gray-300"
+                                        onClick={() => handleAuditoria(auditoria.id, auditoria.name, auditoria.all_controls)}
+                                    >
+                                        <td>{auditoria.name}</td>
+                                        <td>
+                                            <div className="flex flex-col gap-0">
+                                                <span>
+                                                {Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%
+                                                </span>
+                                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                                <div
+                                                    className="bg-primary h-3 rounded-full"
+                                                    style={{
+                                                    width: `${Math.floor(auditoria.controlesVerificados / auditoria.totalControles * 100) || 0}%`
+                                                    }}
+                                                ></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{auditoria.createDate}</td>
+                                        <td>
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                fill="none" 
+                                                viewBox="0 0 24 24" 
+                                                strokeWidth="2.5" 
+                                                stroke="currentColor" 
+                                                className="bg-gray-400 bg-opacity-60 rounded-full p-1 cursor-pointer mx-auto size-8"
+                                                onClick={(e) => {e.stopPropagation(); handleOpenEditPopup(auditoria) }}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                            </svg>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
+            {showEditPopup &&
+                <EditAuditoriaForm show={showEditPopup} onClose={()=>{setshowEditPopup(false)}} id_auditoria={selectedAuditoriaEdit.id} name={selectedAuditoriaEdit.name} fetchData={fetchData} audtoriasList={data.map(a => a.name)}/>
+            }
         </div>
         
         )}

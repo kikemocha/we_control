@@ -17,7 +17,7 @@ const LogIn = () => {
   const [error, setError] = useState(null);
   const [isNewPasswordRequired, setIsNewPasswordRequired] = useState(false); // Estado para mostrar el form de nueva contraseña
   const navigate = useNavigate();
-  const { setToken, setAccessToken, setRefreshToken, setCognitoId, fetchUserData, setExpirationTime, setMfaEnable} = useAuth();
+  const { setToken, setAccessToken, refreshAccessToken, setCognitoId, fetchUserData, setMfaEnable} = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword ] = useState(false);
@@ -48,8 +48,6 @@ const LogIn = () => {
       if (isSignedIn) {
         const session = await fetchAuthSession();
         const cognitoId = session.userSub;
-        const exp = session.tokens.idToken.payload.exp;
-        
         const accessToken = session.tokens.accessToken.toString();
         const idToken = session.tokens.idToken.toString();
   
@@ -59,8 +57,9 @@ const LogIn = () => {
         setToken(idToken);
         setAccessToken(accessToken);
         setCognitoId(cognitoId);
-        setExpirationTime(new Date(exp * 1000));
+
         await fetchUserData(cognitoId, idToken);
+        await refreshAccessToken();
         navigate('/home');
 
       } else if (nextStep && (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_TOTP_CODE' ||
@@ -100,7 +99,7 @@ const LogIn = () => {
         setToken(idToken);
         setAccessToken(accessToken);
         setCognitoId(cognitoId);
-        setExpirationTime(new Date(exp * 1000));
+        //setExpirationTime(new Date(exp * 1000));
         await fetchUserData(cognitoId, idToken);
 
         setMfaEnable(true);
