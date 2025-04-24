@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Popup.css';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, Upload } from '@aws-sdk/client-s3';
 import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,6 +12,9 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
   const [loading, setLoading] = useState(false);
   const [timeSkewError, setTimeSkewError] = useState(null);
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [fileProgress, setFileProgress] = useState({});
+  
   const fileInputRef = useRef(null);
 
   // Handler: agregar archivo vía input o drag/drop
@@ -262,7 +265,7 @@ const FileUploadPopup = ({ show, onClose, selectedControl, selectedAuditoria, fe
             <div className='h-[80%] overflow-scroll w-full'>
               <ul>
                 {archives.map((file, index) => (
-                  <li key={index} className='bg-gray-300 w-[90%] mx-auto h-40 my-4 rounded-xl'>
+                  <li key={index} className='bg-gray-300 w-[90%] mx-auto h-20 my-4 rounded-xl'>
                     <div className='h-full flex items-center justify-around'>
                       <p
                         className='text-blue-700 underline cursor-pointer'

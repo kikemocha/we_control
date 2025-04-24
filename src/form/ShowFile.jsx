@@ -422,14 +422,15 @@ const ShowFile = ({
           <div className='h-[80%] overflow-scroll'>
             <ul>
               {archives.map((archiveKey, index) => (
-                <li index={index} className='bg-gray-300 w-[90%] mx-auto h-40 my-4 rounded-xl'>
-                  <div className='h-full flex items-center justify-around'>
+                <li index={index} className='bg-primary bg-opacity-10 w-[90%] mx-auto h-20 my-4 rounded-xl border-primary border-solid border-2 relative'>
+                  <div className="absolute top-0 left-0 w-full h-full z-10 bg-primary bg-opacity-70 animate-pulse rounded-xl" style={{ width: `${60 || 0}%` }}></div>
+                  <div className='h-full relative flex'>
                     <p
-                      className='text-blue-700 underline cursor-pointer'
+                      className='text-blue-700 underline cursor-pointer my-auto mx-auto'
                       onClick={() => handleDownload(archiveKey)}
                     >{archiveKey.split('_').slice(1).join('_')}
                     </p>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="size-6 text-red-600 cursor-pointer"
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="size-6 text-red-600 cursor-pointer absolute right-4 bottom-7"
                       onClick={()=>{handleDelete(archiveKey)}}
                       >
                       <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -441,7 +442,7 @@ const ShowFile = ({
             {role === 'responsable' && (
               <div className="flex flex-col justify-center items-center gap-4">
                 <button 
-                  className="h-10 w-10 rounded-full bg-gray-400 text-xl font-bold"
+                  className="h-10 w-10 rounded-full bg-primary text-xl font-bold"
                   onClick={handleClickAddFile}
                 >
                   +

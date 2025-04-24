@@ -41,10 +41,26 @@ export const AuthProvider = ({ children }) => {
       return {};
     }
   });
-  
-  
 
   const [s3Client, setS3Client] = useState(null);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('awsCredentials');
+    if (!stored || stored === 'null') return; 
+    if (stored) {
+      const creds = JSON.parse(stored);
+      if (creds.AccessKeyId) {
+        setS3Client(new S3Client({
+          region: 'eu-west-1',
+          credentials: {
+            accessKeyId: creds.AccessKeyId,
+            secretAccessKey: creds.SecretAccessKey,
+            sessionToken: creds.SessionToken,
+          },
+        }));
+      }
+    }
+  }, []);
 
   const [userData, setUserData] = useState(() => {
     const storedUserData = sessionStorage.getItem('userData');
@@ -65,10 +81,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => { sessionStorage.setItem('role', role); }, [role]);
   useEffect(() => { sessionStorage.setItem('cognitoId', cognitoId); }, [cognitoId]);
   useEffect(() => { sessionStorage.setItem('selectedEmpresa', selectedEmpresa); }, [selectedEmpresa]);
-  useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);
-  useEffect(() => { sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials)); }, [awsCredentials]);
+  useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);  
   useEffect(() => {if (expirationTime) {sessionStorage.setItem('expirationTime', expirationTime.toString()); }}, [expirationTime]);
 
+  useEffect(() => {
+    if (awsCredentials != null) {
+      sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials));
+    } else {
+      sessionStorage.removeItem('awsCredentials');
+    }
+  }, [awsCredentials]);
+  
   const signOut = async () => {
     try {
       console.log('Cerrando sesión...');
@@ -120,6 +143,7 @@ export const AuthProvider = ({ children }) => {
             secretAccessKey: credentials.SecretAccessKey,
             sessionToken: credentials.SessionToken,
           },
+        computeChecksums: false,
       });
       setS3Client(client);
 

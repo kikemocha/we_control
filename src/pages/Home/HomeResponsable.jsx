@@ -5,6 +5,7 @@ import axios from "axios";
 
 import FileUploadPopup from "../../form/UploadFile";
 import ShowFile from "../../form/ShowFile";
+import FileManager from "../../form/FileManager";
 
 const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const {cognitoId, token, awsCredentials, fetchAwsCredentials} = useAuth();
@@ -43,7 +44,6 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
     const [orderControl, setOrderControl] = useState(null);
 
     const handleShowIMGPopup = (riesgo, archivos) =>{
-        console.log('riesgos: ', riesgo)
         setImgKeys(archivos)
         setControlName(riesgo[1])
         setMessageAdmin(riesgo[10])
@@ -141,26 +141,31 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
 
  
                                             if (archivos.length === 0) {
-                                            return (
-                                                <div>
-                                                <button
-                                                    className="archive_button"
-                                                    onClick={() => {
-                                                    setShowUploadPopup(true);
-                                                    setSelectedControl(riesgo);
-                                                    }}
-                                                >
-                                                    Subir Archivo
-                                                </button>
-                                                <FileUploadPopup
-                                                    show={showUploadPopup}
-                                                    onClose={() => setShowUploadPopup(false)}
-                                                    selectedControl={selectedControl}
-                                                    selectedAuditoria={selectedControl[9]}
-                                                    fetchData={getUserData}
-                                                />
-                                                </div>
-                                            );
+                                                return (
+                                                    <div>
+                                                    <button
+                                                        className="archive_button"
+                                                        onClick={() => {
+                                                        setShowUploadPopup(true);
+                                                        setSelectedControl(riesgo);
+                                                        }}
+                                                    >
+                                                        Subir Archivo
+                                                    </button>
+                                                    <FileManager
+                                                        show={showUploadPopup}
+                                                        onClose={() => setShowUploadPopup(false)}
+                                                        fetchData={getUserData}
+                                                        data={{
+                                                            "id_control" : selectedControl[0],
+                                                            "id_auditoria" : selectedControl[9],
+                                                            "order" : selectedControl[11],
+                                                            "archives" : []
+                                                        }}
+                                                        className={'bg-opacity-5'}
+                                                    />
+                                                    </div>
+                                                );
                                             }
                                             return (
                                             <div className="archive mx-auto">
@@ -235,16 +240,18 @@ const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {
                 </div>
             )}
             {showIMGPopup && (
-                <ShowFile
+                <FileManager
                     show={showIMGPopup}
                     onClose={() => setshowIMGPopup(false)}
-                    archives={imgkeys}            // <--- PASAMOS el array
-                    control_name={controlName}
-                    message_admin={messageAdmin}
                     fetchData={getUserData}
-                    id_control={id_control}
-                    id_auditoria={id_auditoria}
-                    order={orderControl}
+                    data={{
+                        "archives" : imgkeys,
+                        "control_name" : controlName,
+                        "message_admin" : messageAdmin,
+                        "id_control" : id_control,
+                        "id_auditoria" : id_auditoria,
+                        "order" : orderControl
+                    }}
                 />
             )}
             </div>

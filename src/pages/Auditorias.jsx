@@ -7,6 +7,7 @@ import AuditoriaControlesForm from '../form/AuditoriaControlForm';
 import EditAuditoriaForm from '../form/editForms/EditAuditoriaForm';
 
 import ShowFile from '../form/ShowFile';
+import FileManager from "../form/FileManager";
 
 const Auditorias = () => {
     const { selectedEmpresa, token } = useAuth();
@@ -42,10 +43,11 @@ const Auditorias = () => {
     const [selectedStateIMG, setSelectedStateIMG] = useState(null);
     const [selectedControlName, setSelectedControlName] = useState(null);
     const [messageAdmin, setMessageAdmin] = useState(null);
+    const [periodicity, setPeriodicity] = useState(null);
     
 
     // Función para abrir el popup y almacenar el archivo y bucket seleccionados
-    const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name, message_admin) => {
+    const handleShowFile = (archivos, id_auditoria, id_control, state, order, control_name, message_admin, periodicity) => {
         setSelectedFiles(archivos);
         setSelectedAuditoriaIMG(id_auditoria);
         setSelectedControlIMG(id_control);
@@ -54,6 +56,7 @@ const Auditorias = () => {
         setSelecteControlOrder(order);
         setshowIMGPopup(true);
         setMessageAdmin(message_admin);
+        setPeriodicity(periodicity);
     };
 
 
@@ -228,9 +231,9 @@ const Auditorias = () => {
     return <div className='card_option'>
         {selectedAuditoria? (
             <div>  
-                <div>
+                <div >
                     <svg 
-                    className='close-icon'
+                    className='close-icon !z-30'
                     fill="none" 
                     viewBox="0 0 15 15" 
                     height="3em" 
@@ -343,7 +346,7 @@ const Auditorias = () => {
                                                             
                                                                     <div
                                                                         onClick={() => {
-                                                                        handleShowFile(archivos, control[7], control[8], control[6], control[10], control[0], control[11]);
+                                                                        handleShowFile(archivos, control[7], control[8], control[6], control[10], control[0], control[11], control[9]);
                                                                         }}
                                                                         style={{ cursor: 'pointer' }}
                                                                     >
@@ -362,18 +365,21 @@ const Auditorias = () => {
                                         </div>
                                         {showIMGPopup && (
                                                         <div>
-                                                            <ShowFile
-                                                            show={showIMGPopup}
-                                                            onClose={() => setshowIMGPopup(false)} // Cerrar el popup
-                                                            archives={selectedFiles}
-                                                            id_auditoria={selectedAuditoriaIMG}
-                                                            id_control={selectedControlIMG}
-                                                            order={selectedControlOrder}
-                                                            state={selectedStateIMG}
-                                                            fetchData={fetchAuditoriaData}
-                                                            control_name={selectedControlName}
-                                                            message_admin={messageAdmin}
-                                                            />
+                                                            <FileManager
+                                                                show={showIMGPopup}
+                                                                onClose={() => setshowIMGPopup(false)} // Cerrar el popup
+                                                                fetchData={fetchAuditoriaData}
+                                                                data={{
+                                                                    'archives' : selectedFiles,
+                                                                    'id_auditoria' : selectedAuditoriaIMG,
+                                                                    'id_control' : selectedControlIMG,
+                                                                    'order' : selectedControlOrder,
+                                                                    'state' : selectedStateIMG,
+                                                                    'control_name' : selectedControlName,
+                                                                    'message_admin' : messageAdmin,
+                                                                    'periodicity' : periodicity
+                                                                }}
+                                                                />
                                                         </div>
                                                     )}
                                     </div>
