@@ -1,10 +1,6 @@
 import React, {useEffect, useState} from "react";
 
 import { useAuth } from '../../context/AuthContext';
-import axios from "axios";
-
-import FileUploadPopup from "../../form/UploadFile";
-import ShowFile from "../../form/ShowFile";
 import FileManager from "../../form/FileManager";
 
 const HomeResponsable = ({UserInfo, getUserData, handleCloseMessagePopUp}) => {

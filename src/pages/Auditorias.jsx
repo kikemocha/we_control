@@ -6,7 +6,6 @@ import AuditoriaForm from '../form/AuditoriaForm';
 import AuditoriaControlesForm from '../form/AuditoriaControlForm';
 import EditAuditoriaForm from '../form/editForms/EditAuditoriaForm';
 
-import ShowFile from '../form/ShowFile';
 import FileManager from "../form/FileManager";
 
 const Auditorias = () => {
