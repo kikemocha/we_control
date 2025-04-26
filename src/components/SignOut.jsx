@@ -3,7 +3,7 @@ import { signOut } from 'aws-amplify/auth';
 import { useAuth } from '../context/AuthContext';
 
 function SignOutButton() {
-  const { signOut: signOutContext } = useAuth();
+  const { signOut: signOutContext, refreshAccessToken} = useAuth();
 
   const handleSignOut = async () => {
     try {

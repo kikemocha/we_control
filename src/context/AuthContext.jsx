@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { fetchAuthSession, signOut as awsSignOut} from 'aws-amplify/auth';
 import { S3Client } from '@aws-sdk/client-s3';
@@ -10,14 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => sessionStorage.getItem('token') || null);
   const [accessToken, setAccessToken] = useState(() => sessionStorage.getItem('accessToken') || null);
 
-  const [expirationTime, setExpirationTime] = useState(() => {
-    const storedTime = sessionStorage.getItem('expirationTime');
-    return storedTime ? new Date(storedTime) : null;
-  });
-  const [refreshTimeout, setRefreshTimeout] = useState(null);
+  const timerRef = useRef(null);
+  const leadMs = 2 * 60_000;
   
   const [role, setRole] = useState(() => sessionStorage.getItem('role') || null);
   
+  const [expirationTime, setExpirationTime] = useState(
+    () => Number(sessionStorage.getItem('expirationTime')) || null
+  );
+
   const [cognitoId, setCognitoId] = useState(() => sessionStorage.getItem('cognitoId') || null);
   const [selectedEmpresa, setSelectedEmpresa] = useState(() => sessionStorage.getItem('selectedEmpresa') || null);
   const [selectedEmpresaName, setSelectedEmpresaName] = useState(() => {
@@ -40,10 +41,26 @@ export const AuthProvider = ({ children }) => {
       return {};
     }
   });
-  
-  
 
   const [s3Client, setS3Client] = useState(null);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem('awsCredentials');
+    if (!stored || stored === 'null') return; 
+    if (stored) {
+      const creds = JSON.parse(stored);
+      if (creds.AccessKeyId) {
+        setS3Client(new S3Client({
+          region: 'eu-west-1',
+          credentials: {
+            accessKeyId: creds.AccessKeyId,
+            secretAccessKey: creds.SecretAccessKey,
+            sessionToken: creds.SessionToken,
+          },
+        }));
+      }
+    }
+  }, []);
 
   const [userData, setUserData] = useState(() => {
     const storedUserData = sessionStorage.getItem('userData');
@@ -54,61 +71,32 @@ export const AuthProvider = ({ children }) => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    sessionStorage.setItem('accessToken', accessToken);
-  }, [accessToken]);
+  const refreshTimeoutRef = useRef(null);
+
+  useEffect(() => { sessionStorage.setItem('accessToken', accessToken); }, [accessToken]);
+  useEffect(() => { if (userData) {sessionStorage.setItem('userData', JSON.stringify(userData)); }}, [userData]);
+  useEffect(() => { if (userData && typeof userData === 'string') { setUserData(JSON.parse(userData)); }}, []);
+  useEffect(()=>  { sessionStorage.setItem('mfaEnable', mfaEnable); }, [mfaEnable]);
+  useEffect(() => { sessionStorage.setItem('token', token); }, [token]);
+  useEffect(() => { sessionStorage.setItem('role', role); }, [role]);
+  useEffect(() => { sessionStorage.setItem('cognitoId', cognitoId); }, [cognitoId]);
+  useEffect(() => { sessionStorage.setItem('selectedEmpresa', selectedEmpresa); }, [selectedEmpresa]);
+  useEffect(() => { sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName)); }, [selectedEmpresaName]);  
+  useEffect(() => {if (expirationTime) {sessionStorage.setItem('expirationTime', expirationTime.toString()); }}, [expirationTime]);
 
   useEffect(() => {
-    if (userData) {
-        sessionStorage.setItem('userData', JSON.stringify(userData));
+    if (awsCredentials != null) {
+      sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials));
+    } else {
+      sessionStorage.removeItem('awsCredentials');
     }
-}, [userData]);
-
-  useEffect(() => {
-    if (userData && typeof userData === 'string') {
-        setUserData(JSON.parse(userData)); // Convertirlo al objeto cuando se extrae
-    }
-}, []);
-
-  useEffect(()=>{
-    sessionStorage.setItem('mfaEnable', mfaEnable);
-  }, [mfaEnable]);
-
-  useEffect(() => {
-    sessionStorage.setItem('token', token);
-  }, [token]);
-
-  useEffect(() => {
-    sessionStorage.setItem('role', role);
-  }, [role]);
-
-  useEffect(() => {
-    sessionStorage.setItem('cognitoId', cognitoId);
-  }, [cognitoId]);
-
-  useEffect(() => {
-    sessionStorage.setItem('selectedEmpresa', selectedEmpresa);
-  }, [selectedEmpresa]);
-
-  useEffect(() => {
-    sessionStorage.setItem('selectedEmpresaName', JSON.stringify(selectedEmpresaName));
-  }, [selectedEmpresaName]);
-  
-
-  useEffect(() => {
-    sessionStorage.setItem('awsCredentials', awsCredentials);
   }, [awsCredentials]);
-
-  useEffect(() => {
-    sessionStorage.setItem('expirationTime', expirationTime?.toString() || '');
-  }, [expirationTime]);
   
-
   const signOut = async () => {
     try {
       console.log('Cerrando sesión...');
       await awsSignOut(); // Sign out from AWS Cognito
-      clearTimeout(refreshTimeout);
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
       // Limpiar el estado en el contexto de React
       setToken(null);
       setAccessToken(null);
@@ -147,9 +135,20 @@ export const AuthProvider = ({ children }) => {
       );
       const credentials = credentialsResponse.data;
       setAwsCredentials(credentials);
-      // Save credentials in sessionStorage as a JSON string
       sessionStorage.setItem('awsCredentials', JSON.stringify(credentials));
-      console.log('AWS credentials stored in sessionStorage');
+      const client = new S3Client({
+        region: 'eu-west-1',
+        credentials: {
+            accessKeyId: credentials.AccessKeyId,
+            secretAccessKey: credentials.SecretAccessKey,
+            sessionToken: credentials.SessionToken,
+          },
+        computeChecksums: false,
+      });
+      setS3Client(client);
+
+
+      console.log('S3Client creado y actualizado en el context');
     } catch (error) {
       console.error('Error fetching AWS credentials:', error.message || error.response);
     }
@@ -167,7 +166,6 @@ export const AuthProvider = ({ children }) => {
       
       const data = response.data;
       setUserData(data);
-      await fetchAwsCredentials(token);
       if (data.is_gestor === 0 && data.is_responsable === 0) {
         setSelectedEmpresa(null);
         setRole('admin');
@@ -182,79 +180,41 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user data:', error);
     }
   };
-  
-  useEffect(() => {
-    sessionStorage.setItem('awsCredentials', JSON.stringify(awsCredentials));
-    if (awsCredentials && awsCredentials.AccessKeyId) {
-      const client = new S3Client({
-        region: 'eu-west-1',
-        credentials: {
-          accessKeyId: awsCredentials.AccessKeyId,
-          secretAccessKey: awsCredentials.SecretAccessKey,
-          sessionToken: awsCredentials.SessionToken,
-        },
-      });
-      setS3Client(client);
-      console.log('S3Client creado y actualizado en el context.');
-    } else {
-      setS3Client(null);
-    }
-  }, [awsCredentials]);
+
 
   const refreshAccessToken = async () => {
     try {
       const session = await fetchAuthSession({ forceRefresh: true });
-      const exp = session.tokens.idToken.payload.exp;
-      const newAccessToken = session.tokens.accessToken.toString();
-      const newIdToken = session.tokens.idToken.toString();
+      const { exp, iat } = session.tokens.idToken.payload;
 
-      sessionStorage.setItem('accessToken', newAccessToken);
-      sessionStorage.setItem('idToken', newIdToken);
+      const ttlMs = (exp - iat) * 1000;
+      const delay = Math.max(0, ttlMs - leadMs);
+      const expMs = exp * 1000;
+      setExpirationTime(expMs);
 
-      setAccessToken(newAccessToken);
+      const newAccess = session.tokens.accessToken.toString();
+      const newIdToken     = session.tokens.idToken.toString();
+      setAccessToken(newAccess);
       setToken(newIdToken);
-  
-      const newExpirationTime = new Date(exp * 1000);
-      setExpirationTime(newExpirationTime);
+      sessionStorage.setItem('accessToken', newAccess);
+      sessionStorage.setItem('token',     newIdToken);
+
+      // refresca AWS creds u otras tareas…
       await fetchAwsCredentials(newIdToken);
-      console.log('Tokens renovados con éxito');
-    } catch (error) {
-      console.error('Error al renovar el token:', error);
+      console.log(`Tokens renovados; próximo refresh en ${Math.round(delay/1000)}s`);
+
+      timerRef.current = setTimeout(refreshAccessToken, delay);
+
+    } catch (err) {
+      console.error('Error al renovar token:', err);
+      // si falla, podrías forzar un retry en 1 min:
+      setTimeout(refreshAccessToken, 60_000);
     }
   };
 
-
-  const scheduleTokenRefresh = async (expTime) => {
-    if (refreshTimeout) {
-      clearTimeout(refreshTimeout);
-    }
   
-    const now = Date.now();
-    const expTimeMs = new Date(expTime).getTime();
-    const timeUntilRefresh = expTimeMs - now - 60000; // Renovar 1 min antes de que expire
-    
-    if (timeUntilRefresh > 0) {
-      // Configura un timeout para renovar el token justo antes de que expire
-      const timeoutId = setTimeout( async () => {
-        await refreshAccessToken();
-      }, timeUntilRefresh);
-      
-      setRefreshTimeout(timeoutId);
-    } else {
-      // Si el tiempo restante es muy bajo, renovamos el token inmediatamente
-      console.warn('El tiempo de expiración del token ya ha pasado o es muy cercano. Renovando token inmediatamente.');
-      // Solo renovamos una vez aquí, no necesitamos otro refresh
-      await refreshAccessToken();  // Renovación directa sin timeout
-    }
-  };
   
 
-
-  useEffect(() => {
-    if (expirationTime) {
-      scheduleTokenRefresh(expirationTime);
-    }
-  }, [expirationTime]);
   
 
   const value = {
@@ -278,11 +238,10 @@ export const AuthProvider = ({ children }) => {
     userData,
     fetchAwsCredentials,
     refreshAccessToken,
-    expirationTime,
-    setExpirationTime,
     s3Client,
     mfaEnable,
-    setMfaEnable
+    setMfaEnable,
+    expirationTime
   };
 
   

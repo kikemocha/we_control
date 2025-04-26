@@ -194,12 +194,13 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                   )}
                   
               </div>
-              <div onClick={() => {setShowPopup(true)}}>
+              <div >
                   <svg
                       viewBox="0 0 1024 1024"
                       fill="currentColor"
                       height="2em"
                       width="2em"
+                      onClick={() => {setShowPopup(true)}}
                       >
                       <defs>
                           <style />

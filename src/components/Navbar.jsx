@@ -608,7 +608,7 @@ const Navbar = () => {
                     </div>
                 )}
                 
-                <div>{userData.name}</div>
+                <div className='flex items-center text-center'>{userData.name}</div>
             </div>
             <PhotoPopup
                 show={showPhotoPopUp}
