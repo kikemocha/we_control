@@ -373,7 +373,7 @@ const LogIn = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
           <Button
             type="submit"
-            className={`text-black w-48 mx-auto my-auto bg-yellow-400 font-bold rounded-full text-xl px-5 py-2.5 text-center ${
+            className={`text-black w-48 mx-auto my-auto bg-primary font-bold rounded-full text-xl px-5 py-2.5 text-center ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             disabled={loading}
