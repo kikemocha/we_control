@@ -105,6 +105,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
     setSelectedResponsable([]);
     setSearchTerm('');
     setSearchTermResponsables('');
+    setErrorMessage('');
   }
   const handleClose = () =>{
     resetValues();

@@ -129,8 +129,6 @@ const FileUpload = ({data, onClose}) => {
     try{
       if (file.size <= MAX_SIMPLE_UPLOAD_SIZE) {
 
-        const arrayBuffer = await file.arrayBuffer();
-
         const cmd = new PutObjectCommand({
           Bucket: "wecontrolbucket",
           Key: key,
