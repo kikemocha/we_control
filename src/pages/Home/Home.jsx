@@ -69,8 +69,6 @@ const Home = () => {
         setLoading(true);
         attemptCount += 1;
         await fetchAwsCredentials(token);
-
-        // Si todavía no hay credenciales después del intento, espera 1 segundo y vuelve a intentar
         if (!awsCredentials && attemptCount < 3) {
           setTimeout(checkAwsCredentials, 1000);
         } else {
@@ -128,15 +126,37 @@ const Home = () => {
           
   }
 
+  if (loading && role === 'admin') {
+    return <div className="h-full">
+      <div className="h-full w-full flex-col justify-between">
+        <div className="w-full h-full flex flex-col">
+          <div className="flex flex-row w-full">
+            <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          <div className="w-full h-1/2 flex flex-row items-center">
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/6 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>;
+  }
+
   return (
     <div className='home_main'>
       {role === 'admin' && (
         <HomeAdmin getUserData={getUserData} UserInfo={UserInfo}/>
       )}
       {role === 'gestor' && (
-        <div>
-          <HomeGestor/>
-        </div>
+        <HomeGestor userInfo={UserInfo}/>
       )}
       {role === 'responsable' ? (
   loading ? (

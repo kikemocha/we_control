@@ -168,9 +168,43 @@ const FileShow = ({data, onClose}) => {
             src={previewUrl}
             title="Vista previa del PDF"
             width="100%"
-            height="90%"
+            height="80%"
             className='rounded-3xl border-2 border-solid border-gray-300'
           ></iframe>
+          <div className="flex justify-center h-[20%] w-full">
+                <div className='w-full h-1/2 my-auto'>
+                    {(role === 'admin' || role === 'gestor') && (
+                        <div className="h-full flex justify-around items-center">
+                        {data.state === 'Verificado' ? (
+                            <>
+                            {!showTextPopup && 
+                            <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
+                                No Validar
+                            </button>
+                            }
+                            </>
+                        ) : data.state === 'Denegado' ? (
+                            <>
+                            <button className="popup-button" onClick={handleVerify}>
+                                Verificar
+                            </button>
+                            </>
+                        ) : (
+                            <>
+                            <button className="popup-button" onClick={handleVerify}>
+                                Verificar
+                            </button>
+                            {!showTextPopup && 
+                                <button className="popup-button text-red-800" onClick={() => setShowTextPopup(true)}>
+                                No Validar
+                                </button>
+                            }
+                            </>
+                        )}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
       ) : (
         <div className='h-full w-full'>

@@ -61,7 +61,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
   
     // 2) When empresa AND selectedYear are set, fetch the homeInfo
     useEffect(() => {
-      if (!selectedEmpresa || selectedYear === null) return;
+      if (!selectedEmpresa || selectedEmpresa === 'null'|| selectedYear === null) return;
   
       setLoading(true);
   
@@ -77,7 +77,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
           },
         })
         .then((resp) => {
-          console.log('🏠 homeInfo fetched:', resp.data.result);
           setHomeInfo(resp.data.result);
         })
         .catch((err) => {
@@ -290,9 +289,79 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
     };
 
   
-    if (!homeInfo && loading) {
-      return <div>Cargando…</div>;
+    if (selectedEmpresa && selectedEmpresa !== 'null' && loading) {
+      return <div className="h-full">
+      <div>
+        <svg fill="none" viewBox="0 0 15 15" height="3em" width="3em" onClick={() => {
+          setSelectedEmpresa(null); 
+          setSelectedEmpresaName(null); 
+          setImgUrl(null); 
+          getUserData();
+          setHomeInfo(null)}} className='close-icon text-red-500'>
+          <path
+            fill="currentColor"
+            fillRule="evenodd"
+            d="M11.782 4.032a.575.575 0 10-.813-.814L7.5 6.687 4.032 3.218a.575.575 0 00-.814.814L6.687 7.5l-3.469 3.468a.575.575 0 00.814.814L7.5 8.313l3.469 3.469a.575.575 0 00.813-.814L8.313 7.5l3.469-3.468z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      <div className="h-full w-full flex-col justify-between">
+        <div className="w-full h-full flex flex-col">
+          <div className="flex flex-row w-full">
+            <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          <div className="w-full h-1/2 flex flex-row items-center">
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/6 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>;
+    } else if (loading){
+      return <div className='bussines_box'>
+      <h3 className="md:text-xs lg:text-sm xl:text-md 2xl:text-lg ">Hola {userData.name}</h3>
+      <EmpresasForm show={showPopup} onClose={() => {setShowPopup(false)}} fetchData={getUserData}/>
+      <div className='total_add'>
+        <div className='upper_box'>
+            <div className='text'>Total de&nbsp;<strong>empresas</strong>:</div>
+            
+            <div className='number'> <div className="h-2/3 w-1/2 bg-gray-200 animate-pulse rounded-3xl"></div></div>
+        </div>
+      </div>
+      <div className='bussines_div overflow-auto h-full'>
+          <div className="w-4/5 mx-auto">
+            <ul className="flex flex-col gap-4 pb-24">
+              <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+                <span>Nombre</span>
+                <span>CIF</span>
+                <span>Correo de contacto</span>
+              </li>
+              {[...Array(10)].map((_, i) => (
+                  <li
+                    
+                    className=" h-16 grid grid-cols-3 gap-4 border bg-gray-200 animate-pulse rounded-2xl px-4 py-4"
+                    
+                  >
+ 
+                    
+                  </li>
+                ))
+                }
+            </ul>
+          </div>
+      </div>
+    </div>
     }
+
     return <div className='admin_home'>
     {selectedEmpresa !== null && selectedEmpresa !== 'null'?(
       <div className="h-full">

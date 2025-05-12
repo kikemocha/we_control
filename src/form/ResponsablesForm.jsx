@@ -19,7 +19,15 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
+  const resetValues  = () =>{
+    setName('');
+    setSurname('');
+    setTitulo('');
+    setPhone('');
+    setEmail('');
+    setErrorMessage('');
+    setSuccessMessage('');
+  }
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -52,6 +60,7 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
             setSuccessMessage(result.message || 'Operación exitosa');
             setErrorMessage('');
             onClose();
+            resetValues();
         } else {
           if (result.error === 'User already exists') {
             setErrorMessage('El usuario ya se encuentra en registrado en la plataforma, contacta con el servicio técnico para solucionar el problema soporte@wecontrolapp.com');
@@ -75,7 +84,7 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
   return (
     <div className="popup-overlay">
       <div className="popup">
-      <button className="popup-close" onClick={onClose}>
+      <button className="popup-close" onClick={() => {onClose(); resetValues()}}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -106,7 +115,7 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
           </div>
           <Input
             label="Email"
-            placeholder="example@wecontrool.com"
+            placeholder="example@wecontrolapp.com"
             type="text"
             name="email"
             value={email}
@@ -156,7 +165,7 @@ const ResponsablesForm = ({ show, onClose, fetchData }) => {
           {
           successMessage ? 
           (
-          <p className='h7' style={{ color: 'green' }}>{successMessage}</p>
+          <p className='h7 w-full text-center' style={{ color: 'green' }}>{successMessage}</p>
 
           ):(
             <p className='h7'></p>
