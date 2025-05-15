@@ -59,33 +59,66 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
         .finally(() => setLoading(false));
     }, [selectedEmpresa, token]);
   
-    // 2) When empresa AND selectedYear are set, fetch the homeInfo
+  const fetchHomeInfo = async () => {
+    setLoading(true)
+    try {
+      const resp = await axios.get(
+        "https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getHomeInfo",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { id_empresa: selectedEmpresa, id_year: selectedYear }
+        }
+      )
+      setHomeInfo(resp.data.result)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedEmpresa && selectedYear != null) fetchHomeInfo()
+  }, [selectedEmpresa, selectedYear, token])
+  
+  const [vEspec, setVEspec] = useState(0);
+  const [vTrans, setVTrans] = useState(0);
+
     useEffect(() => {
-      if (!selectedEmpresa || selectedEmpresa === 'null'|| selectedYear === null) return;
-  
-      setLoading(true);
-  
-      axios
-        .get("https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getHomeInfo", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          params: {
+      if (homeInfo) {
+        setVEspec(homeInfo.valor_especifico  ?? 0);
+        setVTrans(homeInfo.valor_transversal ?? 0);
+      }
+    }, [homeInfo, selectedYear]);
+    const handleUpdateValues = async () => {
+      try {
+        console.log({
+          id_empresa: selectedEmpresa,
+          id_year: selectedYear,
+          v_especifico: vEspec,
+          v_transversal: vTrans
+        })
+        await axios.put(
+          "https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getHomeInfo",
+          {
             id_empresa: selectedEmpresa,
             id_year: selectedYear,
+            v_especifico: vEspec,
+            v_transversal: vTrans
           },
-        })
-        .then((resp) => {
-          setHomeInfo(resp.data.result);
-        })
-        .catch((err) => {
-          console.error("failed to load home info", err);
-        })
-        .finally(() => setLoading(false));
-    }, [selectedEmpresa, selectedYear, token]);
-    
-    
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+        setLoading(true);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error al actualizar valores:", err);
+      }
+    };
     
     const [showEditPopup, setshowEditPopup] = useState(false);
     const [selectedEditEmpresa, setSelectedEditEmpresa] = useState(null);
@@ -442,16 +475,46 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                     </select>
                   </div>
                   <div className="w-1/2 flex justify-around">
+
                     <div>
                       <ul className="h-full flex flex-col justify-center">
                         <li className="border-b-2 border-gray-400">Valor Específico</li>
-                        <li className="my-2 text-center font-bold">{info.valor_especifico}</li>
+                        <li className="my-2 text-center">
+                          <input
+                            type="number"
+                            value={vEspec}
+                            onChange={e => setVEspec(e.target.value)}
+                            onBlur={handleUpdateValues}
+                            className="
+                              appearance-none
+                              [-moz-appearance:textfield]
+                              [&::-webkit-outer-spin-button]:appearance-none
+                              [&::-webkit-inner-spin-button]:appearance-none
+                              w-20 text-center font-bold border rounded p-1
+                            "
+                          />
+                        </li>
                       </ul>
                     </div>
+
                     <div>
                       <ul className="h-full flex flex-col justify-center">
                         <li className="border-b-2 border-gray-400">Valor Transversal</li>
-                        <li className="my-2 text-center font-bold">{info.valor_transversal}</li>
+                        <li className="my-2 text-center">
+                          <input
+                            type="number"
+                            value={vTrans}
+                            onChange={e => setVTrans(e.target.value)}
+                            onBlur={handleUpdateValues}
+                            className="
+                              appearance-none
+                              [-moz-appearance:textfield]
+                              [&::-webkit-outer-spin-button]:appearance-none
+                              [&::-webkit-inner-spin-button]:appearance-none
+                              w-20 text-center font-bold border rounded p-1
+                            "
+                          />
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -581,7 +644,7 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                           <span>
                             {empresa[9] === 'None' || !empresa[9] ? '------' : empresa[9]}
                           </span>
-                          <span className="overflow-hidden text-ellipsis">{empresa[6] === 'None' || !empresa[6] ? '------' : empresa[6]}</span>
+                          <span className="overflow-hidden text-ellipsis">{empresa[6] === 'None' || !empresa[5] ? '------' : empresa[5]}</span>
                           <div className='absolute right-3 top-4 hover:bg-gray-400 rounded-full'  onClick={(e) => {e.stopPropagation(); handleOpenEditPopup(empresa)}}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
@@ -612,11 +675,10 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                   fetchData={getUserData}
                   empresa_id={selectedEditEmpresa[0]} 
                   name={selectedEditEmpresa[1]} 
-                  email={selectedEditEmpresa[8]} 
-                  phone={selectedEditEmpresa[10]} 
-                  web={selectedEditEmpresa[9]} 
-                  v_esp={selectedEditEmpresa[6]} 
-                  v_trn={selectedEditEmpresa[7]}
+                  email={selectedEditEmpresa[5]} 
+                  phone={selectedEditEmpresa[7]} 
+                  web={selectedEditEmpresa[6]}
+                  cif={selectedEditEmpresa[9]}
                   />    
           )}
           </div>
