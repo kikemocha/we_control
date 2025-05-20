@@ -14,4 +14,4 @@ git push origin estilos        # Subir los cambios a la rama remota
 
 git checkout master            # Volver a la rama principal
 git branch -d estilos          # Borrar la rama local (si está fusionada)
-git push origin --delete estilos  # Borrar la rama en el repositorio remoto
+git push origin -d estilos  # Borrar la rama en el repositorio remoto
