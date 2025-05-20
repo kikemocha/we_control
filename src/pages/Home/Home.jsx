@@ -69,8 +69,6 @@ const Home = () => {
         setLoading(true);
         attemptCount += 1;
         await fetchAwsCredentials(token);
-
-        // Si todavía no hay credenciales después del intento, espera 1 segundo y vuelve a intentar
         if (!awsCredentials && attemptCount < 3) {
           setTimeout(checkAwsCredentials, 1000);
         } else {
@@ -84,48 +82,63 @@ const Home = () => {
   
 
   if (loading && role === 'admin') {
-    return <div>
-      {'loading: '.loading}
-              <br />
-              <div className='total_add'>
+    return <div className='bussines_box'>
+            <h3 className="md:text-xs lg:text-sm xl:text-md 2xl:text-lg ">Hola </h3>
+            <div className='total_add'>
               <div className='upper_box'>
-                            <div className='text'>Total de&nbsp;<strong>empresas</strong>:</div>
-                            <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
-                        </div>
-                <div>
-                    <svg
-                        viewBox="0 0 1024 1024"
-                        fill="currentColor"
-                        height="2em"
-                        width="2em"
-                        >
-                        <defs>
-                            <style />
-                        </defs>
-                        <path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z" />
-                        <path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z" />
-                    </svg>
-                </div>
+                  <div className='text'>Total de&nbsp;<strong>empresas</strong>:</div>
+                  
+                  <div className='number'> <div className="h-2/3 w-1/2 bg-gray-200 animate-pulse rounded-3xl"></div></div>
               </div>
-            
-              <div className="w-4/5 mx-auto">
-                <ul className="flex flex-col gap-4 pb-24">
-                <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
+            </div>
+            <div className='bussines_div overflow-auto h-full'>
+                <div className="w-4/5 mx-auto">
+                  <ul className="flex flex-col gap-4 pb-24">
+                    <li className="sticky top-0 bg-white z-10 grid grid-cols-3 gap-4 p-2 border-b-2 border-gray-400 font-bold">
                       <span>Nombre</span>
                       <span>CIF</span>
                       <span>Correo de contacto</span>
                     </li>
-                {Array.from({ length: 8 }).map((_, index) => (
-                    <li
-                    key={index}
-                    className="skeleton grid grid-cols-3 gap-4 h-16 border border-gray-200 hover:bg-gray-100 rounded-2xl px-4 py-4 cursor-pointer relative"
-                  >
-                  </li>
-                  ))}
-                </ul>
-              </div>
-            </div> 
+                    {[...Array(10)].map((_, i) => (
+                        <li
+                          
+                          className=" h-16 grid grid-cols-3 gap-4 border bg-gray-200 animate-pulse rounded-2xl px-4 py-4"
+                          
+                        >
+
+                          
+                        </li>
+                      ))
+                      }
+                  </ul>
+                </div>
+            </div>
+          </div>
           
+  }
+
+  if (loading && role === 'gestor') {
+    return <div className="h-full">
+      <div className="h-full w-full flex-col justify-between">
+        <div className="w-full h-full flex flex-col">
+          <div className="flex flex-row w-full">
+            <div className="w-1/2 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          <div className="w-full h-1/2 flex flex-row items-center">
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/6 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+            <div className="w-1/3 h-[40vh] mr-12 p-6 bg-gray-200 animate-pulse rounded-3xl">
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>;
   }
 
   return (
@@ -134,9 +147,7 @@ const Home = () => {
         <HomeAdmin getUserData={getUserData} UserInfo={UserInfo}/>
       )}
       {role === 'gestor' && (
-        <div>
-          <HomeGestor/>
-        </div>
+        <HomeGestor userInfo={UserInfo}/>
       )}
       {role === 'responsable' ? (
   loading ? (
