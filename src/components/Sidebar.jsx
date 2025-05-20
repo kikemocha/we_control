@@ -59,6 +59,9 @@ const Sidebar = () => {
                   <li className={location.pathname === '/auditorias' ? 'link_activate' : ''}>
                     <Link to="/auditorias">Seguimientos<br /> y Auditorías</Link>
                   </li>
+                  <li className={location.pathname === '/miscontroles' ? 'link_activate' : ''}>
+                    <Link to="/miscontroles">Mis<br />Controles</Link>
+                  </li>
                 </ul>
               )}
               {role === 'responsable' && <div></div>}

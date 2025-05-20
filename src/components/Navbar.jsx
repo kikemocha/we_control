@@ -46,11 +46,14 @@ const Navbar = () => {
 
 
     useEffect(() => {
+        
         let newCategory = 'Todas las Categorías';
-    
+        console.log('PATH: ', location.pathname)
         if (location.pathname.includes('riesgos')) {
             newCategory = 'Riesgos';
-        } else if (location.pathname.includes('controles')) {
+        } else if (location.pathname.includes('miscontroles')){
+            newCategory = 'Auditorías y Seguimientos';
+        }else if (location.pathname.includes('controles')) {
             newCategory = 'Controles';
         } else if (location.pathname.includes('gestores')) {
             newCategory = 'Gestores';

@@ -10,6 +10,7 @@ import Auditorias from "./pages/Auditorias";
 import Responsables from "./pages/Responsables";
 import Home from "./pages/Home/Home";
 import LogIn from "./pages/LogIn";
+import MisControles from "./pages/MisControles";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -75,6 +76,14 @@ const App = () => {
               element={
                 <ProtectedRoute allowedRoles={["admin", "gestor"]}>
                   <Responsables />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="miscontroles"
+              element={
+                <ProtectedRoute allowedRoles={["gestor"]}>
+                  <MisControles />
                 </ProtectedRoute>
               }
             />

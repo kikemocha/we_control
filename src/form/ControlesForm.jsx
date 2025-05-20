@@ -135,8 +135,29 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
         setResponsables([]); // Evita que sea null si hay error
     } finally {
         setLoading(false);
+    };
+  };
+
+  const fetchGestores = async () => {
+    setLoading(true)
+    try {
+      const { data } = await axios.get(
+        `https://4qznse98v1.execute-api.eu-west-1.amazonaws.com/dev/getGestoresData?id_empresa=${selectedEmpresa}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      // data comes back as { activo: […], eliminado: […] }
+      if (Array.isArray(data.activo)) {
+        setResponsables(prev => [...prev, ...data.activo])
+      } else {
+        console.warn("API no devolvió un array en data.activo:", data)
+        // no change
+      }
+    } catch (error) {
+      console.error("Error fetching gestores:", error)
+    } finally {
+      setLoading(false)
     }
-};
+  }
 
 
   const fetchRiesgos = async () => {
@@ -153,6 +174,7 @@ const ControlesForm = ({ show, onClose, fetchData, actualControles, selectedYear
   };
   useEffect(() => {
     fetchResponsables();
+    fetchGestores();
     fetchRiesgos();
   }, [selectedEmpresa]);
 

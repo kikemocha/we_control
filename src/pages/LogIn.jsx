@@ -308,8 +308,8 @@ const LogIn = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       ) :  (
-        <form onSubmit={handleSubmit} className='h-96 w-96'>
-            <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
+        <form onSubmit={handleSubmit} className='h-96 w-full flex items-center sm:w-96'>
+            <div className="relative z-0 w-3/4 sm:w-full mb-6 group bg-white rounded-full">
               {/* Input field */}
               <input
                 type="text"
@@ -332,7 +332,7 @@ const LogIn = () => {
               
             </div>
 
-            <div className="relative z-0 w-full mb-6 group bg-white rounded-full">
+            <div className="relative z-0 w-3/4 sm:w-full mb-6 group bg-white rounded-full">
               {password && (
                 showPassword ? (
                   <svg 

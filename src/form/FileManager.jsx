@@ -33,7 +33,7 @@ const FileManager = ({ show, onClose, data, fetchData, className='' }) => {
   return (
     <div className={`z-50 fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-55 flex justify-center gap-4 items-center ${className}`}>
       <div className="popup_img">
-        <button className="popup-close" onClick={handleOnClose}>
+        <button className="popup-close" style={{zIndex: 999}} onClick={handleOnClose}>
           <svg fill="none" viewBox="0 0 15 15" height="2em" width="2em">
             <path
               fill="currentColor"
@@ -45,7 +45,7 @@ const FileManager = ({ show, onClose, data, fetchData, className='' }) => {
         </button>
 
         <div className="h-full w-full rounded-3xl">
-            {userData.is_responsable ? (
+            {userData.is_responsable || userData.id == data.id_user ? (
                 <FileUpload
                     data={data}
                     onClose={handleOnClose}
