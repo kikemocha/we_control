@@ -69,6 +69,13 @@
 .delete:hover{
     background-color: rgba(255, 0, 0, 0.692) !important;
 }
+.long{
+    background-color: primary !important;
+    width: 300px !important;
+}
+.long:hover{
+    background-color: rgb(255, 196, 0);
+}
 .popup form button:hover{
     background-color: rgb(255, 196, 0);
 }
