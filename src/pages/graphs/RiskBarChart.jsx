@@ -11,11 +11,11 @@ import {
 
 const RiskBarChart = ({ counts }) => {
   const categories = [
-    { label: 'Muy Bajo', color:  '#16a34a'  },
+    { label: 'Muy Bajo',          color:  '#16a34a'  },
     { label: 'Bajo',              color:  '#3b82f6'  },
     { label: 'Medio',             color:  '#ca8a04'  },
     { label: 'Alto',              color:  '#ef4444'  },
-    { label: 'Muy alto',          color:  '#000000'   }
+    { label: 'Muy Alto',          color:  '#000000'   }
   ];
 
   const data = categories.map(cat => ({

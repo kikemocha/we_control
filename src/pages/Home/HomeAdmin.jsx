@@ -466,7 +466,6 @@ const HomeAdmin = ({getUserData, UserInfo}) => {
                       <RiskBarChart
                         key={selectedEmpresa}      // ← aquí forzas remount al cambiar de empresa
                         counts={{
-                          
                           'Muy Bajo': info.no_riesgo,
                           'Bajo':       info.poco_riesgo,
                           'Medio':   info.riesgo_medio,
