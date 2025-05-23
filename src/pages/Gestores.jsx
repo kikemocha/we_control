@@ -87,8 +87,8 @@ const Gestores = () => {
                     <div className='total_add'>
                         <div className='flex'>
                             <div className={gestoresState === 'eliminado' ? 'upper_box text-xs' : 'upper_box'}>
-                                <div className='text'>Total de&nbsp;<strong>controles</strong> {gestoresState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
-                                <div className='number'>{gestoresState === 'activo' ? data.activo.length : data.eliminado.length}</div>
+                                <div className='text'>Total de&nbsp;<strong>gestores</strong> {gestoresState === 'eliminado' && <p className='ml-2 text-red-800'>eliminados:</p>}</div>
+                                    <div className='number skeleton' style={{height : '70%', margin: 'auto', width:'50px', borderRadius:'30px'}}></div>
                             </div>
                             <div className='paperbin'>
                                 <svg
